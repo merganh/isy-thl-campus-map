@@ -1004,3 +1004,290 @@
     .mb-0-important {
         margin-bottom: 0 !important;
     }
+
+    /* ===== Quiz-Engine: Custom Multiple/Single Choice ===== */
+    .quiz-container {
+        padding: 0.25rem 0;
+    }
+
+    .quiz-question {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--color-primary);
+        margin-bottom: 1rem;
+        line-height: 1.4;
+    }
+
+    .quiz-options {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .quiz-option {
+        display: flex;
+        align-items: center;
+        gap: 0.85rem;
+        padding: 0.85rem 1rem;
+        background: #fff;
+        border: 2px solid #dee2e6;
+        border-radius: var(--border-radius-sm);
+        cursor: pointer;
+        transition: var(--transition-fast);
+        user-select: none;
+        margin: 0;
+    }
+
+    .quiz-option:hover:not(.locked) {
+        border-color: #63b4b8;
+        background: #f5fbfb;
+    }
+
+    .quiz-option input {
+        position: absolute;
+        opacity: 0;
+        pointer-events: none;
+        width: 0;
+        height: 0;
+    }
+
+    .quiz-option-marker {
+        flex-shrink: 0;
+        width: 26px;
+        height: 26px;
+        border: 2px solid #ced4da;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: transparent;
+        font-size: 0.85rem;
+        transition: var(--transition-fast);
+    }
+
+    .quiz-option-text {
+        flex: 1;
+        color: var(--color-primary);
+        font-size: 1rem;
+        line-height: 1.35;
+    }
+
+    .quiz-option.selected {
+        border-color: #63b4b8;
+        background: #e7f4f4;
+    }
+
+    .quiz-option.selected .quiz-option-marker {
+        border-color: #63b4b8;
+        background: #63b4b8;
+        color: #fff;
+    }
+
+    .quiz-option.locked {
+        cursor: default;
+    }
+
+    .quiz-option.correct {
+        border-color: #2e8b57;
+        background: #e6f4ec;
+    }
+
+    .quiz-option.correct .quiz-option-marker {
+        border-color: #2e8b57;
+        background: #2e8b57;
+        color: #fff;
+    }
+
+    .quiz-option.incorrect {
+        border-color: #c0392b;
+        background: #fbe9e7;
+    }
+
+    .quiz-option.incorrect .quiz-option-marker {
+        border-color: #c0392b;
+        background: #c0392b;
+        color: #fff;
+    }
+
+    .quiz-feedback {
+        display: none;
+        padding: 0.75rem 1rem;
+        border-radius: var(--border-radius-sm);
+        margin-bottom: 1rem;
+        font-weight: 600;
+        line-height: 1.4;
+    }
+
+    .quiz-feedback.show {
+        display: block;
+    }
+
+    .quiz-feedback.success {
+        background: #e6f4ec;
+        color: #1e5e3a;
+        border: 1px solid #b6dcc5;
+    }
+
+    .quiz-feedback.error {
+        background: #fbe9e7;
+        color: #7a2018;
+        border: 1px solid #f1c6c1;
+    }
+
+    .quiz-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    .quiz-submit-btn,
+    .quiz-reset-btn {
+        border-radius: var(--border-radius-pill);
+        padding: 0.5rem 1.5rem;
+        font-weight: 600;
+        font-size: var(--font-size-small);
+    }
+
+    .quiz-submit-btn {
+        background-color: var(--color-primary);
+        border-color: var(--color-primary);
+    }
+
+    .quiz-submit-btn:hover {
+        background-color: #3a4146;
+        border-color: #3a4146;
+    }
+
+    /* ===== Memory-Spiel ===== */
+    .memory-status {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-bottom: 0.85rem;
+    }
+
+    .memory-progress {
+        font-weight: 600;
+        color: var(--color-primary);
+        font-size: 0.95rem;
+    }
+
+    .memory-reset-btn {
+        border-radius: var(--border-radius-pill);
+        font-size: var(--font-size-small);
+        font-weight: 600;
+    }
+
+    .memory-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+
+    .memory-container.shuffling .memory-grid {
+        opacity: 0.2;
+        transform: scale(0.96);
+        pointer-events: none;
+    }
+
+    .memory-container.shuffling .memory-reset-btn i {
+        animation: memory-spin 0.45s ease;
+    }
+
+    @keyframes memory-spin {
+        from { transform: rotate(0); }
+        to { transform: rotate(360deg); }
+    }
+
+    @media (max-width: 575px) {
+        .memory-grid {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.4rem;
+        }
+    }
+
+    @media (max-width: 360px) {
+        .memory-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+
+    .memory-card {
+        aspect-ratio: 1 / 1;
+        perspective: 800px;
+        cursor: pointer;
+    }
+
+    .memory-card-inner {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        transition: transform 0.45s ease;
+        transform-style: preserve-3d;
+    }
+
+    .memory-card.flipped .memory-card-inner {
+        transform: rotateY(180deg);
+    }
+
+    .memory-card-front,
+    .memory-card-back {
+        position: absolute;
+        inset: 0;
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        border-radius: var(--border-radius-sm);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    .memory-card-front {
+        background: var(--color-primary);
+        color: #fff;
+        font-size: 1.6rem;
+        border: 2px solid var(--color-primary);
+    }
+
+    .memory-card-front i {
+        opacity: 0.85;
+    }
+
+    .memory-card:hover:not(.flipped):not(.matched) .memory-card-front {
+        background: #5d6970;
+        border-color: #5d6970;
+    }
+
+    .memory-card-back {
+        background: #fff;
+        border: 2px solid #dee2e6;
+        transform: rotateY(180deg);
+        padding: 0.35rem;
+    }
+
+    .memory-card-back img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+    }
+
+    .memory-card.matched .memory-card-back {
+        border-color: #2e8b57;
+        background: #e6f4ec;
+    }
+
+    .memory-card.matched .memory-card-inner {
+        animation: memory-match-pulse 0.55s ease;
+    }
+
+    @keyframes memory-match-pulse {
+        0% { transform: rotateY(180deg) scale(1); }
+        50% { transform: rotateY(180deg) scale(1.06); }
+        100% { transform: rotateY(180deg) scale(1); }
+    }

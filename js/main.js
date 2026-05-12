@@ -1,5 +1,55 @@
 let cachedCampusMapSvg = '';
 
+// Quiz-Inhalt rendern – Dispatcher nach Typ
+function renderQuizBody(quiz) {
+    if (quiz.content.type === 'memory') return renderMemoryBody(quiz);
+    return renderChoiceBody(quiz);
+}
+
+// Single/Multi Choice mit modernem Card-Styling
+function renderChoiceBody(quiz) {
+    const c = quiz.content;
+    const inputType = c.type === 'radio' ? 'radio' : 'checkbox';
+    const groupName = `quiz-${quiz.id}`;
+
+    const optionsHTML = c.options.map((opt, idx) => `
+        <label class="quiz-option">
+            <input type="${inputType}" name="${groupName}" value="${idx}">
+            <span class="quiz-option-marker"><i class="fas fa-check"></i></span>
+            <span class="quiz-option-text">${opt.text}</span>
+        </label>
+    `).join('');
+
+    return `
+        <div class="quiz-container" data-quiz-id="${quiz.id}" data-h5p-id="${quiz.h5pId}" data-quiz-type="${c.type}">
+            <p class="quiz-question">${c.question}</p>
+            <div class="quiz-options">${optionsHTML}</div>
+            <div class="quiz-feedback"></div>
+            <div class="quiz-actions">
+                <button type="button" class="btn btn-primary quiz-submit-btn">Prüfen</button>
+                <button type="button" class="btn btn-outline-secondary quiz-reset-btn" style="display:none;">Nochmal versuchen</button>
+            </div>
+        </div>
+    `;
+}
+
+// Memory-Spielfeld (Karten werden in initMemoryGame gemischt + befüllt)
+function renderMemoryBody(quiz) {
+    const total = quiz.content.pairs.length;
+    return `
+        <div class="quiz-container memory-container" data-quiz-id="${quiz.id}" data-h5p-id="${quiz.h5pId}" data-quiz-type="memory">
+            <div class="memory-status">
+                <span class="memory-progress">0 / ${total} Paaren</span>
+                <button type="button" class="btn btn-sm btn-outline-secondary memory-reset-btn">
+                    <i class="fas fa-redo me-1"></i>Neu mischen
+                </button>
+            </div>
+            <div class="memory-grid"></div>
+            <div class="quiz-feedback"></div>
+        </div>
+    `;
+}
+
 // Template-Funktion für Quiz-Modals
 function generateQuizModals() {
     const container = document.getElementById('quizModalsContainer');
@@ -14,10 +64,216 @@ function generateQuizModals() {
         } else {
             campusInfoContent = `<p>${quiz.campusInfo.text}</p>${quiz.campusInfo.link ? `<a href="${quiz.campusInfo.link.url}" target="_blank" class="erkundungstour-btn"><p>${quiz.campusInfo.link.text}</p></a>` : ''}`;
         }
-        container.insertAdjacentHTML('beforeend', `<div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${labelId}" aria-hidden="true"><div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down modal-lg"><div class="modal-content"><div class="modal-header"><h5 id="${labelId}" class="modal-title">${quiz.title}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body frageModalBody${quiz.bodyClass ? ' ' + quiz.bodyClass : ''}">${quiz.description ? `<p class="mt-0 mb-0">${quiz.description}</p>` : ''}<iframe data-src="/wp-admin/admin-ajax.php?action=h5p_embed&id=${quiz.h5pId}" width="100%" height="${quiz.height}" frameborder="0" scrolling="yes" allowfullscreen class="expand-animation"></iframe></div><div class="campus-info-overlay"><div class="info-icon-trigger" data-bs-toggle="collapse" data-bs-target="#campusInfosOverlay" aria-expanded="false"><i class="fas fa-info-circle campus-info-icon"></i></div><div class="collapse mt-2" id="campusInfosOverlay"><div class="card campus-info-card"><div class="card-body p-2">${campusInfoContent}</div></div></div></div></div></div></div>`);
+
+        const bodyContent = quiz.content
+            ? renderQuizBody(quiz)
+            : `<iframe data-src="/wp-admin/admin-ajax.php?action=h5p_embed&id=${quiz.h5pId}" width="100%" height="${quiz.height}" frameborder="0" scrolling="yes" allowfullscreen class="expand-animation"></iframe>`;
+
+        container.insertAdjacentHTML('beforeend', `<div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${labelId}" aria-hidden="true"><div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down modal-lg"><div class="modal-content"><div class="modal-header"><h5 id="${labelId}" class="modal-title">${quiz.title}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body frageModalBody${quiz.bodyClass ? ' ' + quiz.bodyClass : ''}">${quiz.description ? `<p class="mt-0 mb-0">${quiz.description}</p>` : ''}${bodyContent}</div><div class="campus-info-overlay"><div class="info-icon-trigger" data-bs-toggle="collapse" data-bs-target="#campusInfosOverlay" aria-expanded="false"><i class="fas fa-info-circle campus-info-icon"></i></div><div class="collapse mt-2" id="campusInfosOverlay"><div class="card campus-info-card"><div class="card-body p-2">${campusInfoContent}</div></div></div></div></div></div></div>`);
     });
 }
 generateQuizModals();
+
+// --- Quiz-Engine: Auswahl, Auswertung, Reset ---
+function updateQuizOptionStates(container) {
+    container.querySelectorAll('.quiz-option').forEach(opt => {
+        const input = opt.querySelector('input');
+        opt.classList.toggle('selected', input.checked);
+    });
+}
+
+function evaluateQuiz(container) {
+    const quizId = container.dataset.quizId;
+    const h5pId = container.dataset.h5pId;
+    const quiz = quizModals.find(q => q.id === quizId);
+    if (!quiz?.content) return;
+
+    const options = Array.from(container.querySelectorAll('.quiz-option'));
+    const allCorrect = options.every((opt, idx) => {
+        const input = opt.querySelector('input');
+        const expected = quiz.content.options[idx].correct;
+        return input.checked === expected;
+    });
+
+    options.forEach((opt, idx) => {
+        const input = opt.querySelector('input');
+        const expected = quiz.content.options[idx].correct;
+        opt.classList.add('locked');
+        if (expected) {
+            opt.classList.add('correct');
+        } else if (input.checked) {
+            opt.classList.add('incorrect');
+        }
+    });
+
+    const feedback = container.querySelector('.quiz-feedback');
+    const submitBtn = container.querySelector('.quiz-submit-btn');
+    const resetBtn = container.querySelector('.quiz-reset-btn');
+
+    if (allCorrect) {
+        const msg = quiz.content.successMessage || 'Richtig!';
+        feedback.className = 'quiz-feedback show success';
+        feedback.innerHTML = `<i class="fas fa-check-circle me-2"></i>${msg}`;
+        submitBtn.style.display = 'none';
+        resetBtn.style.display = 'none';
+        if (addCompletedQuizId(h5pId)) showBadgeNotification();
+    } else {
+        feedback.className = 'quiz-feedback show error';
+        feedback.innerHTML = '<i class="fas fa-times-circle me-2"></i>Leider falsch. Versuche es noch einmal.';
+        submitBtn.style.display = 'none';
+        resetBtn.style.display = 'inline-block';
+    }
+}
+
+function resetQuiz(container) {
+    if (container.dataset.quizType === 'memory') {
+        initMemoryGame(container);
+        return;
+    }
+    container.querySelectorAll('.quiz-option').forEach(opt => {
+        opt.classList.remove('selected', 'correct', 'incorrect', 'locked');
+        const input = opt.querySelector('input');
+        if (input) input.checked = false;
+    });
+    const feedback = container.querySelector('.quiz-feedback');
+    feedback.className = 'quiz-feedback';
+    feedback.innerHTML = '';
+    container.querySelector('.quiz-submit-btn').style.display = 'inline-block';
+    container.querySelector('.quiz-reset-btn').style.display = 'none';
+}
+
+// --- Memory-Spiel ---
+function initMemoryGame(container) {
+    const quizId = container.dataset.quizId;
+    const quiz = quizModals.find(q => q.id === quizId);
+    if (!quiz?.content?.pairs) return;
+
+    const pairs = quiz.content.pairs;
+    const deck = [];
+    pairs.forEach((pair, idx) => {
+        deck.push({ pairId: idx, image: pair.image, label: pair.label || '' });
+        deck.push({ pairId: idx, image: pair.image, label: pair.label || '' });
+    });
+    // Fisher-Yates shuffle
+    for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+
+    const grid = container.querySelector('.memory-grid');
+    const deckHTML = deck.map(card => `
+        <div class="memory-card" data-pair-id="${card.pairId}">
+            <div class="memory-card-inner">
+                <div class="memory-card-front"><i class="fas fa-question"></i></div>
+                <div class="memory-card-back"><img src="${card.image}" alt="${card.label}"></div>
+            </div>
+        </div>
+    `).join('');
+
+    const feedback = container.querySelector('.quiz-feedback');
+    feedback.className = 'quiz-feedback';
+    feedback.innerHTML = '';
+
+    container.dataset.memoryMatched = '0';
+    const isReshuffle = grid.children.length > 0;
+
+    if (isReshuffle) {
+        // Sichtbares Feedback beim Neu-Mischen: kurzes Fade + Icon-Spin
+        container.dataset.memoryBusy = '1';
+        container.classList.add('shuffling');
+        setTimeout(() => {
+            grid.innerHTML = deckHTML;
+            container.classList.remove('shuffling');
+            container.dataset.memoryBusy = '0';
+            updateMemoryProgress(container);
+        }, 280);
+    } else {
+        grid.innerHTML = deckHTML;
+        container.dataset.memoryBusy = '0';
+        updateMemoryProgress(container);
+    }
+}
+
+function updateMemoryProgress(container) {
+    const matched = parseInt(container.dataset.memoryMatched || '0', 10);
+    const total = container.querySelectorAll('.memory-card').length / 2;
+    const el = container.querySelector('.memory-progress');
+    if (el) el.textContent = `${matched} / ${total} Paaren`;
+}
+
+function handleMemoryCardClick(card) {
+    const container = card.closest('.memory-container');
+    if (!container) return;
+    if (container.dataset.memoryBusy === '1') return;
+    if (card.classList.contains('matched') || card.classList.contains('flipped')) return;
+
+    // Bei dritter Karte: vorheriges nicht-passendes Paar zurückdrehen
+    const pending = container.querySelectorAll('.memory-card.flipped:not(.matched)');
+    if (pending.length >= 2) {
+        pending.forEach(c => c.classList.remove('flipped'));
+    }
+
+    card.classList.add('flipped');
+    const flipped = container.querySelectorAll('.memory-card.flipped:not(.matched)');
+
+    if (flipped.length === 2) {
+        const [a, b] = flipped;
+        if (a.dataset.pairId === b.dataset.pairId) {
+            // Kurze Sperre, damit die Flip-Animation der zweiten Karte abschließen kann,
+            // bevor die Match-Pulse-Animation startet
+            container.dataset.memoryBusy = '1';
+            setTimeout(() => {
+                a.classList.add('matched');
+                b.classList.add('matched');
+                const matched = parseInt(container.dataset.memoryMatched || '0', 10) + 1;
+                container.dataset.memoryMatched = String(matched);
+                container.dataset.memoryBusy = '0';
+                updateMemoryProgress(container);
+                const total = container.querySelectorAll('.memory-card').length / 2;
+                if (matched === total) completeMemoryGame(container);
+            }, 350);
+        }
+        // Kein Match: Karten bleiben offen, bis Spieler die dritte Karte klickt
+    }
+}
+
+function completeMemoryGame(container) {
+    const h5pId = container.dataset.h5pId;
+    const feedback = container.querySelector('.quiz-feedback');
+    feedback.className = 'quiz-feedback show success';
+    feedback.innerHTML = '<i class="fas fa-check-circle me-2"></i>Super! Alle Paare gefunden.';
+    if (addCompletedQuizId(h5pId)) showBadgeNotification();
+}
+
+document.addEventListener('change', (e) => {
+    const input = e.target.closest('.quiz-option input');
+    if (!input) return;
+    const container = input.closest('.quiz-container');
+    if (container) updateQuizOptionStates(container);
+});
+
+document.addEventListener('click', (e) => {
+    const submitBtn = e.target.closest('.quiz-submit-btn');
+    if (submitBtn) {
+        evaluateQuiz(submitBtn.closest('.quiz-container'));
+        return;
+    }
+    const resetBtn = e.target.closest('.quiz-reset-btn, .memory-reset-btn');
+    if (resetBtn) {
+        const container = resetBtn.closest('.quiz-container');
+        if (container) resetQuiz(container);
+        return;
+    }
+    const memoryCard = e.target.closest('.memory-card');
+    if (memoryCard) {
+        handleMemoryCardClick(memoryCard);
+    }
+});
+
+document.addEventListener('shown.bs.modal', (e) => {
+    const container = e.target.querySelector('.quiz-container');
+    if (container) resetQuiz(container);
+});
 
 const filterStyleEl = document.createElement('style');
 document.head.appendChild(filterStyleEl);
@@ -232,6 +488,11 @@ styleTag.textContent = `
 #lottieMap svg ${clickableSelectorMap},
 #lottieMap svg ${clickableSelectorMap} * {
   pointer-events: all !important; cursor: pointer !important;
+}
+/* Gebäude-Beschriftungen liegen über den Flächen – Events durchreichen */
+#lottieMap svg g#Gebaeudebezeichnung,
+#lottieMap svg g#Gebaeudebezeichnung * {
+  pointer-events: none !important;
 }
   `;
 document.head.appendChild(styleTag);
