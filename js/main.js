@@ -3,7 +3,36 @@ let cachedCampusMapSvg = '';
 // Quiz-Inhalt rendern – Dispatcher nach Typ
 function renderQuizBody(quiz) {
     if (quiz.content.type === 'memory') return renderMemoryBody(quiz);
+    if (quiz.content.type === 'sort') return renderSortBody(quiz);
+    if (quiz.content.type === 'imageGrid') return renderImageGridBody(quiz);
     return renderChoiceBody(quiz);
+}
+
+// Bilder-Grid (mehrere Bilder auswählen) – nutzt dieselbe Auswertungslogik wie Checkbox
+function renderImageGridBody(quiz) {
+    const c = quiz.content;
+    const cols = c.columns || 3;
+    const groupName = `quiz-${quiz.id}`;
+
+    const optionsHTML = c.options.map((opt, idx) => `
+        <label class="quiz-option quiz-option-image" title="${opt.label || ''}">
+            <input type="checkbox" name="${groupName}" value="${idx}">
+            <span class="quiz-option-marker"><i class="fas fa-check"></i></span>
+            <img src="${opt.image}" alt="${opt.label || ''}" class="quiz-option-img">
+        </label>
+    `).join('');
+
+    return `
+        <div class="quiz-container" data-quiz-id="${quiz.id}" data-h5p-id="${quiz.h5pId}" data-quiz-type="imageGrid">
+            <p class="quiz-question">${c.question}</p>
+            <div class="quiz-image-grid" style="grid-template-columns: repeat(${cols}, 1fr);">${optionsHTML}</div>
+            <div class="quiz-feedback"></div>
+            <div class="quiz-actions">
+                <button type="button" class="btn btn-primary quiz-submit-btn">Prüfen</button>
+                <button type="button" class="btn btn-outline-secondary quiz-reset-btn" style="display:none;">Nochmal versuchen</button>
+            </div>
+        </div>
+    `;
 }
 
 // Single/Multi Choice mit modernem Card-Styling
@@ -28,6 +57,21 @@ function renderChoiceBody(quiz) {
             <div class="quiz-actions">
                 <button type="button" class="btn btn-primary quiz-submit-btn">Prüfen</button>
                 <button type="button" class="btn btn-outline-secondary quiz-reset-btn" style="display:none;">Nochmal versuchen</button>
+            </div>
+        </div>
+    `;
+}
+
+// Sortier-Quiz (Items werden in initSortQuiz gemischt + per SortableJS verschiebbar)
+function renderSortBody(quiz) {
+    return `
+        <div class="quiz-container sort-container" data-quiz-id="${quiz.id}" data-h5p-id="${quiz.h5pId}" data-quiz-type="sort">
+            <p class="quiz-question">${quiz.content.question}</p>
+            <ul class="sort-list" role="list"></ul>
+            <div class="quiz-feedback"></div>
+            <div class="quiz-actions">
+                <button type="button" class="btn btn-primary quiz-submit-btn">Prüfen</button>
+                <button type="button" class="btn btn-outline-secondary quiz-reset-btn" style="display:none;">Nochmal mischen</button>
             </div>
         </div>
     `;
@@ -69,7 +113,7 @@ function generateQuizModals() {
             ? renderQuizBody(quiz)
             : `<iframe data-src="/wp-admin/admin-ajax.php?action=h5p_embed&id=${quiz.h5pId}" width="100%" height="${quiz.height}" frameborder="0" scrolling="yes" allowfullscreen class="expand-animation"></iframe>`;
 
-        container.insertAdjacentHTML('beforeend', `<div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${labelId}" aria-hidden="true"><div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down modal-lg"><div class="modal-content"><div class="modal-header"><h5 id="${labelId}" class="modal-title">${quiz.title}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body frageModalBody${quiz.bodyClass ? ' ' + quiz.bodyClass : ''}">${quiz.description ? `<p class="mt-0 mb-0">${quiz.description}</p>` : ''}${bodyContent}</div><div class="campus-info-overlay"><div class="info-icon-trigger" data-bs-toggle="collapse" data-bs-target="#campusInfosOverlay" aria-expanded="false"><i class="fas fa-info-circle campus-info-icon"></i></div><div class="collapse mt-2" id="campusInfosOverlay"><div class="card campus-info-card"><div class="card-body p-2">${campusInfoContent}</div></div></div></div></div></div></div>`);
+        container.insertAdjacentHTML('beforeend', `<div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${labelId}" aria-hidden="true"><div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down modal-lg"><div class="modal-content"><div class="modal-header"><h5 id="${labelId}" class="modal-title">${quiz.title}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body frageModalBody${quiz.bodyClass ? ' ' + quiz.bodyClass : ''}">${quiz.description ? `<p class="quiz-question">${quiz.description}</p>` : ''}${bodyContent}</div><div class="campus-info-overlay"><div class="info-icon-trigger" data-bs-toggle="collapse" data-bs-target="#campusInfosOverlay" aria-expanded="false"><i class="fas fa-info-circle campus-info-icon"></i></div><div class="collapse mt-2" id="campusInfosOverlay"><div class="card campus-info-card"><div class="card-body p-2">${campusInfoContent}</div></div></div></div></div></div></div>`);
     });
 }
 generateQuizModals();
@@ -83,6 +127,10 @@ function updateQuizOptionStates(container) {
 }
 
 function evaluateQuiz(container) {
+    if (container.dataset.quizType === 'sort') {
+        evaluateSortQuiz(container);
+        return;
+    }
     const quizId = container.dataset.quizId;
     const h5pId = container.dataset.h5pId;
     const quiz = quizModals.find(q => q.id === quizId);
@@ -130,6 +178,10 @@ function resetQuiz(container) {
         initMemoryGame(container);
         return;
     }
+    if (container.dataset.quizType === 'sort') {
+        initSortQuiz(container);
+        return;
+    }
     container.querySelectorAll('.quiz-option').forEach(opt => {
         opt.classList.remove('selected', 'correct', 'incorrect', 'locked');
         const input = opt.querySelector('input');
@@ -140,6 +192,139 @@ function resetQuiz(container) {
     feedback.innerHTML = '';
     container.querySelector('.quiz-submit-btn').style.display = 'inline-block';
     container.querySelector('.quiz-reset-btn').style.display = 'none';
+}
+
+// --- Sortier-Quiz (Drag & Drop) ---
+function initSortQuiz(container) {
+    const quizId = container.dataset.quizId;
+    const quiz = quizModals.find(q => q.id === quizId);
+    if (!quiz?.content?.items) return;
+
+    const correctItems = quiz.content.items;
+    // Reihenfolge mischen — sicherstellen, dass NICHT die Ausgangsreihenfolge rauskommt
+    let shuffledIdx;
+    do {
+        shuffledIdx = correctItems.map((_, i) => i);
+        for (let i = shuffledIdx.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffledIdx[i], shuffledIdx[j]] = [shuffledIdx[j], shuffledIdx[i]];
+        }
+    } while (correctItems.length > 1 && shuffledIdx.every((v, i) => v === i));
+
+    const list = container.querySelector('.sort-list');
+    list.innerHTML = shuffledIdx.map(originalIdx => `
+        <li class="sort-item" data-correct-idx="${originalIdx}">
+            <span class="sort-handle" aria-hidden="true"><i class="fas fa-grip-vertical"></i></span>
+            <span class="sort-text">${correctItems[originalIdx]}</span>
+            <span class="sort-arrows">
+                <button type="button" class="sort-arrow-btn" data-direction="up" aria-label="Schritt nach oben">
+                    <i class="fas fa-chevron-up"></i>
+                </button>
+                <button type="button" class="sort-arrow-btn" data-direction="down" aria-label="Schritt nach unten">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </span>
+        </li>
+    `).join('');
+
+    // Vorhandene Sortable-Instanz zerstören (bei Neu-Mischen)
+    if (container._sortable) {
+        try { container._sortable.destroy(); } catch (e) {}
+        container._sortable = null;
+    }
+
+    if (typeof Sortable !== 'undefined') {
+        container._sortable = Sortable.create(list, {
+            animation: 180,
+            handle: '.sort-item',
+            filter: '.sort-arrow-btn',
+            preventOnFilter: true,
+            ghostClass: 'sort-ghost',
+            chosenClass: 'sort-chosen',
+            dragClass: 'sort-drag',
+            forceFallback: true,
+            fallbackTolerance: 4,
+            touchStartThreshold: 4,
+            onSort: () => updateSortArrowStates(container)
+        });
+    }
+
+    container.querySelectorAll('.sort-item').forEach(li => {
+        li.classList.remove('correct', 'incorrect', 'locked');
+    });
+    updateSortArrowStates(container);
+    const feedback = container.querySelector('.quiz-feedback');
+    feedback.className = 'quiz-feedback';
+    feedback.innerHTML = '';
+    container.querySelector('.quiz-submit-btn').style.display = 'inline-block';
+    container.querySelector('.quiz-reset-btn').style.display = 'none';
+}
+
+function updateSortArrowStates(container) {
+    const items = Array.from(container.querySelectorAll('.sort-item'));
+    items.forEach((li, idx) => {
+        const upBtn = li.querySelector('.sort-arrow-btn[data-direction="up"]');
+        const downBtn = li.querySelector('.sort-arrow-btn[data-direction="down"]');
+        if (upBtn) upBtn.disabled = idx === 0;
+        if (downBtn) downBtn.disabled = idx === items.length - 1;
+    });
+}
+
+function moveSortItem(item, direction) {
+    const list = item.parentNode;
+    if (!list) return;
+    if (direction === 'up') {
+        const prev = item.previousElementSibling;
+        if (prev) list.insertBefore(item, prev);
+    } else if (direction === 'down') {
+        const next = item.nextElementSibling;
+        if (next) list.insertBefore(next, item);
+    }
+    item.classList.remove('sort-bump');
+    // Reflow erzwingen, damit die Animation neu startet
+    void item.offsetWidth;
+    item.classList.add('sort-bump');
+    const container = item.closest('.sort-container');
+    if (container) updateSortArrowStates(container);
+}
+
+function evaluateSortQuiz(container) {
+    const h5pId = container.dataset.h5pId;
+    const items = Array.from(container.querySelectorAll('.sort-item'));
+    let allCorrect = true;
+
+    items.forEach((li, currentIdx) => {
+        const expectedIdx = parseInt(li.dataset.correctIdx, 10);
+        li.classList.add('locked');
+        if (expectedIdx === currentIdx) {
+            li.classList.add('correct');
+        } else {
+            li.classList.add('incorrect');
+            allCorrect = false;
+        }
+    });
+
+    // Sortable während Auswertung deaktivieren
+    if (container._sortable) {
+        container._sortable.option('disabled', true);
+    }
+
+    const feedback = container.querySelector('.quiz-feedback');
+    const submitBtn = container.querySelector('.quiz-submit-btn');
+    const resetBtn = container.querySelector('.quiz-reset-btn');
+
+    if (allCorrect) {
+        feedback.className = 'quiz-feedback show success';
+        feedback.innerHTML = '<i class="fas fa-check-circle me-2"></i>Richtige Reihenfolge!';
+        submitBtn.style.display = 'none';
+        resetBtn.style.display = 'none';
+        if (addCompletedQuizId(h5pId)) showBadgeNotification();
+    } else {
+        feedback.className = 'quiz-feedback show error';
+        feedback.innerHTML = '<i class="fas fa-times-circle me-2"></i>Noch nicht ganz. Schau dir die rot markierten Schritte an und versuche es noch einmal.';
+        submitBtn.style.display = 'none';
+        resetBtn.style.display = 'inline-block';
+    }
 }
 
 // --- Memory-Spiel ---
@@ -262,6 +447,18 @@ document.addEventListener('click', (e) => {
     if (resetBtn) {
         const container = resetBtn.closest('.quiz-container');
         if (container) resetQuiz(container);
+        return;
+    }
+    const sortArrow = e.target.closest('.sort-arrow-btn');
+    if (sortArrow) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (sortArrow.disabled) return;
+        const item = sortArrow.closest('.sort-item');
+        const container = sortArrow.closest('.sort-container');
+        if (item && container && !item.classList.contains('locked')) {
+            moveSortItem(item, sortArrow.dataset.direction);
+        }
         return;
     }
     const memoryCard = e.target.closest('.memory-card');

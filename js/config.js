@@ -46,9 +46,44 @@ const quizModals = [
         },
         campusInfo: { text: 'Das Logo ist kein konkretes Symbol, sondern ein abstraktes Erkennungszeichen der Technischen Hochschule Lübeck.', link: { url: 'https://www.th-luebeck.de/', text: 'Zur Website der TH Lübeck' } }
     },
-    { id: 'Frage4', title: 'Quiz 4', h5pId: 19, height: 680, campusInfo: { text: 'Du hast Interesse an einem Studium an der Technischen Hochschule Lübeck? Dann läuft deine Bewerbung ganz einfach online über unser Bewerbungsportal. Alle Schritte findest du hier:', link: { url: 'https://www.th-luebeck.de/studium/bewerbung/schritt-fuer-schritt-erklaert/', text: 'Schritt-für-Schritt-Anleitung der TH Lübeck' } } },
+    {
+        id: 'Frage4', title: 'Quiz 4', h5pId: 19, height: 680,
+        content: {
+            type: 'sort',
+            question: 'Bringe die Schritte einer Studienbewerbung an der THL in die richtige Reihenfolge:',
+            // Reihenfolge unten = korrekte Reihenfolge (wird beim Rendern gemischt)
+            items: [
+                'Ich registriere mich beim THL Bewerbungsportal',
+                'Ich gebe meine persönlichen Daten ein',
+                'Ich gebe an, für welchen Studiengang ich mich bewerben möchte',
+                'Ich reiche meine Hochschulzugangsberechtigung im Online-Portal ein',
+                'Ich gebe meine Bewerbung im Online-Portal ab'
+            ]
+        },
+        campusInfo: { text: 'Du hast Interesse an einem Studium an der Technischen Hochschule Lübeck? Dann läuft deine Bewerbung ganz einfach online über unser Bewerbungsportal. Alle Schritte findest du hier:', link: { url: 'https://www.th-luebeck.de/studium/bewerbung/schritt-fuer-schritt-erklaert/', text: 'Schritt-für-Schritt-Anleitung der TH Lübeck' } }
+    },
     { id: 'Frage5', title: 'Quiz 5', h5pId: 37, height: 1000, campusInfo: { hasAccordion: true, accordionItems: [{ id: 'wohnheim', title: 'Wohnheim', text: 'Infos zum Studentenwohnheim in Lübeck findest du beim', link: { url: 'https://studentenwerk.sh/de/wohnheime-luebeck', text: 'Studentenwerk Schleswig-Holstein' } }, { id: 'asta', title: 'AStA', text: 'Der Allgemeine Studierendenausschuss vertritt deine Interessen und organisiert viele Events. Mehr Infos:', link: { url: 'https://www.th-luebeck.de/gremien-thl/gremien/asta', text: 'AStA TH Lübeck' } }, { id: 'klokurier', title: 'Klokurier', text: 'Die Studierendenzeitung der TH Lübeck:', link: { url: 'https://www.th-luebeck.de/gremien-thl/gremien/hochschulgruppen/klokurier/', text: 'Klokurier Website' } }, { id: 'coal', title: 'COAL Festival', text: 'Das Campus Open Air Lübeck - das größte Festival der Lübecker Hochschulen:', link: { url: 'https://coaluebeck.de', text: 'COAL Festival' } }, { id: 'erasmus', title: 'Erasmus', text: 'Austauschstudium mit Erasmus+: Infos beim', link: { url: 'https://www.th-luebeck.de/en/studies/study-offer/international-students/', text: 'International Office TH Lübeck' } }, { id: 'chor', title: 'TH Chor', text: 'Der Hochschulchor Lübeck bietet musikalische Gemeinschaft und Auftritte. Infos:', link: { url: 'https://www.th-luebeck.de/gremien-thl/gremien/hochschulgruppen/th-chor/', text: 'Hochschulchor' } }, { id: 'stressbar', title: 'Stressbar', text: 'Die legendäre Studierendenbar „Stress" am Campus Lübeck. Mehr Infos:', link: { url: 'https://www.th-luebeck.de/gremien-thl/studentisches-leben/nachtleben/studentisch-gefuehrte-kneipen/stress/', text: 'Stress Bar' } }, { id: 'gaming', title: 'Hochschulgaming Lübeck', text: 'Die Gaming-Community an der TH Lübeck organisiert Turniere und Treffen. Mehr Infos:', link: { url: 'https://www.th-luebeck.de/gremien-thl/gremien/hochschulgruppen/hsgl-hochschulgamingluebeck/', text: 'Hochschulgaming Lübeck' } }, { id: 'bafoeg', title: 'BAföG', text: 'Infos zur Studienfinanzierung durch BAföG bei der', link: { url: 'https://www.th-luebeck.de/studium/studienstart/foerderung-und-stipendien/uebersicht/bafoeg/', text: 'TH Lübeck' } }, { id: 'stipendien', title: 'Stipendien', text: 'Verschiedene Stipendien wie Deutschlandstipendium oder fachspezifische Förderungen:', link: { url: 'https://www.th-luebeck.de/studium/studienstart/foerderung-und-stipendien/deutschlandstipendium/', text: 'Infos zu Stipendien' } }] } },
-    { id: 'Frage6', title: 'Quiz 6', h5pId: 31, height: 800, campusInfo: { text: 'Die Technische Hochschule Lübeck bietet eine große Auswahl an Studiengängen in Technik, Naturwissenschaften, Bauwesen und Wirtschaft. Es gibt Bachelor- und Masterabschlüsse, viele davon auch in Online- oder dualen Formaten.', link: { url: 'https://www.th-luebeck.de/studium/studienangebot/studiengaenge', text: 'Alle Studiengänge im Überblick – TH Lübeck' } } },
+    {
+        id: 'Frage6', title: 'Quiz 6', h5pId: 31, height: 800,
+        content: {
+            type: 'imageGrid',
+            question: 'Welche zwei Studiengänge werden NICHT an der TH Lübeck angeboten?',
+            columns: 3,
+            // correct: true = Studiengang wird NICHT angeboten (richtige Antwort, anklicken)
+            options: [
+                { image: 'assets/01_bauingenieurwesen.png', label: 'Bauingenieurwesen', correct: false },
+                { image: 'assets/02_game_design.png', label: 'Game Design', correct: true },
+                { image: 'assets/03_hoerakustik.png', label: 'Hörakustik', correct: false },
+                { image: 'assets/04_informatik.png', label: 'Informatik', correct: false },
+                { image: 'assets/05_biomedizintechnik.png', label: 'Biomedizintechnik', correct: false },
+                { image: 'assets/06_it-sicherheit.png', label: 'IT-Sicherheit', correct: false },
+                { image: 'assets/07_maschinenbau.png', label: 'Maschinenbau', correct: false },
+                { image: 'assets/08_international_management.png', label: 'International Management', correct: true },
+                { image: 'assets/09_architektur.png', label: 'Architektur', correct: false }
+            ]
+        },
+        campusInfo: { text: 'Die Technische Hochschule Lübeck bietet eine große Auswahl an Studiengängen in Technik, Naturwissenschaften, Bauwesen und Wirtschaft. Es gibt Bachelor- und Masterabschlüsse, viele davon auch in Online- oder dualen Formaten.', link: { url: 'https://www.th-luebeck.de/studium/studienangebot/studiengaenge', text: 'Alle Studiengänge im Überblick – TH Lübeck' } }
+    },
     {
         id: 'Frage7', title: 'Quiz 7', h5pId: 27, height: 400, bodyClass: 'mt-3',
         content: {
