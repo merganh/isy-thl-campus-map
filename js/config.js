@@ -62,7 +62,27 @@ const quizModals = [
         },
         campusInfo: { text: 'Du hast Interesse an einem Studium an der Technischen Hochschule Lübeck? Dann läuft deine Bewerbung ganz einfach online über unser Bewerbungsportal. Alle Schritte findest du hier:', link: { url: 'https://www.th-luebeck.de/studium/bewerbung/schritt-fuer-schritt-erklaert/', text: 'Schritt-für-Schritt-Anleitung der TH Lübeck' } }
     },
-    { id: 'Frage5', title: 'Quiz 5', h5pId: 37, height: 1000, campusInfo: { hasAccordion: true, accordionItems: [{ id: 'wohnheim', title: 'Wohnheim', text: 'Infos zum Studentenwohnheim in Lübeck findest du beim', link: { url: 'https://studentenwerk.sh/de/wohnheime-luebeck', text: 'Studentenwerk Schleswig-Holstein' } }, { id: 'asta', title: 'AStA', text: 'Der Allgemeine Studierendenausschuss vertritt deine Interessen und organisiert viele Events. Mehr Infos:', link: { url: 'https://www.th-luebeck.de/gremien-thl/gremien/asta', text: 'AStA TH Lübeck' } }, { id: 'klokurier', title: 'Klokurier', text: 'Die Studierendenzeitung der TH Lübeck:', link: { url: 'https://www.th-luebeck.de/gremien-thl/gremien/hochschulgruppen/klokurier/', text: 'Klokurier Website' } }, { id: 'coal', title: 'COAL Festival', text: 'Das Campus Open Air Lübeck - das größte Festival der Lübecker Hochschulen:', link: { url: 'https://coaluebeck.de', text: 'COAL Festival' } }, { id: 'erasmus', title: 'Erasmus', text: 'Austauschstudium mit Erasmus+: Infos beim', link: { url: 'https://www.th-luebeck.de/en/studies/study-offer/international-students/', text: 'International Office TH Lübeck' } }, { id: 'chor', title: 'TH Chor', text: 'Der Hochschulchor Lübeck bietet musikalische Gemeinschaft und Auftritte. Infos:', link: { url: 'https://www.th-luebeck.de/gremien-thl/gremien/hochschulgruppen/th-chor/', text: 'Hochschulchor' } }, { id: 'stressbar', title: 'Stressbar', text: 'Die legendäre Studierendenbar „Stress" am Campus Lübeck. Mehr Infos:', link: { url: 'https://www.th-luebeck.de/gremien-thl/studentisches-leben/nachtleben/studentisch-gefuehrte-kneipen/stress/', text: 'Stress Bar' } }, { id: 'gaming', title: 'Hochschulgaming Lübeck', text: 'Die Gaming-Community an der TH Lübeck organisiert Turniere und Treffen. Mehr Infos:', link: { url: 'https://www.th-luebeck.de/gremien-thl/gremien/hochschulgruppen/hsgl-hochschulgamingluebeck/', text: 'Hochschulgaming Lübeck' } }, { id: 'bafoeg', title: 'BAföG', text: 'Infos zur Studienfinanzierung durch BAföG bei der', link: { url: 'https://www.th-luebeck.de/studium/studienstart/foerderung-und-stipendien/uebersicht/bafoeg/', text: 'TH Lübeck' } }, { id: 'stipendien', title: 'Stipendien', text: 'Verschiedene Stipendien wie Deutschlandstipendium oder fachspezifische Förderungen:', link: { url: 'https://www.th-luebeck.de/studium/studienstart/foerderung-und-stipendien/deutschlandstipendium/', text: 'Infos zu Stipendien' } }] } },
+    {
+        id: 'Frage5', title: 'Quiz 5', h5pId: 37, height: 1000,
+        content: {
+            type: 'wordsearch',
+            question: 'Finde alle Begriffe rund um das Studentenleben an der TH Lübeck:',
+            width: 14, height: 14,
+            // display = was in der Liste angezeigt wird; search = was tatsächlich im Raster steht
+            words: [
+                { display: 'Wohnheim', search: 'WOHNHEIM' },
+                { display: 'AStA', search: 'ASTA' },
+                { display: 'Klokurier', search: 'KLOKURIER' },
+                { display: 'COAL Festival', search: 'COAL' },
+                { display: 'Erasmus', search: 'ERASMUS' },
+                { display: 'TH Chor', search: 'CHOR' },
+                { display: 'Stressbar', search: 'STRESSBAR' },
+                { display: 'Hochschulgaming', search: 'GAMING' },
+                { display: 'BAföG', search: 'BAFOEG' },
+                { display: 'Stipendien', search: 'STIPENDIEN' }
+            ]
+        },
+        campusInfo: { hasAccordion: true, accordionItems: [{ id: 'wohnheim', title: 'Wohnheim', text: 'Infos zum Studentenwohnheim in Lübeck findest du beim', link: { url: 'https://studentenwerk.sh/de/wohnheime-luebeck', text: 'Studentenwerk Schleswig-Holstein' } }, { id: 'asta', title: 'AStA', text: 'Der Allgemeine Studierendenausschuss vertritt deine Interessen und organisiert viele Events. Mehr Infos:', link: { url: 'https://www.th-luebeck.de/gremien-thl/gremien/asta', text: 'AStA TH Lübeck' } }, { id: 'klokurier', title: 'Klokurier', text: 'Die Studierendenzeitung der TH Lübeck:', link: { url: 'https://www.th-luebeck.de/gremien-thl/gremien/hochschulgruppen/klokurier/', text: 'Klokurier Website' } }, { id: 'coal', title: 'COAL Festival', text: 'Das Campus Open Air Lübeck - das größte Festival der Lübecker Hochschulen:', link: { url: 'https://coaluebeck.de', text: 'COAL Festival' } }, { id: 'erasmus', title: 'Erasmus', text: 'Austauschstudium mit Erasmus+: Infos beim', link: { url: 'https://www.th-luebeck.de/en/studies/study-offer/international-students/', text: 'International Office TH Lübeck' } }, { id: 'chor', title: 'TH Chor', text: 'Der Hochschulchor Lübeck bietet musikalische Gemeinschaft und Auftritte. Infos:', link: { url: 'https://www.th-luebeck.de/gremien-thl/gremien/hochschulgruppen/th-chor/', text: 'Hochschulchor' } }, { id: 'stressbar', title: 'Stressbar', text: 'Die legendäre Studierendenbar „Stress" am Campus Lübeck. Mehr Infos:', link: { url: 'https://www.th-luebeck.de/gremien-thl/studentisches-leben/nachtleben/studentisch-gefuehrte-kneipen/stress/', text: 'Stress Bar' } }, { id: 'gaming', title: 'Hochschulgaming Lübeck', text: 'Die Gaming-Community an der TH Lübeck organisiert Turniere und Treffen. Mehr Infos:', link: { url: 'https://www.th-luebeck.de/gremien-thl/gremien/hochschulgruppen/hsgl-hochschulgamingluebeck/', text: 'Hochschulgaming Lübeck' } }, { id: 'bafoeg', title: 'BAföG', text: 'Infos zur Studienfinanzierung durch BAföG bei der', link: { url: 'https://www.th-luebeck.de/studium/studienstart/foerderung-und-stipendien/uebersicht/bafoeg/', text: 'TH Lübeck' } }, { id: 'stipendien', title: 'Stipendien', text: 'Verschiedene Stipendien wie Deutschlandstipendium oder fachspezifische Förderungen:', link: { url: 'https://www.th-luebeck.de/studium/studienstart/foerderung-und-stipendien/deutschlandstipendium/', text: 'Infos zu Stipendien' } }] } },
     {
         id: 'Frage6', title: 'Quiz 6', h5pId: 31, height: 800,
         content: {
@@ -98,7 +118,25 @@ const quizModals = [
         },
         campusInfo: { hasMultipleLinks: true, items: [{ text: 'Sich für ein Studium zu entscheiden, kann eine große Herausforderung darstellen. Deshalb wollen wir Dich auf diesem Weg bestmöglich unterstützen. Infos zur persönlichen Beratung findest Du hier:', link: { url: 'https://www.th-luebeck.de/studium/studienorientierung/persoenliche-beratung/', text: 'Persönliche Beratung | Technische Hochschule Lübeck' } }, { text: 'sowie Angebote für Schüler:innen und Studieninteressierte hier:', link: { url: 'https://www.th-luebeck.de/studium/studienorientierung/studienorientierung-fuer-schueler-innen-und-studieninteressierten/', text: 'Orientierungsangebote für Schüler*innen und Studieninteressierte' }, className: 'mt-3' }] }
     },
-    { id: 'Frage8', title: 'Quiz 8', h5pId: 30, height: 760, bodyClass: 'mt-3', campusInfo: { text: 'An der TH wird Praxis groß geschrieben. Hier eignest du dir nicht nur Wissen an, sondern kannst es in verschiedenen Praktika auch direkt anwenden.' } },
+    {
+        id: 'Frage8', title: 'Quiz 8', h5pId: 30, height: 760, bodyClass: 'mt-3',
+        content: {
+            type: 'hotspot',
+            question: 'Was fehlt für einen sicheren Laborversuch? Klicke alle Sicherheitsmängel an.',
+            image: 'assets/labor.png',
+            // x,y in %, radius in % der Bildbreite
+            // debug: true zeigt Zonen + loggt Klick-Koordinaten in der Konsole (nur zum Justieren)
+            debug: false,
+            hotspots: [
+                { x: 30.4, y: 56.9, radius: 7, label: 'Essen im Labor' },
+                { x: 46.5, y: 95.2, radius: 7, label: 'Verschüttete Probe' },
+                { x: 47.5, y: 33.8, radius: 6, label: 'Keine Schutzbrille' },
+                { x: 67.6, y: 30.2, radius: 6, label: 'Keine Schutzbrille (2. Person)' },
+                { x: 86.6, y: 64.0, radius: 11, label: 'Kein Laborkittel' }
+            ]
+        },
+        campusInfo: { text: 'An der TH wird Praxis groß geschrieben. Hier eignest du dir nicht nur Wissen an, sondern kannst es in verschiedenen Praktika auch direkt anwenden.' }
+    },
     {
         id: 'Frage9', title: 'Quiz 9', h5pId: 9, height: 270,
         content: {
@@ -113,7 +151,26 @@ const quizModals = [
         },
         campusInfo: { text: 'Die ZHB ist ein toller Ort zum Lernen oder Recherchieren. Hier gibt es nicht nur viele Bücher, sondern auch mehrere Einzel- und Gruppenarbeitstische sowie buchbare Räume. Wenn du die Bibliothek einmal nicht besuchen möchtest, kannst du über die Fernleihe zahlreiche Bücher bequem von Zuhause aus online aufrufen.', link: { url: 'https://www.zhb.uni-luebeck.de/', text: 'Mehr Informationen zur ZHB' } }
     },
-    { id: 'Frage10', title: 'Quiz 10', h5pId: 13, height: 700, campusInfo: { text: 'Wenn dich das Rätsel neugierig gemacht hat, findest du auf der Website der Technischen Hochschule Lübeck weitere Tipps und Angebote für Studieninteressierte.', link: { url: 'https://www.th-luebeck.de/studium/studienorientierung/studienorientierung-fuer-schueler-innen-und-studieninteressierten/', text: 'Zur Studienorientierung an der TH Lübeck' } } }
+    {
+        id: 'Frage10', title: 'Quiz 10', h5pId: 13, height: 700,
+        content: {
+            type: 'crossword',
+            question: 'Welche Studienbegriffe sind gesucht?',
+            words: [
+                { answer: 'MENSA', clue: 'Kantine für Studierende' },
+                { answer: 'PROFESSOR', clue: 'Hochschullehrende:r' },
+                { answer: 'VORLESUNG', clue: 'Lehrveranstaltung' },
+                { answer: 'HÖRSAAL', clue: 'Raum für Vorlesungen' },
+                { answer: 'KLAUSUR', clue: 'Prüfung am Ende des Semesters' },
+                { answer: 'BACHELOR', clue: 'Erster akademischer Grad' },
+                { answer: 'CAMPUS', clue: 'Universitätsgelände' },
+                { answer: 'BAFÖG', clue: 'Staatliche Studienförderung' },
+                { answer: 'SEMESTER', clue: 'Halbjahr im Studium' },
+                { answer: 'AUDIMAX', clue: 'Größter Hörsaal einer Hochschule' }
+            ]
+        },
+        campusInfo: { text: 'Wenn dich das Rätsel neugierig gemacht hat, findest du auf der Website der Technischen Hochschule Lübeck weitere Tipps und Angebote für Studieninteressierte.', link: { url: 'https://www.th-luebeck.de/studium/studienorientierung/studienorientierung-fuer-schueler-innen-und-studieninteressierten/', text: 'Zur Studienorientierung an der TH Lübeck' } }
+    }
 ];
 
 /**

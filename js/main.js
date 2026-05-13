@@ -5,7 +5,76 @@ function renderQuizBody(quiz) {
     if (quiz.content.type === 'memory') return renderMemoryBody(quiz);
     if (quiz.content.type === 'sort') return renderSortBody(quiz);
     if (quiz.content.type === 'imageGrid') return renderImageGridBody(quiz);
+    if (quiz.content.type === 'wordsearch') return renderWordSearchBody(quiz);
+    if (quiz.content.type === 'hotspot') return renderHotspotBody(quiz);
+    if (quiz.content.type === 'crossword') return renderCrosswordBody(quiz);
     return renderChoiceBody(quiz);
+}
+
+// Kreuzworträtsel – Container; Grid + Hinweise werden in initCrossword befüllt
+function renderCrosswordBody(quiz) {
+    return `
+        <div class="quiz-container crossword-container" data-quiz-id="${quiz.id}" data-h5p-id="${quiz.h5pId}" data-quiz-type="crossword">
+            <p class="quiz-question">${quiz.content.question}</p>
+            <div class="crossword-grid-wrapper">
+                <div class="crossword-grid"></div>
+            </div>
+            <div class="crossword-clues">
+                <div class="crossword-clues-section">
+                    <h6 class="crossword-clues-title">Waagerecht</h6>
+                    <ol class="crossword-clue-list crossword-clues-across"></ol>
+                </div>
+                <div class="crossword-clues-section">
+                    <h6 class="crossword-clues-title">Senkrecht</h6>
+                    <ol class="crossword-clue-list crossword-clues-down"></ol>
+                </div>
+            </div>
+            <div class="quiz-feedback"></div>
+            <div class="quiz-actions">
+                <button type="button" class="btn btn-primary quiz-submit-btn">Prüfen</button>
+                <button type="button" class="btn btn-outline-secondary quiz-reset-btn" style="display:none;">Nochmal versuchen</button>
+            </div>
+        </div>
+    `;
+}
+
+// Image Hotspot – User klickt auf Stellen im Bild
+function renderHotspotBody(quiz) {
+    const c = quiz.content;
+    return `
+        <div class="quiz-container hotspot-container" data-quiz-id="${quiz.id}" data-h5p-id="${quiz.h5pId}" data-quiz-type="hotspot">
+            <p class="quiz-question">${c.question}</p>
+            <div class="hotspot-progress">0 / ${c.hotspots.length} gefunden</div>
+            <div class="hotspot-image-wrapper">
+                <img src="${c.image}" alt="" class="hotspot-image" draggable="false">
+                <div class="hotspot-overlay"></div>
+            </div>
+            <div class="quiz-feedback"></div>
+            <div class="quiz-actions">
+                <button type="button" class="btn btn-sm btn-outline-secondary quiz-reset-btn">
+                    <i class="fas fa-redo me-1"></i>Neu starten
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+// Wortsuche – Container; Grid wird in initWordSearch befüllt
+function renderWordSearchBody(quiz) {
+    return `
+        <div class="quiz-container wordsearch-container" data-quiz-id="${quiz.id}" data-h5p-id="${quiz.h5pId}" data-quiz-type="wordsearch">
+            <p class="quiz-question">${quiz.content.question}</p>
+            <div class="wordsearch-grid" role="grid"></div>
+            <div class="wordsearch-progress"></div>
+            <div class="wordsearch-words"></div>
+            <div class="quiz-feedback"></div>
+            <div class="quiz-actions">
+                <button type="button" class="btn btn-sm btn-outline-secondary quiz-reset-btn">
+                    <i class="fas fa-redo me-1"></i>Neu starten
+                </button>
+            </div>
+        </div>
+    `;
 }
 
 // Bilder-Grid (mehrere Bilder auswählen) – nutzt dieselbe Auswertungslogik wie Checkbox
@@ -71,7 +140,7 @@ function renderSortBody(quiz) {
             <div class="quiz-feedback"></div>
             <div class="quiz-actions">
                 <button type="button" class="btn btn-primary quiz-submit-btn">Prüfen</button>
-                <button type="button" class="btn btn-outline-secondary quiz-reset-btn" style="display:none;">Nochmal mischen</button>
+                <button type="button" class="btn btn-outline-secondary quiz-reset-btn" style="display:none;">Nochmal versuchen</button>
             </div>
         </div>
     `;
@@ -131,6 +200,10 @@ function evaluateQuiz(container) {
         evaluateSortQuiz(container);
         return;
     }
+    if (container.dataset.quizType === 'crossword') {
+        evaluateCrossword(container);
+        return;
+    }
     const quizId = container.dataset.quizId;
     const h5pId = container.dataset.h5pId;
     const quiz = quizModals.find(q => q.id === quizId);
@@ -180,6 +253,18 @@ function resetQuiz(container) {
     }
     if (container.dataset.quizType === 'sort') {
         initSortQuiz(container);
+        return;
+    }
+    if (container.dataset.quizType === 'wordsearch') {
+        initWordSearch(container);
+        return;
+    }
+    if (container.dataset.quizType === 'hotspot') {
+        initHotspotQuiz(container);
+        return;
+    }
+    if (container.dataset.quizType === 'crossword') {
+        initCrossword(container);
         return;
     }
     container.querySelectorAll('.quiz-option').forEach(opt => {
@@ -327,6 +412,637 @@ function evaluateSortQuiz(container) {
     }
 }
 
+// --- Kreuzworträtsel (crossword-layout-generator + eigenes UI) ---
+function initCrossword(container) {
+    const quiz = quizModals.find(q => q.id === container.dataset.quizId);
+    if (!quiz?.content?.words || typeof generateLayout === 'undefined') {
+        const fb = container.querySelector('.quiz-feedback');
+        if (fb && typeof generateLayout === 'undefined') {
+            fb.className = 'quiz-feedback show error';
+            fb.innerHTML = '<i class="fas fa-times-circle me-2"></i>Kreuzworträtsel-Bibliothek konnte nicht geladen werden.';
+        }
+        return;
+    }
+
+    const wordsJson = quiz.content.words.map(w => ({
+        clue: w.clue,
+        answer: w.answer.toUpperCase()
+    }));
+
+    const layout = generateLayout(wordsJson);
+    container._crosswordLayout = layout;
+
+    renderCrosswordGrid(container, layout);
+    renderCrosswordClues(container, layout);
+    setupCrosswordInput(container);
+
+    const feedback = container.querySelector('.quiz-feedback');
+    feedback.className = 'quiz-feedback';
+    feedback.innerHTML = '';
+    container.querySelector('.quiz-submit-btn').style.display = 'inline-block';
+    container.querySelector('.quiz-reset-btn').style.display = 'none';
+}
+
+function renderCrosswordGrid(container, layout) {
+    const grid = container.querySelector('.crossword-grid');
+    grid.style.gridTemplateColumns = `repeat(${layout.cols}, var(--cw-cell-size, 38px))`;
+
+    // Zellgröße dynamisch an Modal-Breite anpassen (verhindert Horizontal-Scroll auf Desktop)
+    const fitCellSize = () => {
+        const wrapper = grid.closest('.crossword-grid-wrapper');
+        if (!wrapper || !wrapper.clientWidth) return;
+        const isMobile = window.innerWidth < 576;
+        const idealMax = isMobile ? 36 : 42;
+        const minSize = 22;
+        const gap = isMobile ? 3 : 2;
+        // verfügbare Breite minus wrapper-padding (8) und grid-padding (4) und Puffer (4)
+        const available = wrapper.clientWidth - 16;
+        const fitting = Math.floor((available - (layout.cols - 1) * gap) / layout.cols);
+        const size = Math.max(minSize, Math.min(idealMax, fitting));
+        grid.style.setProperty('--cw-cell-size', size + 'px');
+    };
+    requestAnimationFrame(fitCellSize);
+    // Bei Resize neu rechnen
+    if (container._crosswordResize) window.removeEventListener('resize', container._crosswordResize);
+    container._crosswordResize = fitCellSize;
+    window.addEventListener('resize', container._crosswordResize);
+
+    // Position-Map: "row,col" → number (clue-Nummer)
+    const numberMap = {};
+    layout.result.forEach(word => {
+        if (word.startx === undefined || word.starty === undefined) return;
+        const key = `${word.starty - 1},${word.startx - 1}`;
+        if (!numberMap[key] || word.position < numberMap[key]) {
+            numberMap[key] = word.position;
+        }
+    });
+
+    let html = '';
+    for (let r = 0; r < layout.rows; r++) {
+        for (let c = 0; c < layout.cols; c++) {
+            const letter = layout.table[r][c];
+            if (!letter || letter === '-') {
+                html += `<div class="cw-cell cw-cell-empty"></div>`;
+            } else {
+                const number = numberMap[`${r},${c}`];
+                html += `
+                    <div class="cw-cell" data-row="${r}" data-col="${c}" data-letter="${letter.toUpperCase()}">
+                        ${number ? `<span class="cw-cell-number">${number}</span>` : ''}
+                        <input type="text" maxlength="1" class="cw-cell-input" autocapitalize="characters" autocomplete="off" inputmode="text">
+                    </div>
+                `;
+            }
+        }
+    }
+    grid.innerHTML = html;
+}
+
+function renderCrosswordClues(container, layout) {
+    const acrossEl = container.querySelector('.crossword-clues-across');
+    const downEl = container.querySelector('.crossword-clues-down');
+
+    const across = layout.result
+        .filter(w => w.orientation === 'across')
+        .sort((a, b) => a.position - b.position);
+    const down = layout.result
+        .filter(w => w.orientation === 'down')
+        .sort((a, b) => a.position - b.position);
+
+    const tpl = w => `<li class="cw-clue" value="${w.position}"><span class="cw-clue-num">${w.position}.</span> ${w.clue}</li>`;
+    acrossEl.innerHTML = across.map(tpl).join('');
+    downEl.innerHTML = down.map(tpl).join('');
+}
+
+function setupCrosswordInput(container) {
+    const layout = container._crosswordLayout;
+    if (!layout) return;
+
+    // Zellen-Map: "row,col" → DOM-Element
+    const cellMap = {};
+    container.querySelectorAll('.cw-cell:not(.cw-cell-empty)').forEach(cell => {
+        cellMap[`${cell.dataset.row},${cell.dataset.col}`] = cell;
+    });
+
+    // Pro Zelle merken: welche Wörter laufen durch sie hindurch + Position
+    const cellWords = new Map();
+    layout.result.forEach(word => {
+        if (word.startx === undefined) return;
+        for (let i = 0; i < word.answer.length; i++) {
+            const r = word.starty - 1 + (word.orientation === 'down' ? i : 0);
+            const c = word.startx - 1 + (word.orientation === 'across' ? i : 0);
+            const cell = cellMap[`${r},${c}`];
+            if (!cell) continue;
+            if (!cellWords.has(cell)) cellWords.set(cell, {});
+            cellWords.get(cell)[word.orientation] = { word, pos: i };
+        }
+    });
+
+    // Highlight des aktiven Wortes
+    function highlightActiveWord() {
+        container.querySelectorAll('.cw-cell.cw-cell-active').forEach(c => c.classList.remove('cw-cell-active'));
+        const focusedInput = container.querySelector('.cw-cell-input:focus');
+        if (!focusedInput) return;
+        const focusedCell = focusedInput.closest('.cw-cell');
+        const info = cellWords.get(focusedCell);
+        if (!info) return;
+        const dir = container._crosswordDir;
+        const wordInfo = info[dir] || info.across || info.down;
+        if (!wordInfo) return;
+        const { word } = wordInfo;
+        for (let i = 0; i < word.answer.length; i++) {
+            const r = word.starty - 1 + (word.orientation === 'down' ? i : 0);
+            const c = word.startx - 1 + (word.orientation === 'across' ? i : 0);
+            const cell = cellMap[`${r},${c}`];
+            if (cell) cell.classList.add('cw-cell-active');
+        }
+    }
+
+    function getNeighborCell(cell, direction, step) {
+        const info = cellWords.get(cell);
+        if (!info || !info[direction]) return null;
+        const { word, pos } = info[direction];
+        const newPos = pos + step;
+        if (newPos < 0 || newPos >= word.answer.length) return null;
+        const r = word.starty - 1 + (direction === 'down' ? newPos : 0);
+        const c = word.startx - 1 + (direction === 'across' ? newPos : 0);
+        return cellMap[`${r},${c}`];
+    }
+
+    container._crosswordDir = 'across';
+
+    container.querySelectorAll('.cw-cell-input').forEach(input => {
+        const cell = input.closest('.cw-cell');
+
+        input.addEventListener('focus', () => {
+            const info = cellWords.get(cell);
+            if (!info) return;
+            // Falls Zelle nur in einer Richtung liegt, automatisch umschalten
+            if (info.across && !info.down) container._crosswordDir = 'across';
+            else if (info.down && !info.across) container._crosswordDir = 'down';
+            highlightActiveWord();
+        });
+
+        // Erneutes Klicken auf bereits fokussierte Kreuzungszelle → Richtung toggeln
+        input.addEventListener('mousedown', () => {
+            const info = cellWords.get(cell);
+            if (info?.across && info?.down && document.activeElement === input) {
+                container._crosswordDir = container._crosswordDir === 'across' ? 'down' : 'across';
+                highlightActiveWord();
+            }
+        });
+
+        input.addEventListener('input', (e) => {
+            let val = (e.target.value || '').toUpperCase().replace(/[^A-ZÄÖÜ]/g, '').slice(0, 1);
+            e.target.value = val;
+            cell.classList.remove('cw-cell-incorrect', 'cw-cell-correct');
+            if (val) {
+                // Nächste LEERE Zelle entlang der aktuellen Richtung finden
+                let next = getNeighborCell(cell, container._crosswordDir, 1);
+                while (next) {
+                    const nextInput = next.querySelector('.cw-cell-input');
+                    if (!nextInput.value) {
+                        nextInput.focus();
+                        break;
+                    }
+                    next = getNeighborCell(next, container._crosswordDir, 1);
+                }
+            }
+        });
+
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !e.target.value) {
+                e.preventDefault();
+                const prev = getNeighborCell(cell, container._crosswordDir, -1);
+                if (prev) {
+                    const prevInput = prev.querySelector('.cw-cell-input');
+                    prevInput.focus();
+                    prevInput.value = '';
+                    prev.classList.remove('cw-cell-incorrect', 'cw-cell-correct');
+                }
+                return;
+            }
+            // Pfeiltasten zum Navigieren (wechseln auch die Richtung)
+            const dirMap = { ArrowRight: ['across', 1], ArrowLeft: ['across', -1], ArrowDown: ['down', 1], ArrowUp: ['down', -1] };
+            if (dirMap[e.key]) {
+                e.preventDefault();
+                const [dir, step] = dirMap[e.key];
+                container._crosswordDir = dir;
+                const target = getNeighborCell(cell, dir, step);
+                if (target) target.querySelector('.cw-cell-input').focus();
+                else highlightActiveWord();
+            }
+        });
+    });
+
+    // Klick auf einen Hinweis: zur ersten Zelle des Wortes springen + Richtung setzen
+    container.querySelectorAll('.cw-clue').forEach(li => {
+        li.style.cursor = 'pointer';
+        li.addEventListener('click', () => {
+            const isAcross = li.closest('.crossword-clues-across') !== null;
+            const position = parseInt(li.getAttribute('value'), 10);
+            const word = layout.result.find(w => w.position === position && w.orientation === (isAcross ? 'across' : 'down'));
+            if (!word) return;
+            container._crosswordDir = word.orientation;
+            const firstCell = cellMap[`${word.starty - 1},${word.startx - 1}`];
+            if (firstCell) firstCell.querySelector('.cw-cell-input').focus();
+        });
+    });
+}
+
+function normalizeCrosswordChar(c) {
+    return (c || '').toUpperCase()
+        .replace(/Ö/g, 'O').replace(/Ä/g, 'A').replace(/Ü/g, 'U');
+}
+
+function evaluateCrossword(container) {
+    const cells = Array.from(container.querySelectorAll('.cw-cell:not(.cw-cell-empty)'));
+    let allCorrect = true;
+    let allFilled = true;
+
+    cells.forEach(cell => {
+        const input = cell.querySelector('.cw-cell-input');
+        const expected = normalizeCrosswordChar(cell.dataset.letter);
+        const got = normalizeCrosswordChar(input.value);
+        cell.classList.remove('cw-cell-correct', 'cw-cell-incorrect');
+        if (!got) {
+            allFilled = false;
+            allCorrect = false;
+            return;
+        }
+        if (got === expected) {
+            cell.classList.add('cw-cell-correct');
+        } else {
+            cell.classList.add('cw-cell-incorrect');
+            allCorrect = false;
+        }
+    });
+
+    const feedback = container.querySelector('.quiz-feedback');
+    const submitBtn = container.querySelector('.quiz-submit-btn');
+    const resetBtn = container.querySelector('.quiz-reset-btn');
+
+    if (allCorrect && allFilled) {
+        feedback.className = 'quiz-feedback show success';
+        feedback.innerHTML = '<i class="fas fa-check-circle me-2"></i>Super! Kreuzworträtsel gelöst.';
+        submitBtn.style.display = 'none';
+        resetBtn.style.display = 'none';
+        cells.forEach(c => {
+            const inp = c.querySelector('.cw-cell-input');
+            if (inp) inp.disabled = true;
+        });
+        if (addCompletedQuizId(container.dataset.h5pId)) showBadgeNotification();
+    } else if (!allFilled) {
+        feedback.className = 'quiz-feedback show error';
+        feedback.innerHTML = '<i class="fas fa-times-circle me-2"></i>Es fehlen noch Buchstaben.';
+    } else {
+        feedback.className = 'quiz-feedback show error';
+        feedback.innerHTML = '<i class="fas fa-times-circle me-2"></i>Ein paar Buchstaben sind noch falsch (rot markiert).';
+        resetBtn.style.display = 'inline-block';
+    }
+}
+
+// --- Image Hotspot ---
+function initHotspotQuiz(container) {
+    const overlay = container.querySelector('.hotspot-overlay');
+    if (!overlay) return;
+    overlay.innerHTML = '';
+    container._hotspotFound = new Set();
+
+    const quiz = quizModals.find(q => q.id === container.dataset.quizId);
+    const hotspots = quiz?.content?.hotspots || [];
+    const total = hotspots.length;
+    const progressEl = container.querySelector('.hotspot-progress');
+    if (progressEl) progressEl.textContent = `0 / ${total} gefunden`;
+
+    const feedback = container.querySelector('.quiz-feedback');
+    if (feedback) {
+        feedback.className = 'quiz-feedback';
+        feedback.innerHTML = '';
+    }
+
+    // Debug-Modus: Zonen als gestrichelte Kreise einblenden
+    if (quiz?.content?.debug) {
+        hotspots.forEach((h, i) => {
+            const zone = document.createElement('div');
+            zone.className = 'hotspot-debug-zone';
+            zone.style.left = `${h.x}%`;
+            zone.style.top = `${h.y}%`;
+            // Durchmesser = 2 * radius % der Bildbreite
+            zone.style.width = `${h.radius * 2}%`;
+            zone.style.aspectRatio = '1 / 1';
+            zone.title = `[${i}] ${h.label || ''} (x:${h.x}, y:${h.y}, r:${h.radius})`;
+            overlay.appendChild(zone);
+        });
+    }
+}
+
+function handleHotspotClick(overlay, evt) {
+    const container = overlay.closest('.hotspot-container');
+    if (!container) return;
+    const quiz = quizModals.find(q => q.id === container.dataset.quizId);
+    const hotspots = quiz?.content?.hotspots;
+    if (!hotspots) return;
+
+    const rect = overlay.getBoundingClientRect();
+    if (!rect.width || !rect.height) return;
+    const x = ((evt.clientX - rect.left) / rect.width) * 100;
+    const y = ((evt.clientY - rect.top) / rect.height) * 100;
+
+    if (quiz.content.debug) {
+        console.log(`[hotspot click] x: ${x.toFixed(1)}%, y: ${y.toFixed(1)}%`);
+    }
+
+    const found = container._hotspotFound || new Set();
+
+    // Klick auf bereits gefundenen Bereich → ignorieren
+    for (let i = 0; i < hotspots.length; i++) {
+        if (!found.has(i)) continue;
+        const h = hotspots[i];
+        const dx = x - h.x, dy = y - h.y;
+        if (Math.sqrt(dx * dx + dy * dy) <= h.radius) return;
+    }
+
+    // Treffer auf neuen Hotspot suchen
+    let hitIdx = -1;
+    for (let i = 0; i < hotspots.length; i++) {
+        if (found.has(i)) continue;
+        const h = hotspots[i];
+        const dx = x - h.x, dy = y - h.y;
+        if (Math.sqrt(dx * dx + dy * dy) <= h.radius) { hitIdx = i; break; }
+    }
+
+    if (hitIdx >= 0) {
+        const h = hotspots[hitIdx];
+        const marker = document.createElement('div');
+        marker.className = 'hotspot-marker correct';
+        marker.style.left = `${h.x}%`;
+        marker.style.top = `${h.y}%`;
+        marker.title = h.label || '';
+        marker.innerHTML = '<i class="fas fa-check"></i>';
+        overlay.appendChild(marker);
+
+        found.add(hitIdx);
+        container._hotspotFound = found;
+
+        const progressEl = container.querySelector('.hotspot-progress');
+        if (progressEl) progressEl.textContent = `${found.size} / ${hotspots.length} gefunden`;
+
+        if (found.size === hotspots.length) completeHotspotQuiz(container);
+    } else {
+        const marker = document.createElement('div');
+        marker.className = 'hotspot-marker incorrect';
+        marker.style.left = `${x}%`;
+        marker.style.top = `${y}%`;
+        marker.innerHTML = '<i class="fas fa-times"></i>';
+        overlay.appendChild(marker);
+        setTimeout(() => marker.remove(), 850);
+    }
+}
+
+function completeHotspotQuiz(container) {
+    const h5pId = container.dataset.h5pId;
+    const feedback = container.querySelector('.quiz-feedback');
+    feedback.className = 'quiz-feedback show success';
+    feedback.innerHTML = '<i class="fas fa-check-circle me-2"></i>Super! Alle Sicherheitsmängel gefunden.';
+    if (addCompletedQuizId(h5pId)) showBadgeNotification();
+}
+
+// --- Wortsuche (Wordfind.js + eigenes Click/Drag-UI) ---
+const WORDSEARCH_COLORS = [
+    '#c8e6c9', '#ffe0b2', '#c5cae9', '#f8bbd0', '#b2dfdb',
+    '#d1c4e9', '#ffccbc', '#fff9c4', '#b3e5fc', '#d7ccc8'
+];
+
+const WORDSEARCH_ORIENTATIONS = {
+    horizontal: (x, y, i) => ({ x: x + i, y: y }),
+    horizontalBack: (x, y, i) => ({ x: x - i, y: y }),
+    vertical: (x, y, i) => ({ x: x, y: y + i }),
+    verticalUp: (x, y, i) => ({ x: x, y: y - i }),
+    diagonal: (x, y, i) => ({ x: x + i, y: y + i }),
+    diagonalBack: (x, y, i) => ({ x: x - i, y: y + i }),
+    diagonalUp: (x, y, i) => ({ x: x + i, y: y - i }),
+    diagonalUpBack: (x, y, i) => ({ x: x - i, y: y - i })
+};
+
+function solutionToCells(sol) {
+    const fn = WORDSEARCH_ORIENTATIONS[sol.orientation];
+    if (!fn) return [];
+    const cells = [];
+    for (let i = 0; i < sol.word.length; i++) {
+        const p = fn(sol.x, sol.y, i);
+        cells.push({ row: p.y, col: p.x });
+    }
+    return cells;
+}
+
+function initWordSearch(container) {
+    const quiz = quizModals.find(q => q.id === container.dataset.quizId);
+    if (!quiz?.content?.words || typeof wordfind === 'undefined') {
+        if (typeof wordfind === 'undefined') {
+            const fb = container.querySelector('.quiz-feedback');
+            if (fb) {
+                fb.className = 'quiz-feedback show error';
+                fb.innerHTML = '<i class="fas fa-times-circle me-2"></i>Wortsuch-Bibliothek konnte nicht geladen werden.';
+            }
+        }
+        return;
+    }
+
+    if (container._wsCleanup) container._wsCleanup();
+
+    const c = quiz.content;
+    const width = c.width || 14;
+    const height = c.height || 14;
+    const searchTerms = c.words.map(w => w.search.toUpperCase());
+
+    let puzzle;
+    try {
+        puzzle = wordfind.newPuzzle(searchTerms, {
+            height: height, width: width,
+            fillBlanks: true, preferOverlap: true
+        });
+    } catch (e) {
+        const fb = container.querySelector('.quiz-feedback');
+        if (fb) {
+            fb.className = 'quiz-feedback show error';
+            fb.innerHTML = '<i class="fas fa-times-circle me-2"></i>Rätsel konnte nicht erstellt werden.';
+        }
+        return;
+    }
+
+    const solved = wordfind.solve(puzzle, searchTerms);
+    const solutionMap = {};
+    (solved.found || []).forEach(sol => {
+        solutionMap[sol.word.toUpperCase()] = sol;
+    });
+
+    container._wsPuzzle = puzzle;
+    container._wsSolutions = solutionMap;
+    container._wsFoundCount = 0;
+    container._wsColorIdx = 0;
+    container._wsTotal = c.words.length;
+
+    // Grid rendern
+    const gridEl = container.querySelector('.wordsearch-grid');
+    const actualWidth = puzzle[0].length;
+    const actualHeight = puzzle.length;
+    gridEl.style.gridTemplateColumns = `repeat(${actualWidth}, 1fr)`;
+    gridEl.innerHTML = puzzle.map((row, r) =>
+        row.map((letter, col) =>
+            `<div class="wordsearch-cell" data-row="${r}" data-col="${col}">${letter.toUpperCase()}</div>`
+        ).join('')
+    ).join('');
+
+    // Wortliste rendern – (SEARCH)-Zusatz nur, wenn Anzeige ≠ Suche
+    const wordsEl = container.querySelector('.wordsearch-words');
+    wordsEl.innerHTML = c.words.map(w => {
+        const search = w.search.toUpperCase();
+        const displayUpper = w.display.toUpperCase();
+        const displayLabel = displayUpper === search ? search : `${w.display} (${search})`;
+        return `<span class="wordsearch-word" data-search="${search}">${displayLabel}</span>`;
+    }).join('');
+
+    // Fortschritt
+    const progressEl = container.querySelector('.wordsearch-progress');
+    progressEl.textContent = `0 / ${c.words.length} gefunden`;
+
+    // Feedback zurücksetzen
+    const feedback = container.querySelector('.quiz-feedback');
+    feedback.className = 'quiz-feedback';
+    feedback.innerHTML = '';
+
+    setupWordSearchInteraction(container);
+}
+
+function setupWordSearchInteraction(container) {
+    const grid = container.querySelector('.wordsearch-grid');
+    let isDragging = false;
+    let startCell = null;
+    let currentCells = [];
+
+    const getCellFromPoint = (x, y) => {
+        const el = document.elementFromPoint(x, y);
+        if (!el) return null;
+        return el.classList.contains('wordsearch-cell') ? el : null;
+    };
+
+    const clearHighlight = () => {
+        grid.querySelectorAll('.wordsearch-cell.highlight').forEach(c => c.classList.remove('highlight'));
+    };
+
+    const calculateLine = (start, end) => {
+        const r1 = +start.dataset.row, c1 = +start.dataset.col;
+        const r2 = +end.dataset.row, c2 = +end.dataset.col;
+        const diffR = r2 - r1, diffC = c2 - c1;
+        const absR = Math.abs(diffR), absC = Math.abs(diffC);
+        let dr, dc;
+        if (absC > absR * 2.5) { dr = 0; dc = Math.sign(diffC) || 1; }
+        else if (absR > absC * 2.5) { dr = Math.sign(diffR) || 1; dc = 0; }
+        else { dr = Math.sign(diffR); dc = Math.sign(diffC); }
+        if (dr === 0 && dc === 0) return [start];
+        const length = Math.max(absR, absC) + 1;
+        const cells = [];
+        for (let i = 0; i < length; i++) {
+            const r = r1 + i * dr;
+            const col = c1 + i * dc;
+            const cell = grid.querySelector(`.wordsearch-cell[data-row="${r}"][data-col="${col}"]`);
+            if (cell) cells.push(cell);
+        }
+        return cells;
+    };
+
+    const highlight = (cells) => {
+        clearHighlight();
+        cells.forEach(c => c.classList.add('highlight'));
+    };
+
+    const onDown = (e) => {
+        const cell = getCellFromPoint(e.clientX, e.clientY);
+        if (!cell) return;
+        if (cell.classList.contains('found-locked')) return;
+        e.preventDefault();
+        isDragging = true;
+        startCell = cell;
+        currentCells = [cell];
+        highlight(currentCells);
+    };
+
+    const onMove = (e) => {
+        if (!isDragging) return;
+        const cell = getCellFromPoint(e.clientX, e.clientY);
+        if (!cell) return;
+        currentCells = calculateLine(startCell, cell);
+        highlight(currentCells);
+    };
+
+    const onUp = (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        if (currentCells.length >= 2) {
+            checkWordSearchSelection(container, currentCells);
+        }
+        clearHighlight();
+        startCell = null;
+        currentCells = [];
+    };
+
+    grid.addEventListener('pointerdown', onDown);
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+    document.addEventListener('pointercancel', onUp);
+
+    container._wsCleanup = () => {
+        grid.removeEventListener('pointerdown', onDown);
+        document.removeEventListener('pointermove', onMove);
+        document.removeEventListener('pointerup', onUp);
+        document.removeEventListener('pointercancel', onUp);
+    };
+}
+
+function checkWordSearchSelection(container, selectedCells) {
+    const solutions = container._wsSolutions || {};
+    const selectedKey = selectedCells.map(c => `${c.dataset.row},${c.dataset.col}`).join('|');
+    const reverseKey = [...selectedCells].reverse().map(c => `${c.dataset.row},${c.dataset.col}`).join('|');
+
+    for (const search in solutions) {
+        const wordEl = container.querySelector(`.wordsearch-word[data-search="${search}"]`);
+        if (!wordEl || wordEl.classList.contains('found')) continue;
+
+        const solCells = solutionToCells(solutions[search]);
+        const solKey = solCells.map(p => `${p.row},${p.col}`).join('|');
+
+        if (solKey === selectedKey || solKey === reverseKey) {
+            const color = WORDSEARCH_COLORS[container._wsColorIdx % WORDSEARCH_COLORS.length];
+            container._wsColorIdx++;
+
+            selectedCells.forEach(cell => {
+                cell.classList.add('found-locked');
+                cell.style.backgroundColor = color;
+            });
+            wordEl.classList.add('found');
+            wordEl.style.backgroundColor = color;
+            wordEl.style.borderColor = color;
+
+            container._wsFoundCount++;
+            const progressEl = container.querySelector('.wordsearch-progress');
+            if (progressEl) progressEl.textContent = `${container._wsFoundCount} / ${container._wsTotal} gefunden`;
+
+            if (container._wsFoundCount === container._wsTotal) {
+                completeWordSearch(container);
+            }
+            return;
+        }
+    }
+}
+
+function completeWordSearch(container) {
+    const h5pId = container.dataset.h5pId;
+    const feedback = container.querySelector('.quiz-feedback');
+    feedback.className = 'quiz-feedback show success';
+    feedback.innerHTML = '<i class="fas fa-check-circle me-2"></i>Super! Alle Begriffe gefunden.';
+    if (addCompletedQuizId(h5pId)) showBadgeNotification();
+}
+
 // --- Memory-Spiel ---
 function initMemoryGame(container) {
     const quizId = container.dataset.quizId;
@@ -464,6 +1180,11 @@ document.addEventListener('click', (e) => {
     const memoryCard = e.target.closest('.memory-card');
     if (memoryCard) {
         handleMemoryCardClick(memoryCard);
+        return;
+    }
+    const hotspotOverlay = e.target.closest('.hotspot-overlay');
+    if (hotspotOverlay) {
+        handleHotspotClick(hotspotOverlay, e);
     }
 });
 
@@ -1696,42 +2417,37 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Reset Progress Button
+    // Reset Progress Button – öffnet das Bestätigungs-Modal
     const resetProgressBtn = document.getElementById('resetProgressBtn');
-    if (resetProgressBtn) {
+    const resetConfirmModalEl = document.getElementById('resetConfirmModal');
+    if (resetProgressBtn && resetConfirmModalEl) {
         resetProgressBtn.addEventListener('click', function () {
-            // Bestätigungs-Dialog
-            const confirmed = confirm(
-                'Fortschritt zurücksetzen?\n\n' +
-                'Möchtest du nochmal von vorne beginnen?\n\n' +
-                '• Alle abgeschlossenen Quizze werden zurückgesetzt\n' +
-                '• Alle freigeschalteten Badges werden zurückgesetzt\n' +
-                '• Du kannst die Badges erneut freischalten\n\n' +
-                'Jetzt zurücksetzen?'
-            );
+            bootstrap.Modal.getOrCreateInstance(resetConfirmModalEl).show();
+        });
+    }
 
-            if (confirmed) {
-                // Lösche H5P-Daten aus localStorage
-                localStorage.removeItem('h5p_completed_ids');
-                localStorage.removeItem('h5p_quiz_results');
+    // Bestätigen-Button im Modal: führt den Reset aus
+    const confirmResetBtn = document.getElementById('confirmResetBtn');
+    if (confirmResetBtn) {
+        confirmResetBtn.addEventListener('click', function () {
+            // Lösche H5P-Daten aus localStorage
+            localStorage.removeItem('h5p_completed_ids');
+            localStorage.removeItem('h5p_quiz_results');
 
-                // Lösche Filter-Einstellungen
-                localStorage.removeItem('filter_settings');
+            // Lösche Filter-Einstellungen
+            localStorage.removeItem('filter_settings');
 
-                // Optional: Lösche alle H5P-bezogenen Keys
-                const keysToRemove = [];
-                for (let i = 0; i < localStorage.length; i++) {
-                    const key = localStorage.key(i);
-                    if (key) {
-                        if (key.startsWith('h5p')) {
-                            keysToRemove.push(key);
-                        }
-                    }
+            // Alle H5P-bezogenen Keys löschen
+            const keysToRemove = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('h5p')) {
+                    keysToRemove.push(key);
                 }
-                keysToRemove.forEach(key => localStorage.removeItem(key));
-
-                window.location.reload();
             }
+            keysToRemove.forEach(key => localStorage.removeItem(key));
+
+            window.location.reload();
         });
     }
 });
