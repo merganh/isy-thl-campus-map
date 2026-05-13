@@ -14,7 +14,7 @@ function renderQuizBody(quiz) {
 // Kreuzworträtsel – Container; Grid + Hinweise werden in initCrossword befüllt
 function renderCrosswordBody(quiz) {
     return `
-        <div class="quiz-container crossword-container" data-quiz-id="${quiz.id}" data-h5p-id="${quiz.h5pId}" data-quiz-type="crossword">
+        <div class="quiz-container crossword-container" data-quiz-id="${quiz.id}" data-quiz-type="crossword">
             <p class="quiz-question">${quiz.content.question}</p>
             <div class="crossword-grid-wrapper">
                 <div class="crossword-grid"></div>
@@ -42,7 +42,7 @@ function renderCrosswordBody(quiz) {
 function renderHotspotBody(quiz) {
     const c = quiz.content;
     return `
-        <div class="quiz-container hotspot-container" data-quiz-id="${quiz.id}" data-h5p-id="${quiz.h5pId}" data-quiz-type="hotspot">
+        <div class="quiz-container hotspot-container" data-quiz-id="${quiz.id}" data-quiz-type="hotspot">
             <p class="quiz-question">${c.question}</p>
             <div class="hotspot-progress">0 / ${c.hotspots.length} gefunden</div>
             <div class="hotspot-image-wrapper">
@@ -62,13 +62,16 @@ function renderHotspotBody(quiz) {
 // Wortsuche – Container; Grid wird in initWordSearch befüllt
 function renderWordSearchBody(quiz) {
     return `
-        <div class="quiz-container wordsearch-container" data-quiz-id="${quiz.id}" data-h5p-id="${quiz.h5pId}" data-quiz-type="wordsearch">
+        <div class="quiz-container wordsearch-container" data-quiz-id="${quiz.id}" data-quiz-type="wordsearch">
             <p class="quiz-question">${quiz.content.question}</p>
             <div class="wordsearch-grid" role="grid"></div>
             <div class="wordsearch-progress"></div>
             <div class="wordsearch-words"></div>
             <div class="quiz-feedback"></div>
             <div class="quiz-actions">
+                <button type="button" class="btn btn-sm btn-outline-warning wordsearch-hint-btn">
+                    <i class="fas fa-lightbulb me-1"></i>Hilfe
+                </button>
                 <button type="button" class="btn btn-sm btn-outline-secondary quiz-reset-btn">
                     <i class="fas fa-redo me-1"></i>Neu starten
                 </button>
@@ -92,7 +95,7 @@ function renderImageGridBody(quiz) {
     `).join('');
 
     return `
-        <div class="quiz-container" data-quiz-id="${quiz.id}" data-h5p-id="${quiz.h5pId}" data-quiz-type="imageGrid">
+        <div class="quiz-container" data-quiz-id="${quiz.id}" data-quiz-type="imageGrid">
             <p class="quiz-question">${c.question}</p>
             <div class="quiz-image-grid" style="grid-template-columns: repeat(${cols}, 1fr);">${optionsHTML}</div>
             <div class="quiz-feedback"></div>
@@ -119,7 +122,7 @@ function renderChoiceBody(quiz) {
     `).join('');
 
     return `
-        <div class="quiz-container" data-quiz-id="${quiz.id}" data-h5p-id="${quiz.h5pId}" data-quiz-type="${c.type}">
+        <div class="quiz-container" data-quiz-id="${quiz.id}" data-quiz-type="${c.type}">
             <p class="quiz-question">${c.question}</p>
             <div class="quiz-options">${optionsHTML}</div>
             <div class="quiz-feedback"></div>
@@ -134,7 +137,7 @@ function renderChoiceBody(quiz) {
 // Sortier-Quiz (Items werden in initSortQuiz gemischt + per SortableJS verschiebbar)
 function renderSortBody(quiz) {
     return `
-        <div class="quiz-container sort-container" data-quiz-id="${quiz.id}" data-h5p-id="${quiz.h5pId}" data-quiz-type="sort">
+        <div class="quiz-container sort-container" data-quiz-id="${quiz.id}" data-quiz-type="sort">
             <p class="quiz-question">${quiz.content.question}</p>
             <ul class="sort-list" role="list"></ul>
             <div class="quiz-feedback"></div>
@@ -150,7 +153,7 @@ function renderSortBody(quiz) {
 function renderMemoryBody(quiz) {
     const total = quiz.content.pairs.length;
     return `
-        <div class="quiz-container memory-container" data-quiz-id="${quiz.id}" data-h5p-id="${quiz.h5pId}" data-quiz-type="memory">
+        <div class="quiz-container memory-container" data-quiz-id="${quiz.id}" data-quiz-type="memory">
             <div class="memory-status">
                 <span class="memory-progress">0 / ${total} Paaren</span>
                 <button type="button" class="btn btn-sm btn-outline-secondary memory-reset-btn">
@@ -178,9 +181,7 @@ function generateQuizModals() {
             campusInfoContent = `<p>${quiz.campusInfo.text}</p>${quiz.campusInfo.link ? `<a href="${quiz.campusInfo.link.url}" target="_blank" class="erkundungstour-btn"><p>${quiz.campusInfo.link.text}</p></a>` : ''}`;
         }
 
-        const bodyContent = quiz.content
-            ? renderQuizBody(quiz)
-            : `<iframe data-src="/wp-admin/admin-ajax.php?action=h5p_embed&id=${quiz.h5pId}" width="100%" height="${quiz.height}" frameborder="0" scrolling="yes" allowfullscreen class="expand-animation"></iframe>`;
+        const bodyContent = renderQuizBody(quiz);
 
         container.insertAdjacentHTML('beforeend', `<div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${labelId}" aria-hidden="true"><div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down modal-lg"><div class="modal-content"><div class="modal-header"><h5 id="${labelId}" class="modal-title">${quiz.title}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body frageModalBody${quiz.bodyClass ? ' ' + quiz.bodyClass : ''}">${quiz.description ? `<p class="quiz-question">${quiz.description}</p>` : ''}${bodyContent}</div><div class="campus-info-overlay"><div class="info-icon-trigger" data-bs-toggle="collapse" data-bs-target="#campusInfosOverlay" aria-expanded="false"><i class="fas fa-info-circle campus-info-icon"></i></div><div class="collapse mt-2" id="campusInfosOverlay"><div class="card campus-info-card"><div class="card-body p-2">${campusInfoContent}</div></div></div></div></div></div></div>`);
     });
@@ -205,7 +206,6 @@ function evaluateQuiz(container) {
         return;
     }
     const quizId = container.dataset.quizId;
-    const h5pId = container.dataset.h5pId;
     const quiz = quizModals.find(q => q.id === quizId);
     if (!quiz?.content) return;
 
@@ -237,7 +237,7 @@ function evaluateQuiz(container) {
         feedback.innerHTML = `<i class="fas fa-check-circle me-2"></i>${msg}`;
         submitBtn.style.display = 'none';
         resetBtn.style.display = 'none';
-        if (addCompletedQuizId(h5pId)) showBadgeNotification();
+        if (addCompletedQuizId(quizId)) showBadgeNotification();
     } else {
         feedback.className = 'quiz-feedback show error';
         feedback.innerHTML = '<i class="fas fa-times-circle me-2"></i>Leider falsch. Versuche es noch einmal.';
@@ -374,7 +374,7 @@ function moveSortItem(item, direction) {
 }
 
 function evaluateSortQuiz(container) {
-    const h5pId = container.dataset.h5pId;
+    const quizId = container.dataset.quizId;
     const items = Array.from(container.querySelectorAll('.sort-item'));
     let allCorrect = true;
 
@@ -403,7 +403,7 @@ function evaluateSortQuiz(container) {
         feedback.innerHTML = '<i class="fas fa-check-circle me-2"></i>Richtige Reihenfolge!';
         submitBtn.style.display = 'none';
         resetBtn.style.display = 'none';
-        if (addCompletedQuizId(h5pId)) showBadgeNotification();
+        if (addCompletedQuizId(quizId)) showBadgeNotification();
     } else {
         feedback.className = 'quiz-feedback show error';
         feedback.innerHTML = '<i class="fas fa-times-circle me-2"></i>Noch nicht ganz. Schau dir die rot markierten Schritte an und versuche es noch einmal.';
@@ -690,7 +690,7 @@ function evaluateCrossword(container) {
             const inp = c.querySelector('.cw-cell-input');
             if (inp) inp.disabled = true;
         });
-        if (addCompletedQuizId(container.dataset.h5pId)) showBadgeNotification();
+        if (addCompletedQuizId(container.dataset.quizId)) showBadgeNotification();
     } else if (!allFilled) {
         feedback.className = 'quiz-feedback show error';
         feedback.innerHTML = '<i class="fas fa-times-circle me-2"></i>Es fehlen noch Buchstaben.';
@@ -748,10 +748,6 @@ function handleHotspotClick(overlay, evt) {
     const x = ((evt.clientX - rect.left) / rect.width) * 100;
     const y = ((evt.clientY - rect.top) / rect.height) * 100;
 
-    if (quiz.content.debug) {
-        console.log(`[hotspot click] x: ${x.toFixed(1)}%, y: ${y.toFixed(1)}%`);
-    }
-
     const found = container._hotspotFound || new Set();
 
     // Klick auf bereits gefundenen Bereich → ignorieren
@@ -800,11 +796,11 @@ function handleHotspotClick(overlay, evt) {
 }
 
 function completeHotspotQuiz(container) {
-    const h5pId = container.dataset.h5pId;
+    const quizId = container.dataset.quizId;
     const feedback = container.querySelector('.quiz-feedback');
     feedback.className = 'quiz-feedback show success';
     feedback.innerHTML = '<i class="fas fa-check-circle me-2"></i>Super! Alle Sicherheitsmängel gefunden.';
-    if (addCompletedQuizId(h5pId)) showBadgeNotification();
+    if (addCompletedQuizId(quizId)) showBadgeNotification();
 }
 
 // --- Wortsuche (Wordfind.js + eigenes Click/Drag-UI) ---
@@ -881,6 +877,7 @@ function initWordSearch(container) {
     container._wsFoundCount = 0;
     container._wsColorIdx = 0;
     container._wsTotal = c.words.length;
+    container._wsHinted = new Set();
 
     // Grid rendern
     const gridEl = container.querySelector('.wordsearch-grid');
@@ -959,7 +956,7 @@ function setupWordSearchInteraction(container) {
     const onDown = (e) => {
         const cell = getCellFromPoint(e.clientX, e.clientY);
         if (!cell) return;
-        if (cell.classList.contains('found-locked')) return;
+        // Drag auch auf bereits gefundenen Zellen erlauben (Wörter können sich kreuzen)
         e.preventDefault();
         isDragging = true;
         startCell = cell;
@@ -1016,8 +1013,11 @@ function checkWordSearchSelection(container, selectedCells) {
             container._wsColorIdx++;
 
             selectedCells.forEach(cell => {
-                cell.classList.add('found-locked');
-                cell.style.backgroundColor = color;
+                // Bereits gefundene Schnittzellen behalten ihre ursprüngliche Farbe
+                if (!cell.classList.contains('found-locked')) {
+                    cell.style.backgroundColor = color;
+                    cell.classList.add('found-locked');
+                }
             });
             wordEl.classList.add('found');
             wordEl.style.backgroundColor = color;
@@ -1036,11 +1036,62 @@ function checkWordSearchSelection(container, selectedCells) {
 }
 
 function completeWordSearch(container) {
-    const h5pId = container.dataset.h5pId;
+    const quizId = container.dataset.quizId;
     const feedback = container.querySelector('.quiz-feedback');
     feedback.className = 'quiz-feedback show success';
     feedback.innerHTML = '<i class="fas fa-check-circle me-2"></i>Super! Alle Begriffe gefunden.';
-    if (addCompletedQuizId(h5pId)) showBadgeNotification();
+    if (addCompletedQuizId(quizId)) showBadgeNotification();
+}
+
+function showWordsearchHint(container) {
+    const solutions = container._wsSolutions || {};
+    const missing = Object.keys(solutions).filter(search => {
+        const wordEl = container.querySelector(`.wordsearch-word[data-search="${search}"]`);
+        return wordEl && !wordEl.classList.contains('found');
+    });
+    if (missing.length === 0) return;
+
+    let candidate;
+    if (missing.length === 1) {
+        // Letztes verbleibendes Wort: immer dieses anzeigen
+        candidate = missing[0];
+    } else {
+        if (!container._wsHinted) container._wsHinted = new Set();
+        // Bereits gehintete in diesem Zyklus rausfiltern
+        let pool = missing.filter(w => !container._wsHinted.has(w));
+        // Wenn alle missing schon gehintet wurden: Zyklus zurücksetzen
+        if (pool.length === 0) {
+            container._wsHinted.clear();
+            pool = missing;
+        }
+        candidate = pool[Math.floor(Math.random() * pool.length)];
+        container._wsHinted.add(candidate);
+    }
+
+    const sol = solutions[candidate];
+    if (!sol) return;
+    const cells = solutionToCells(sol);
+    if (!cells.length) return;
+
+    const grid = container.querySelector('.wordsearch-grid');
+    grid.querySelectorAll('.wordsearch-cell.hint-flash').forEach(c => c.classList.remove('hint-flash'));
+
+    const firstPos = cells[0];
+    const firstCell = grid.querySelector(`.wordsearch-cell[data-row="${firstPos.row}"][data-col="${firstPos.col}"]`);
+    if (!firstCell) return;
+    // Reflow erzwingen, damit die Animation neu startet
+    void firstCell.offsetWidth;
+    firstCell.classList.add('hint-flash');
+    setTimeout(() => firstCell.classList.remove('hint-flash'), 3000);
+
+    // Auch das passende Wort in der Liste kurz hervorheben
+    const wordEl = container.querySelector(`.wordsearch-word[data-search="${candidate}"]`);
+    if (wordEl) {
+        wordEl.classList.remove('hint-pulse');
+        void wordEl.offsetWidth;
+        wordEl.classList.add('hint-pulse');
+        setTimeout(() => wordEl.classList.remove('hint-pulse'), 3000);
+    }
 }
 
 // --- Memory-Spiel ---
@@ -1139,11 +1190,11 @@ function handleMemoryCardClick(card) {
 }
 
 function completeMemoryGame(container) {
-    const h5pId = container.dataset.h5pId;
+    const quizId = container.dataset.quizId;
     const feedback = container.querySelector('.quiz-feedback');
     feedback.className = 'quiz-feedback show success';
     feedback.innerHTML = '<i class="fas fa-check-circle me-2"></i>Super! Alle Paare gefunden.';
-    if (addCompletedQuizId(h5pId)) showBadgeNotification();
+    if (addCompletedQuizId(quizId)) showBadgeNotification();
 }
 
 document.addEventListener('change', (e) => {
@@ -1163,6 +1214,12 @@ document.addEventListener('click', (e) => {
     if (resetBtn) {
         const container = resetBtn.closest('.quiz-container');
         if (container) resetQuiz(container);
+        return;
+    }
+    const hintBtn = e.target.closest('.wordsearch-hint-btn');
+    if (hintBtn) {
+        const container = hintBtn.closest('.wordsearch-container');
+        if (container) showWordsearchHint(container);
         return;
     }
     const sortArrow = e.target.closest('.sort-arrow-btn');
@@ -1576,13 +1633,7 @@ function openBuildingInfo(id) {
 function openTarget(id, modalId) {
     const mId = modalId && modalId.trim() ? modalId : `${id}_modal`;
     const modalElement = document.getElementById(mId);
-    if (!modalElement) {
-        console.warn(`Modal mit ID '${mId}' nicht gefunden.`);
-        return;
-    }
-
-
-    // 3) Modal anzeigen
+    if (!modalElement) return;
     bootstrap.Modal.getOrCreateInstance(modalElement).show();
 }
 //openTarget
@@ -2278,40 +2329,42 @@ function setupAccordionToggle(modal) {
 }
 
 // ========================================
-// H5P iframe-Überwachung und Event-Handling
+// Quiz-Fortschritt & Marker-Einfärbung
 // ========================================
+
+const COMPLETED_QUIZZES_STORAGE_KEY = 'quiz_completed_ids';
 
 // Globale Variable für Quiz-Fortschritt
 let completedQuizzesCount = 0;
 
-// Hilfsfunktionen für Local Storage Management
+// Hilfsfunktion für Local Storage Management
 function getCompletedQuizIds() {
-    const stored = localStorage.getItem('h5p_completed_ids');
+    const stored = localStorage.getItem(COMPLETED_QUIZZES_STORAGE_KEY);
     const ids = stored ? JSON.parse(stored) : [];
-    // Konvertiere alle IDs zu Strings für konsistenten Vergleich
     return ids.map(id => String(id));
 }
 
-// Globale Funktion zum Einfärben der Frage-Elemente basierend auf Quiz-Completion
+// Globale Funktion zum Einfärben der Frage-Marker basierend auf Quiz-Completion.
+// Map: SVG-Marker-ID auf der Karte → Quiz-ID im quizModals-Array
 window.colorQuizElements = function () {
     const completedIds = getCompletedQuizIds();
 
     const quizMapping = {
-        'Frage': '34',
-        'Frage-2': '32',
-        'Frage-3': '16',
-        'Frage-4': '19',
-        'Frage-5': '37',
-        'Frage-6': '31',
-        'Frage-7': '27',
-        'Frage-8': '30',
-        'Frage-9': '9',
-        'Frage-10': '13'
+        'Frage': 'Frage',
+        'Frage-2': 'Frage2',
+        'Frage-3': 'Frage3',
+        'Frage-4': 'Frage4',
+        'Frage-5': 'Frage5',
+        'Frage-6': 'Frage6',
+        'Frage-7': 'Frage7',
+        'Frage-8': 'Frage8',
+        'Frage-9': 'Frage9',
+        'Frage-10': 'Frage10'
     };
 
     Object.keys(quizMapping).forEach(frageId => {
-        const h5pId = quizMapping[frageId];
-        const isCompleted = completedIds.includes(h5pId);
+        const quizId = quizMapping[frageId];
+        const isCompleted = completedIds.includes(quizId);
 
         const frageGruppe = document.querySelector(`#${frageId}`);
 
@@ -2353,14 +2406,13 @@ window.colorQuizElements = function () {
     });
 }
 
-function addCompletedQuizId(h5pId) {
+function addCompletedQuizId(quizId) {
     const completedIds = getCompletedQuizIds();
+    const idString = String(quizId);
 
-    const h5pIdString = String(h5pId);
-
-    if (!completedIds.includes(h5pIdString)) {
-        completedIds.push(h5pIdString);
-        localStorage.setItem('h5p_completed_ids', JSON.stringify(completedIds));
+    if (!completedIds.includes(idString)) {
+        completedIds.push(idString);
+        localStorage.setItem(COMPLETED_QUIZZES_STORAGE_KEY, JSON.stringify(completedIds));
 
         completedQuizzesCount++;
 
@@ -2430,162 +2482,15 @@ document.addEventListener('DOMContentLoaded', function () {
     const confirmResetBtn = document.getElementById('confirmResetBtn');
     if (confirmResetBtn) {
         confirmResetBtn.addEventListener('click', function () {
-            // Lösche H5P-Daten aus localStorage
-            localStorage.removeItem('h5p_completed_ids');
-            localStorage.removeItem('h5p_quiz_results');
-
-            // Lösche Filter-Einstellungen
+            localStorage.removeItem(COMPLETED_QUIZZES_STORAGE_KEY);
             localStorage.removeItem('filter_settings');
-
-            // Alle H5P-bezogenen Keys löschen
-            const keysToRemove = [];
-            for (let i = 0; i < localStorage.length; i++) {
-                const key = localStorage.key(i);
-                if (key && key.startsWith('h5p')) {
-                    keysToRemove.push(key);
-                }
-            }
-            keysToRemove.forEach(key => localStorage.removeItem(key));
-
             window.location.reload();
         });
     }
 });
 
-// Hilfsfunktion zur Extraktion der Content-ID aus der iframe-URL
-function extractContentIdFromUrl(url) {
-    const match = url.match(/[?&]id=(\d+)/);
-    return match ? parseInt(match[1]) : null;
-}
-
-function checkH5PCategory(statement, categoryName) {
-    return statement.context?.contextActivities?.category?.some(cat =>
-        cat.id !== null && cat.id.includes(categoryName)
-    ) || false;
-}
-
-function tryAwardBadge(contentId) {
-    if (addCompletedQuizId(contentId)) showBadgeNotification();
-}
-
-function setupH5PForIframe(h5pInstance, contentId) {
-    h5pInstance.externalDispatcher.on('xAPI', function (event) {
-        const statement = event.data?.statement;
-        if (!statement) return;
-
-        const idFromExtension = statement.object?.definition?.extensions?.['http://h5p.org/x-api/h5p-local-content-id'];
-        const fullContentId = idFromExtension || contentId;
-
-        let existing = JSON.parse(localStorage.getItem('h5p_' + fullContentId) || '[]');
-        if (!Array.isArray(existing)) existing = [existing];
-
-        const subId = statement.object?.definition?.extensions?.['http://h5p.org/x-api/h5p-subContentId'];
-        const objectId = statement.object?.id;
-
-        // Prüfen, ob bereits ein Statement für dieses Objekt existiert
-        const index = existing.findIndex(s => {
-            const storedSubId = s.object?.definition?.extensions?.['http://h5p.org/x-api/h5p-subContentId'];
-            const storedObjId = s.object?.id;
-            return (subId && storedSubId === subId) || (!subId && storedObjId === objectId);
-        });
-
-        const isMemoryGameInteraction = statement.verb?.id.includes('interacted') && checkH5PCategory(statement, 'MemoryGame');
-        const isMemoryGameCompleted = statement.verb?.id.includes('completed') && checkH5PCategory(statement, 'MemoryGame');
-        const isFlashcardInteraction = statement.verb?.id.includes('interacted') && checkH5PCategory(statement, 'Flashcards');
-        const isFlashcardCompleted = statement.verb?.id.includes('completed') && checkH5PCategory(statement, 'Flashcards');
-        const isCrosswordInteraction = statement.verb?.id.includes('interacted') && checkH5PCategory(statement, 'Crossword');
-        const isCrosswordCompleted = statement.verb?.id.includes('completed') && checkH5PCategory(statement, 'Crossword');
-
-        const isFlashcard = checkH5PCategory(statement, 'Flashcards');
-        const isCrossword = checkH5PCategory(statement, 'Crossword');
-
-        const isNewCorrectAnswer = statement.verb?.id.includes('answered') && statement.result?.success === true && !isFlashcard && !isCrossword;
-        const isFlashcardAnsweredCorrect = statement.verb?.id.includes('answered') && isFlashcard &&
-            statement.result?.score?.raw > 0 &&
-            statement.result.score.raw === statement.result.score.max;
-        const isFlashcardInteracted = statement.verb?.id.includes('interacted') && isFlashcard;
-        const isCrosswordAnsweredCorrect = statement.verb?.id.includes('answered') && isCrossword && statement.result?.success === true;
-        const isCrosswordInteracted = statement.verb?.id.includes('interacted') && isCrossword;
-        const isMultipleHotspots = statement.verb?.id.includes('answered') &&
-            checkH5PCategory(statement, 'ImageMultipleHotspotQuestion') &&
-            statement.result?.score &&
-            statement.result.score.raw > 0 &&
-            statement.result.score.raw >= statement.result.score.max;
-
-        const shouldAwardBadge = [isNewCorrectAnswer, isFlashcardAnsweredCorrect, isFlashcardCompleted,
-            isCrosswordAnsweredCorrect, isCrosswordCompleted, isMultipleHotspots, isMemoryGameCompleted].some(Boolean);
-        const shouldUpdate = shouldAwardBadge || [isFlashcardInteracted, isCrosswordInteracted,
-            isMemoryGameInteraction, isFlashcardInteraction, isCrosswordInteraction].some(Boolean);
-
-        if (index === -1) {
-            existing.push(statement);
-            if (shouldAwardBadge) tryAwardBadge(fullContentId);
-        } else if (shouldUpdate) {
-            const old = existing[index];
-            const oldSuccess = old.result?.success === true;
-            const oldVerb = old.verb?.id || '';
-            const replace = !oldSuccess && (oldVerb.includes('interacted') || oldVerb.includes('attempted') || oldVerb.includes('progressed'));
-            const isNewSuccess = statement.result?.success === true;
-
-            if (oldSuccess && !isNewSuccess && !isMultipleHotspots) {
-            } else if (!oldSuccess && isNewSuccess) {
-                existing[index] = statement;
-                tryAwardBadge(fullContentId);
-            } else if (isMultipleHotspots) {
-                const oldScore = old.result?.score?.raw || 0;
-                const newScore = statement.result?.score?.raw || 0;
-                if (newScore > oldScore && newScore === statement.result.score.max) {
-                    existing[index] = statement;
-                    tryAwardBadge(fullContentId);
-                } else if (newScore === oldScore) {
-                    existing[index] = statement;
-                }
-            } else if (shouldAwardBadge) {
-                existing[index] = statement;
-                tryAwardBadge(fullContentId);
-            } else if (replace) {
-                existing[index] = statement;
-            }
-        }
-
-        // Speichern nach eventuellem Update
-        localStorage.setItem('h5p_' + fullContentId, JSON.stringify(existing));
-    });
-}
-
+// Accordion-Toggle für die Campus-Info im jeweiligen Modal verdrahten
 document.addEventListener('shown.bs.modal', (e) => {
-    const iframe = e.target.querySelector('iframe[data-src]');
-    if (iframe !== null) {
-        if (!iframe.src) {
-            iframe.src = iframe.dataset.src;
-
-            iframe.addEventListener('load', function () {
-                setTimeout(() => {
-                    try {
-                        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-                        const iframeWindow = iframe.contentWindow;
-
-                        const checkH5P = (window) => {
-                            if (window && typeof window.H5P !== 'undefined' && window.H5P.externalDispatcher) {
-                                const iframeContentId = extractContentIdFromUrl(iframe.src);
-                                if (iframeContentId) {
-                                    setupH5PForIframe(window.H5P, iframeContentId);
-                                    return true;
-                                }
-                            }
-                            return false;
-                        };
-
-                        if (!checkH5P(iframeWindow)) {
-                            setTimeout(() => checkH5P(iframeWindow), 2000);
-                        }
-                    } catch (error) {
-                    }
-                }, 1000);
-            });
-        }
-    }
-
     setupAccordionToggle(e.target);
 });
 

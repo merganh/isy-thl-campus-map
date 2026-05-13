@@ -6,12 +6,19 @@ An interactive campus map application for Technische Hochschule Lübeck (THL) fe
 
 - **Interactive Campus Map**: Animated Lottie-based campus map with smooth zoom and pan controls
 - **Building Information**: Detailed information for each building including opening hours and descriptions
-- **Interactive Quizzes**: H5P-integrated quiz system with 10 campus-related questions
-- **Gamification System**: 
+- **Native Quiz Engine**: 10 self-contained quizzes covering several interaction types:
+  - Single choice and multiple choice (with modern card-style options)
+  - Memory pair-matching game
+  - Drag-and-drop sorting (with up/down arrow alternative)
+  - Image grid "find the odd ones out"
+  - Word search puzzle
+  - Image hotspot (click on regions of an image)
+  - Crossword puzzle
+- **Gamification System**:
   - Badge system with 3 unlockable achievements
   - Progress tracking with localStorage persistence
   - Visual notifications for earned badges
-- **Customizable Filters**: 
+- **Customizable Filters**:
   - Toggle visibility of map elements (quiz markers, bike stations, bus stops, cafés, buttons)
   - "Toggle All" feature for quick show/hide of all filters
   - Filter preferences saved to localStorage
@@ -24,11 +31,14 @@ An interactive campus map application for Technische Hochschule Lübeck (THL) fe
 
 ## Tech Stack
 
-- **Frontend**: Pure HTML, CSS, JavaScript (no framework dependencies)
+- **Frontend**: Pure HTML, CSS, JavaScript (no framework, no build step)
+- **UI Framework**: Bootstrap 5.3.2 (CDN) for responsive components and modals
 - **Animation**: Lottie-web for interactive SVG animations
-- **UI Framework**: Bootstrap 5.3.2 for responsive components
 - **Icons**: Font Awesome 5.15.4
-- **Quiz Integration**: H5P (external)
+- **Quiz utility libraries** (all loaded from CDN, MIT licensed):
+  - [SortableJS](https://github.com/SortableJS/Sortable) — drag-and-drop for the sort quiz
+  - [wordfind](https://github.com/bunkat/wordfind) — word-search grid generation
+  - [crossword-layout-generator](https://github.com/MichaelWehar/Crossword-Layout-Generator) — auto crossword layout
 
 ## Project Structure
 
@@ -39,12 +49,12 @@ isy-thl-campus-map/
 │   └── style.css       # Application styles
 ├── js/
 │   ├── config.js       # Configuration data (buildings, quizzes, badges)
-│   └── main.js         # Application logic and event handlers
+│   └── main.js         # Application logic, quiz engine, badge system
 ├── assets/
 │   ├── campus_map_intro.json  # Lottie animation data
 │   ├── campus_map.svg          # Static campus map SVG
-│   ├── badges/                 # Badge SVG assets
-│   └── [building images]       # Building photos and icons
+│   ├── badge_*.svg             # Badge SVG assets
+│   └── [building & quiz images]
 └── README.md
 ```
 
@@ -70,6 +80,8 @@ isy-thl-campus-map/
 3. **Open in browser**:
    Navigate to `http://localhost:3000`
 
+There is no build step — files are served as-is and all dependencies come from CDNs.
+
 ## Usage
 
 ### Navigation
@@ -89,7 +101,7 @@ isy-thl-campus-map/
 - Access settings via the gear icon in the top-right corner
 - Toggle individual map element categories
 - Use "Toggle All" to show/hide all elements at once
-- Reset progress to clear quiz completions and badges
+- Reset progress (confirmation dialog) clears completed quizzes and badges
 
 ### Badges
 - View earned badges via the medal icon in the top-right corner
@@ -102,8 +114,8 @@ isy-thl-campus-map/
 
 ### Key Files
 
-- **`js/config.js`**: Contains all configuration data including:
-  - Quiz modal definitions
+- **`js/config.js`**: Configuration data including:
+  - Quiz definitions (id, title, type, question, options/items/pairs/hotspots…)
   - Building information
   - Filter configurations
   - Badge definitions
@@ -112,38 +124,40 @@ isy-thl-campus-map/
   - Lottie animation initialization
   - Filter system
   - Event handlers for map interactions
-  - H5P quiz integration
+  - Quiz engine (renderers, interaction logic, validation)
   - Badge system
 
-- **`css/style.css`**: All styling including:
-  - Responsive design rules
-  - Animation definitions
-  - Component styles
+- **`css/style.css`**: All styling, including responsive rules and quiz-specific layouts
+
+### Adding or Editing Quizzes
+
+Each quiz in `quizModals` (in `js/config.js`) has a `content` object whose `type` selects the renderer:
+
+| `type`        | Used for                                  | Required fields                                      |
+|---------------|-------------------------------------------|------------------------------------------------------|
+| `radio`       | single-choice question                    | `question`, `options[{ text, correct }]`             |
+| `checkbox`    | multiple-choice (incl. "all wrong" trick) | `question`, `options[{ text, correct }]`             |
+| `memory`      | pair-matching memory game                 | `pairs[{ image, label }]`                            |
+| `sort`        | drag/arrow sortable list                  | `question`, `items[]` (in correct order)             |
+| `imageGrid`   | select correct images from a grid         | `question`, `columns`, `options[{ image, label, correct }]` |
+| `wordsearch`  | word search puzzle                        | `question`, `width`, `height`, `words[{ display, search }]` |
+| `hotspot`     | click correct regions in an image         | `question`, `image`, `hotspots[{ x, y, radius, label }]` (percent coords) |
+| `crossword`   | crossword puzzle                          | `question`, `words[{ answer, clue }]`                |
+
+The quiz `id` (e.g. `'Frage'`, `'Frage2'`) is the unique key used to track completion in localStorage and to identify the marker on the map.
 
 ### Local Storage
 
-The application uses localStorage to persist:
-- Quiz completion status (`h5p_completed_ids`)
-- Quiz results (`h5p_quiz_results`)
-- Filter preferences (`filter_settings`)
+The application persists state under these keys:
+- `quiz_completed_ids` — array of completed quiz IDs (string IDs like `Frage`, `Frage2`, …)
+- `filter_settings` — visibility preferences for map element categories
 
 ### Customization
 
 To customize the map:
 1. Update building data in `js/config.js`
 2. Add/modify images in the `assets/` folder
-3. Adjust Lottie animation in `assets/campus_map_intro.json`
-4. Modify quiz questions via H5P (external integration)
+3. Adjust the Lottie animation in `assets/campus_map_intro.json` if needed
+4. Edit individual quizzes by tweaking their entry in `quizModals` (in `js/config.js`)
 
-## Important Notes
-
-### H5P Quizzes
-
-The application uses H5P quizzes embedded via iframes. **Note that the quiz iframes will show 404 errors without proper CORS access** to the H5P server endpoint (`/wp-admin/admin-ajax.php`).
-
-**Options:**
-- **Replace with your own quizzes**: Update the `quizModals` configuration in `js/config.js` with your own H5P content IDs and server URLs
-- **Hide quiz markers**: If you don't have H5P integration, simply toggle off the "Quiz" option in the settings menu to hide all quiz markers from the map
-- **Remove quiz functionality**: Delete or comment out the quiz-related elements in `js/config.js` if not needed
-
-The map works fully without quizzes - the quiz system is optional and can be disabled through the filter settings.
+For the image hotspot quiz, set `debug: true` on the quiz config to visualize hotspot zones and log click coordinates to the browser console — useful for tuning positions.

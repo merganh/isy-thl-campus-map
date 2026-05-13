@@ -1,7 +1,7 @@
 // Quiz-Modal Konfiguration - einfache Modals
 const quizModals = [
     {
-        id: 'Frage', title: 'Quiz 1', h5pId: 34, height: 900, bodyClass: 'mt-3',
+        id: 'Frage', title: 'Quiz 1', bodyClass: 'mt-3',
         content: {
             type: 'radio',
             question: 'Welche Lernplattform nutzt die TH Lübeck?',
@@ -15,7 +15,7 @@ const quizModals = [
         campusInfo: { text: 'Die TH Lübeck benutzt für die Organisation im Semester die auf Moodle basierende Plattform „Lernraum". Dort kannst du dich in deine Kurse einschreiben und während des Semesters alle Informationen und Inhalte abrufen.', link: { url: 'https://www.th-luebeck.de/studium/studierende/lernplattformen/', text: 'Mehr zum Lernraum an der TH Lübeck' } }
     },
     {
-        id: 'Frage2', title: 'Quiz 2', h5pId: 32, height: 900, bodyClass: 'mt-1',
+        id: 'Frage2', title: 'Quiz 2', bodyClass: 'mt-1',
         description: 'Memory - Finde die Sportangebote der TH Lübeck',
         content: {
             type: 'memory',
@@ -32,7 +32,7 @@ const quizModals = [
         campusInfo: { text: 'Du interessierst dich für Sport und Bewegung neben dem Studium? Dann bietet dir der Hochschulsport vielfältige Möglichkeiten, fit zu bleiben und neue Sportarten auszuprobieren.', link: { url: 'https://www.hochschulsport-luebeck.de/', text: 'Zum Hochschulsport Lübeck' } }
     },
     {
-        id: 'Frage3', title: 'Quiz 3', h5pId: 16, height: 450,
+        id: 'Frage3', title: 'Quiz 3',
         content: {
             type: 'checkbox',
             question: 'Was soll das Logo der THL darstellen?',
@@ -47,7 +47,7 @@ const quizModals = [
         campusInfo: { text: 'Das Logo ist kein konkretes Symbol, sondern ein abstraktes Erkennungszeichen der Technischen Hochschule Lübeck.', link: { url: 'https://www.th-luebeck.de/', text: 'Zur Website der TH Lübeck' } }
     },
     {
-        id: 'Frage4', title: 'Quiz 4', h5pId: 19, height: 680,
+        id: 'Frage4', title: 'Quiz 4',
         content: {
             type: 'sort',
             question: 'Bringe die Schritte einer Studienbewerbung an der THL in die richtige Reihenfolge:',
@@ -63,7 +63,7 @@ const quizModals = [
         campusInfo: { text: 'Du hast Interesse an einem Studium an der Technischen Hochschule Lübeck? Dann läuft deine Bewerbung ganz einfach online über unser Bewerbungsportal. Alle Schritte findest du hier:', link: { url: 'https://www.th-luebeck.de/studium/bewerbung/schritt-fuer-schritt-erklaert/', text: 'Schritt-für-Schritt-Anleitung der TH Lübeck' } }
     },
     {
-        id: 'Frage5', title: 'Quiz 5', h5pId: 37, height: 1000,
+        id: 'Frage5', title: 'Quiz 5',
         content: {
             type: 'wordsearch',
             question: 'Finde alle Begriffe rund um das Studentenleben an der TH Lübeck:',
@@ -84,7 +84,7 @@ const quizModals = [
         },
         campusInfo: { hasAccordion: true, accordionItems: [{ id: 'wohnheim', title: 'Wohnheim', text: 'Infos zum Studentenwohnheim in Lübeck findest du beim', link: { url: 'https://studentenwerk.sh/de/wohnheime-luebeck', text: 'Studentenwerk Schleswig-Holstein' } }, { id: 'asta', title: 'AStA', text: 'Der Allgemeine Studierendenausschuss vertritt deine Interessen und organisiert viele Events. Mehr Infos:', link: { url: 'https://www.th-luebeck.de/gremien-thl/gremien/asta', text: 'AStA TH Lübeck' } }, { id: 'klokurier', title: 'Klokurier', text: 'Die Studierendenzeitung der TH Lübeck:', link: { url: 'https://www.th-luebeck.de/gremien-thl/gremien/hochschulgruppen/klokurier/', text: 'Klokurier Website' } }, { id: 'coal', title: 'COAL Festival', text: 'Das Campus Open Air Lübeck - das größte Festival der Lübecker Hochschulen:', link: { url: 'https://coaluebeck.de', text: 'COAL Festival' } }, { id: 'erasmus', title: 'Erasmus', text: 'Austauschstudium mit Erasmus+: Infos beim', link: { url: 'https://www.th-luebeck.de/en/studies/study-offer/international-students/', text: 'International Office TH Lübeck' } }, { id: 'chor', title: 'TH Chor', text: 'Der Hochschulchor Lübeck bietet musikalische Gemeinschaft und Auftritte. Infos:', link: { url: 'https://www.th-luebeck.de/gremien-thl/gremien/hochschulgruppen/th-chor/', text: 'Hochschulchor' } }, { id: 'stressbar', title: 'Stressbar', text: 'Die legendäre Studierendenbar „Stress" am Campus Lübeck. Mehr Infos:', link: { url: 'https://www.th-luebeck.de/gremien-thl/studentisches-leben/nachtleben/studentisch-gefuehrte-kneipen/stress/', text: 'Stress Bar' } }, { id: 'gaming', title: 'Hochschulgaming Lübeck', text: 'Die Gaming-Community an der TH Lübeck organisiert Turniere und Treffen. Mehr Infos:', link: { url: 'https://www.th-luebeck.de/gremien-thl/gremien/hochschulgruppen/hsgl-hochschulgamingluebeck/', text: 'Hochschulgaming Lübeck' } }, { id: 'bafoeg', title: 'BAföG', text: 'Infos zur Studienfinanzierung durch BAföG bei der', link: { url: 'https://www.th-luebeck.de/studium/studienstart/foerderung-und-stipendien/uebersicht/bafoeg/', text: 'TH Lübeck' } }, { id: 'stipendien', title: 'Stipendien', text: 'Verschiedene Stipendien wie Deutschlandstipendium oder fachspezifische Förderungen:', link: { url: 'https://www.th-luebeck.de/studium/studienstart/foerderung-und-stipendien/deutschlandstipendium/', text: 'Infos zu Stipendien' } }] } },
     {
-        id: 'Frage6', title: 'Quiz 6', h5pId: 31, height: 800,
+        id: 'Frage6', title: 'Quiz 6',
         content: {
             type: 'imageGrid',
             question: 'Welche zwei Studiengänge werden NICHT an der TH Lübeck angeboten?',
@@ -105,7 +105,7 @@ const quizModals = [
         campusInfo: { text: 'Die Technische Hochschule Lübeck bietet eine große Auswahl an Studiengängen in Technik, Naturwissenschaften, Bauwesen und Wirtschaft. Es gibt Bachelor- und Masterabschlüsse, viele davon auch in Online- oder dualen Formaten.', link: { url: 'https://www.th-luebeck.de/studium/studienangebot/studiengaenge', text: 'Alle Studiengänge im Überblick – TH Lübeck' } }
     },
     {
-        id: 'Frage7', title: 'Quiz 7', h5pId: 27, height: 400, bodyClass: 'mt-3',
+        id: 'Frage7', title: 'Quiz 7', bodyClass: 'mt-3',
         content: {
             type: 'checkbox',
             question: 'Welche Möglichkeiten gibt es, sich besser für ein Studium an der THL zu orientieren?',
@@ -119,13 +119,13 @@ const quizModals = [
         campusInfo: { hasMultipleLinks: true, items: [{ text: 'Sich für ein Studium zu entscheiden, kann eine große Herausforderung darstellen. Deshalb wollen wir Dich auf diesem Weg bestmöglich unterstützen. Infos zur persönlichen Beratung findest Du hier:', link: { url: 'https://www.th-luebeck.de/studium/studienorientierung/persoenliche-beratung/', text: 'Persönliche Beratung | Technische Hochschule Lübeck' } }, { text: 'sowie Angebote für Schüler:innen und Studieninteressierte hier:', link: { url: 'https://www.th-luebeck.de/studium/studienorientierung/studienorientierung-fuer-schueler-innen-und-studieninteressierten/', text: 'Orientierungsangebote für Schüler*innen und Studieninteressierte' }, className: 'mt-3' }] }
     },
     {
-        id: 'Frage8', title: 'Quiz 8', h5pId: 30, height: 760, bodyClass: 'mt-3',
+        id: 'Frage8', title: 'Quiz 8', bodyClass: 'mt-3',
         content: {
             type: 'hotspot',
             question: 'Was fehlt für einen sicheren Laborversuch? Klicke alle Sicherheitsmängel an.',
             image: 'assets/labor.png',
             // x,y in %, radius in % der Bildbreite
-            // debug: true zeigt Zonen + loggt Klick-Koordinaten in der Konsole (nur zum Justieren)
+            // debug: true blendet die Hotspot-Zonen als gestrichelte Kreise ein (nur zum Justieren)
             debug: false,
             hotspots: [
                 { x: 30.4, y: 56.9, radius: 7, label: 'Essen im Labor' },
@@ -138,7 +138,7 @@ const quizModals = [
         campusInfo: { text: 'An der TH wird Praxis groß geschrieben. Hier eignest du dir nicht nur Wissen an, sondern kannst es in verschiedenen Praktika auch direkt anwenden.' }
     },
     {
-        id: 'Frage9', title: 'Quiz 9', h5pId: 9, height: 270,
+        id: 'Frage9', title: 'Quiz 9',
         content: {
             type: 'radio',
             question: 'Um wie viel Uhr macht die Zentrale Hochschulbibliothek in der Regel auf?',
@@ -152,7 +152,7 @@ const quizModals = [
         campusInfo: { text: 'Die ZHB ist ein toller Ort zum Lernen oder Recherchieren. Hier gibt es nicht nur viele Bücher, sondern auch mehrere Einzel- und Gruppenarbeitstische sowie buchbare Räume. Wenn du die Bibliothek einmal nicht besuchen möchtest, kannst du über die Fernleihe zahlreiche Bücher bequem von Zuhause aus online aufrufen.', link: { url: 'https://www.zhb.uni-luebeck.de/', text: 'Mehr Informationen zur ZHB' } }
     },
     {
-        id: 'Frage10', title: 'Quiz 10', h5pId: 13, height: 700,
+        id: 'Frage10', title: 'Quiz 10',
         content: {
             type: 'crossword',
             question: 'Welche Studienbegriffe sind gesucht?',
