@@ -2,15 +2,16 @@
 # Campus Map - IONOS / Apache config
 # ============================================================
 # Erlaubt das Einbetten der Campus Map per <iframe> auf:
-#   - hm-techlab.de (eigene Seite)
-#   - train-on.net (Empfaenger-Seite)
+#   - hm-techlab.de (eigene Seite, Self-Host)
+#   - train-on.net  (Empfaenger-Seite)
+#   - th-luebeck.de (Empfaenger-Seite, TYPO3/CMS)
 # Andere Domains werden vom Browser blockiert.
 # ------------------------------------------------------------
 
 <IfModule mod_headers.c>
     # Moderne, von allen aktuellen Browsern unterstuetzte Regel.
     # 'self' = gleicher Host (hm-techlab.de)
-    Header always set Content-Security-Policy "frame-ancestors 'self' https://train-on.net https://www.train-on.net https://hm-techlab.de https://www.hm-techlab.de"
+    Header always set Content-Security-Policy "frame-ancestors 'self' https://train-on.net https://www.train-on.net https://hm-techlab.de https://www.hm-techlab.de https://th-luebeck.de https://www.th-luebeck.de"
 
     # X-Frame-Options entfernen (laesst nur eine Domain zu und wuerde CSP widersprechen).
     Header always unset X-Frame-Options

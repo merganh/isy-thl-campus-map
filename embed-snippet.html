@@ -1,0 +1,68 @@
+<!--
+============================================================
+Campus Map - iframe Embed-Snippets
+============================================================
+Diese Datei ist NUR Dokumentation / Copy-Paste-Vorlage.
+Sie wird nicht direkt aufgerufen.
+
+URL der Campus Map (anpassen, sobald auf IONOS hochgeladen):
+    https://www.hm-techlab.de/campus-map/
+
+Erlaubte Einbettungs-Domains sind in .htaccess festgelegt:
+    - hm-techlab.de / www.hm-techlab.de
+    - train-on.net  / www.train-on.net
+    - th-luebeck.de / www.th-luebeck.de
+============================================================
+-->
+
+
+<!-- ============================================================ -->
+<!-- VARIANTE A: Feste Hoehe (einfachste Variante, immer 700px)    -->
+<!-- Empfehlung fuer TYPO3 (th-luebeck.de) und train-on.net.       -->
+<!-- ============================================================ -->
+<iframe
+    src="https://www.hm-techlab.de/campus-map/"
+    title="Campus Map - TH Luebeck"
+    width="100%"
+    height="700"
+    style="border:0; display:block; max-width:100%;"
+    loading="lazy"
+    allowfullscreen
+    referrerpolicy="no-referrer-when-downgrade">
+</iframe>
+
+
+<!-- ============================================================ -->
+<!-- VARIANTE B: Responsives 16:9-Seitenverhaeltnis                -->
+<!-- Hoehe skaliert mit der Breite mit. Schick auf Smartphones.    -->
+<!-- ============================================================ -->
+<div style="position:relative; width:100%; aspect-ratio:16/9; min-height:480px;">
+    <iframe
+        src="https://www.hm-techlab.de/campus-map/"
+        title="Campus Map - TH Luebeck"
+        style="position:absolute; inset:0; width:100%; height:100%; border:0;"
+        loading="lazy"
+        allowfullscreen
+        referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+</div>
+
+
+<!-- ============================================================ -->
+<!-- HINWEISE                                                      -->
+<!-- ============================================================ -->
+<!--
+- Falls die Campus Map auf einer Subdomain liegt
+  (z.B. https://map.hm-techlab.de/) einfach die src= Adresse
+  oben anpassen.
+
+- Falls TYPO3 das style-Attribut filtert: die beiden Style-Regeln
+  in eine externe CSS-Klasse auslagern, z.B.:
+      .campus-map-frame { border:0; display:block; width:100%;
+                          height:700px; max-width:100%; }
+
+- Test, ob das iframe-Einbetten funktioniert:
+  Browser-Konsole (F12) auf der einbettenden Seite oeffnen.
+  Fehler "Refused to display ... frame-ancestors" bedeutet:
+  Domain fehlt in .htaccess auf hm-techlab.de -> dort ergaenzen.
+-->
