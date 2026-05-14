@@ -61,6 +61,49 @@
         cursor: grabbing;
     }
 
+    .skip-intro-hint {
+        position: fixed;
+        left: 50%;
+        bottom: 24px;
+        transform: translateX(-50%);
+        color: #b0b4ba;
+        font-size: 0.95rem;
+        letter-spacing: 0.02em;
+        text-align: center;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.4s ease;
+        z-index: 1000;
+        white-space: nowrap;
+        text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+        user-select: none;
+    }
+
+    .skip-intro-hint.visible {
+        opacity: 1;
+    }
+
+    .skip-intro-hint kbd {
+        display: inline-block;
+        padding: 2px 8px;
+        margin: 0 2px;
+        background: #f1f3f5;
+        border: 1px solid #d0d4da;
+        border-bottom-width: 2px;
+        border-radius: 4px;
+        color: #6c757d;
+        font-family: inherit;
+        font-size: 0.85rem;
+        line-height: 1;
+    }
+
+    @media (max-width: 768px) {
+        .skip-intro-hint {
+            bottom: 6%;
+            font-size: 0.9rem;
+        }
+    }
+
     #lottieMap,
     #lottieMap svg {
         width: 100%;
@@ -137,6 +180,38 @@
             animation: none;
             transition: none;
         }
+    }
+
+    /* Globaler Animations-Schalter (Einstellung "Animationen") */
+    body.no-animations,
+    body.no-animations *,
+    body.no-animations *::before,
+    body.no-animations *::after {
+        animation-duration: 0.001ms !important;
+        animation-delay: 0s !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+        transition-delay: 0s !important;
+        scroll-behavior: auto !important;
+    }
+
+    body.no-animations #lottieMap svg g[id^="Frage-"],
+    body.no-animations #lottieMap svg g[id="Frage"],
+    body.no-animations #lottieMap svg g[id^="Button_"] {
+        animation: none !important;
+        transition: none !important;
+    }
+
+    /* Icon für Einstellungs-Karten (statt <img>) */
+    .filter-icon-fa {
+        width: 40px;
+        height: 40px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        color: #8c9b39;
+        font-size: 1.4rem;
+        opacity: 0.85;
     }
 
     .navbar,

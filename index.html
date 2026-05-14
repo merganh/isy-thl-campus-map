@@ -47,6 +47,23 @@
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
         </div>
         <div class="offcanvas-body p-3">
+            <!-- Anzeige Sektion -->
+            <div class="settings-section">
+                <h5 class="settings-section-title">
+                    Anzeige
+                </h5>
+                <label class="filter-card" for="animationsToggle">
+                    <div class="filter-card-content">
+                        <span class="filter-icon-fa"><i class="fas fa-film"></i></span>
+                        <span class="filter-label-text">Animationen</span>
+                    </div>
+                    <div class="filter-toggle">
+                        <input type="checkbox" id="animationsToggle" checked>
+                        <span class="toggle-slider"></span>
+                    </div>
+                </label>
+            </div>
+
             <!-- Filter Sektion -->
             <div class="settings-section">
                 <h5 class="settings-section-title">
@@ -132,6 +149,7 @@
     <!-- Map-Container -->
     <div id="mapContainer">
         <div id="lottieMap"></div>
+        <div id="skipIntroHint" class="skip-intro-hint" aria-hidden="true"></div>
     </div>
 
     <script src="js/config.js"></script>

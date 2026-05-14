@@ -1,5 +1,25 @@
 let cachedCampusMapSvg = '';
 
+// Animationen-Einstellung
+const ANIMATIONS_STORAGE_KEY = 'animations_enabled';
+
+function areAnimationsEnabled() {
+    const stored = localStorage.getItem(ANIMATIONS_STORAGE_KEY);
+    return stored === null ? true : stored === 'true';
+}
+
+function applyAnimationsPreference() {
+    if (!document.body) return;
+    document.body.classList.toggle('no-animations', !areAnimationsEnabled());
+}
+
+// So früh wie möglich anwenden (verhindert Flicker beim Laden)
+if (document.body) {
+    applyAnimationsPreference();
+} else {
+    document.addEventListener('DOMContentLoaded', applyAnimationsPreference, { once: true });
+}
+
 // Quiz-Inhalt rendern – Dispatcher nach Typ
 function renderQuizBody(quiz) {
     if (quiz.content.type === 'memory') return renderMemoryBody(quiz);
@@ -1936,21 +1956,26 @@ async function initAnimations() {
         loadJSON('assets/campus_map_intro.json')
     ]);
 
-    if (!cachedCampusMapSvg) {
-        fetch('assets/campus_map.svg')
+    const animationsOn = areAnimationsEnabled();
+
+    // Campus-SVG vorladen. Bei deaktivierten Animationen müssen wir warten,
+    // weil showCampusSVG sofort (ohne 5s-Intro) aufgerufen wird.
+    const svgFetchPromise = (!cachedCampusMapSvg)
+        ? fetch('assets/campus_map.svg')
             .then(r => r.text())
-            .then(svgText => {
-                cachedCampusMapSvg = svgText;
-            })
-            .catch(err => {
-            });
+            .then(svgText => { cachedCampusMapSvg = svgText; })
+            .catch(() => { })
+        : Promise.resolve();
+
+    if (!animationsOn) {
+        await svgFetchPromise;
     }
 
     lottieInstance = lottie.loadAnimation({
         container: document.getElementById('lottieMap'),
         renderer: 'svg',
         loop: false,
-        autoplay: true,
+        autoplay: animationsOn,
         rendererSettings: {
             preserveAspectRatio: 'xMidYMid meet',
             progressiveLoad: true,
@@ -2077,9 +2102,26 @@ async function initAnimations() {
         }
 
         // 2) Timeout speichern, damit wir ihn abbrechen können
+        // Wenn Animationen deaktiviert sind, direkt überspringen
+        const introDelay = animationsOn ? durationMs : 0;
+
+        // Skip-Hinweis (nur wenn Animation läuft)
+        const skipHint = document.getElementById('skipIntroHint');
+        const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+        if (skipHint && animationsOn) {
+            skipHint.innerHTML = isTouchDevice
+                ? 'Tippen zum Überspringen'
+                : '<kbd>Leertaste</kbd> zum Überspringen';
+            // Nach kurzer Verzögerung einblenden, damit Animation Zeit hat zu starten
+            setTimeout(() => skipHint.classList.add('visible'), 400);
+        }
+        const hideSkipHint = () => skipHint?.classList.remove('visible');
+
         const introTimeout = setTimeout(() => {
+            if (!animationsOn) jumpToFinalZoom();
             showCampusSVG();
-        }, durationMs);
+            hideSkipHint();
+        }, introDelay);
 
         // Funktion um zum finalen Zoom-Zustand zu springen
         function jumpToFinalZoom() {
@@ -2123,6 +2165,7 @@ async function initAnimations() {
                 clearTimeout(introTimeout);
                 jumpToFinalZoom();
                 showCampusSVG();
+                hideSkipHint();
             }
         });
 
@@ -2139,6 +2182,7 @@ async function initAnimations() {
             clearTimeout(introTimeout);
             jumpToFinalZoom();
             showCampusSVG();
+            hideSkipHint();
 
             // Event-Listener entfernen
             window.removeEventListener('touchstart', onFirstTouch, { passive: false });
@@ -2168,7 +2212,9 @@ async function initAnimations() {
 
     Promise.all([mL]).then(() => {
         setupZoomPan();
-        runIntroZoom(svg, orig, 3000);
+        if (animationsOn) {
+            runIntroZoom(svg, orig, 3000);
+        }
         setTimeout(async () => {
             initFilters();
         }, 300);
@@ -2469,6 +2515,22 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Animationen-Toggle
+    const animationsToggle = document.getElementById('animationsToggle');
+    if (animationsToggle) {
+        const enabled = areAnimationsEnabled();
+        animationsToggle.checked = enabled;
+        const card = animationsToggle.closest('.filter-card');
+        if (card) card.classList.toggle('active', enabled);
+
+        animationsToggle.addEventListener('change', (e) => {
+            const on = e.target.checked;
+            localStorage.setItem(ANIMATIONS_STORAGE_KEY, String(on));
+            applyAnimationsPreference();
+            if (card) card.classList.toggle('active', on);
+        });
+    }
+
     // Reset Progress Button – öffnet das Bestätigungs-Modal
     const resetProgressBtn = document.getElementById('resetProgressBtn');
     const resetConfirmModalEl = document.getElementById('resetConfirmModal');
@@ -2484,6 +2546,7 @@ document.addEventListener('DOMContentLoaded', function () {
         confirmResetBtn.addEventListener('click', function () {
             localStorage.removeItem(COMPLETED_QUIZZES_STORAGE_KEY);
             localStorage.removeItem('filter_settings');
+            localStorage.removeItem(ANIMATIONS_STORAGE_KEY);
             window.location.reload();
         });
     }
