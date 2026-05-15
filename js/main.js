@@ -2109,9 +2109,14 @@ async function initAnimations() {
         const skipHint = document.getElementById('skipIntroHint');
         const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
         if (skipHint && animationsOn) {
+            // In iframes erreicht keydown das iframe-Dokument oft nicht
+            // (kein Fokus). Dann nur Klick anbieten.
+            const inIframe = window.self !== window.top;
             skipHint.innerHTML = isTouchDevice
                 ? 'Tippen zum Überspringen'
-                : 'Klicken oder <kbd>Leertaste</kbd> zum Überspringen';
+                : inIframe
+                    ? 'Klicken zum Überspringen'
+                    : 'Klicken oder <kbd>Leertaste</kbd> zum Überspringen';
             // Nach kurzer Verzögerung einblenden, damit Animation Zeit hat zu starten
             setTimeout(() => skipHint.classList.add('visible'), 400);
         }
