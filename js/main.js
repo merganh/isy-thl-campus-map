@@ -2111,7 +2111,7 @@ async function initAnimations() {
         if (skipHint && animationsOn) {
             skipHint.innerHTML = isTouchDevice
                 ? 'Tippen zum Überspringen'
-                : '<kbd>Leertaste</kbd> zum Überspringen';
+                : 'Klicken oder <kbd>Leertaste</kbd> zum Überspringen';
             // Nach kurzer Verzögerung einblenden, damit Animation Zeit hat zu starten
             setTimeout(() => skipHint.classList.add('visible'), 400);
         }
@@ -2169,28 +2169,36 @@ async function initAnimations() {
             }
         });
 
-        // 4) Skip-Listener für Touchscreen (einmaliger Tap)
-        let skipTouchHandled = false;
-        function onFirstTouch(e) {
-            if (skipTouchHandled) return;
+        // 4) Skip-Listener für Touchscreen + Maus (einmaliger Tap/Klick).
+        //    Klick ist nötig, weil in Cross-Origin-iframes (z.B. train-on.net)
+        //    keine keydown-Events ankommen, solange das iframe keinen Fokus hat.
+        //    pointerdown statt mousedown, weil setupZoomPan() auf dem mapContainer
+        //    bereits einen pointerdown-Handler mit preventDefault() registriert hat.
+        //    Das unterdrueckt per Spec die nachfolgenden mousedown/click-Events.
+        //    Capture-Phase auf document feuert VOR dem Container-Handler.
+        let skipPointerHandled = false;
+        function onFirstPointer(e) {
+            if (skipPointerHandled) return;
 
             e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation();
 
-            skipTouchHandled = true;
+            skipPointerHandled = true;
             clearTimeout(introTimeout);
             jumpToFinalZoom();
             showCampusSVG();
             hideSkipHint();
 
-            // Event-Listener entfernen
-            window.removeEventListener('touchstart', onFirstTouch, { passive: false });
-            document.removeEventListener('touchstart', onFirstTouch, { passive: false });
+            window.removeEventListener('touchstart', onFirstPointer, { capture: true });
+            document.removeEventListener('touchstart', onFirstPointer, { capture: true });
+            window.removeEventListener('pointerdown', onFirstPointer, { capture: true });
+            document.removeEventListener('pointerdown', onFirstPointer, { capture: true });
         }
-        // Event-Listener mit höherer Priorität registrieren
-        window.addEventListener('touchstart', onFirstTouch, { passive: false, capture: true });
-        document.addEventListener('touchstart', onFirstTouch, { passive: false, capture: true });
+        window.addEventListener('touchstart', onFirstPointer, { passive: false, capture: true });
+        document.addEventListener('touchstart', onFirstPointer, { passive: false, capture: true });
+        window.addEventListener('pointerdown', onFirstPointer, { passive: false, capture: true });
+        document.addEventListener('pointerdown', onFirstPointer, { passive: false, capture: true });
     });
 
 
