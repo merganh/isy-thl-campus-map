@@ -39,7 +39,7 @@ const quizModals = [
             options: [
                 { text: 'Das Holstentor', correct: false },
                 { text: 'Das Auge Saurons', correct: false },
-                { text: 'Ein Zahnrad', correct: false },
+                { text: 'Ein abstraktes Erkennungszeichen', correct: true },
                 { text: 'Die Sonne über der Ostsee', correct: false }
             ],
             successMessage: 'Richtig! Das Logo ist kein konkretes Symbol, sondern ein abstraktes Erkennungszeichen.'

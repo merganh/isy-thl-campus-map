@@ -240,10 +240,14 @@ function evaluateQuiz(container) {
         const input = opt.querySelector('input');
         const expected = quiz.content.options[idx].correct;
         opt.classList.add('locked');
-        if (expected) {
-            opt.classList.add('correct');
-        } else if (input.checked) {
-            opt.classList.add('incorrect');
+        if (allCorrect) {
+            if (expected) opt.classList.add('correct');
+        } else {
+            if (!expected && input.checked) {
+                opt.classList.add('incorrect');
+                const icon = opt.querySelector('.quiz-option-marker i');
+                if (icon) { icon.classList.remove('fa-check'); icon.classList.add('fa-times'); }
+            }
         }
     });
 
@@ -291,6 +295,8 @@ function resetQuiz(container) {
         opt.classList.remove('selected', 'correct', 'incorrect', 'locked');
         const input = opt.querySelector('input');
         if (input) input.checked = false;
+        const icon = opt.querySelector('.quiz-option-marker i');
+        if (icon) { icon.classList.remove('fa-times'); icon.classList.add('fa-check'); }
     });
     const feedback = container.querySelector('.quiz-feedback');
     feedback.className = 'quiz-feedback';
@@ -340,16 +346,16 @@ function initSortQuiz(container) {
 
     if (typeof Sortable !== 'undefined') {
         container._sortable = Sortable.create(list, {
-            animation: 180,
+            animation: 150,
             handle: '.sort-item',
             filter: '.sort-arrow-btn',
             preventOnFilter: true,
             ghostClass: 'sort-ghost',
             chosenClass: 'sort-chosen',
             dragClass: 'sort-drag',
-            forceFallback: true,
-            fallbackTolerance: 4,
-            touchStartThreshold: 4,
+            forceFallback: false,
+            fallbackTolerance: 3,
+            touchStartThreshold: 3,
             onSort: () => updateSortArrowStates(container)
         });
     }
@@ -2118,9 +2124,13 @@ async function initAnimations() {
                     ? 'Klicken zum Überspringen'
                     : 'Klicken oder <kbd>Leertaste</kbd> zum Überspringen';
             // Nach kurzer Verzögerung einblenden, damit Animation Zeit hat zu starten
-            setTimeout(() => skipHint.classList.add('visible'), 400);
+            setTimeout(() => { if (!introSkipped) skipHint.classList.add('visible'); }, 400);
         }
-        const hideSkipHint = () => skipHint?.classList.remove('visible');
+        let introSkipped = false;
+        const hideSkipHint = () => {
+            introSkipped = true;
+            skipHint?.classList.remove('visible');
+        };
 
         const introTimeout = setTimeout(() => {
             if (!animationsOn) jumpToFinalZoom();
