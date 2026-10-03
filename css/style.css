@@ -2793,6 +2793,13 @@ button.legend-row:focus-visible {
     color: var(--color-gray-text);
 }
 
+/* Ungefähre Treffer (Frage oder Tippfehler) */
+.legend-fuzzy-hint {
+    margin: 14px 0 0;
+    color: var(--color-gray-text);
+    font-size: var(--font-size-small);
+}
+
 /* Keine Treffer */
 .legend-empty {
     padding: 32px 8px;

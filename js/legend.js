@@ -254,6 +254,67 @@ const campusLegend = (() => {
         return entry.hay.filter(Boolean).some(field => norm(field).includes(q) || (qc && compact(field).includes(qc)));
     }
 
+    // --- Ersatzsuche: Fragen und Tippfehler --------------------------------
+    // Greift nur, wenn die normale Suche nichts findet. Aus „Wo kann ich
+    // Mittag essen?“ werden die Wörter „mittag“ + „essen“, „Mesna“ findet
+    // die Mensa. Angezeigt werden die Einträge, die die meisten Wörter treffen.
+
+    // schon normalisiert (norm): ohne Umlaute, ß → ss
+    const STOPWORDS = new Set((
+        'wo wie was wer wann welche welcher welches ist sind gibt gibts es der die das den dem des ein eine einen einem einer ' +
+        'ich man du wir kann konnen finde finden such suche brauche mochte will komme kommen hin ' +
+        'mein meine meinen meinem mich mir dich dir sich uns ' +
+        'zu zur zum nach in im am an auf bei mit fur und oder hier da mal bitte nachste naheste campus thl hochschule ' +
+        'where how what which who is are there the a an can could i we you find get go to in at on for of and or my me ' +
+        'any some please nearest closest want need look looking'
+    ).split(' '));
+
+    function queryWords(query) {
+        return [...new Set(norm(query).split(/[^a-z0-9]+/).filter(w => w && !STOPWORDS.has(w)))];
+    }
+
+    // Damerau-Levenshtein (Vertauschen zweier Buchstaben zählt als 1 Fehler)
+    function editDistance(a, b) {
+        let prev2 = null;
+        let prev = Array.from({ length: b.length + 1 }, (_, j) => j);
+        for (let i = 1; i <= a.length; i++) {
+            const cur = [i];
+            for (let j = 1; j <= b.length; j++) {
+                cur[j] = Math.min(prev[j] + 1, cur[j - 1] + 1, prev[j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+                if (prev2 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) cur[j] = Math.min(cur[j], prev2[j - 2] + 1);
+            }
+            prev2 = prev;
+            prev = cur;
+        }
+        return prev[b.length];
+    }
+
+    // grobe Stammform: „immatrikulieren“ → „immatrikul“ (findet „Immatrikulation“)
+    function stem(w) {
+        const suffix = ['ieren', 'ungen', 'ung', 'en', 'er', 'e', 'n', 's'].find(s => w.endsWith(s) && w.length - s.length >= 5);
+        return suffix ? w.slice(0, -suffix.length) : w;
+    }
+
+    // 2 = Wort steckt im Feld, 1 = nur mit Tippfehler, 0 = kein Treffer
+    function wordMatches(w, field) {
+        if (compact(field) === w) return 2;                 // „c4“ → C.4
+        if (w.length >= 3 && (norm(field).includes(w) || compact(field).includes(w))) return 2;
+        const parts = norm(field).split(/[^a-z0-9]+/).filter(Boolean);
+        if (w.length < 4) return parts.some(p => p.startsWith(w)) ? 2 : 0;
+        const s = stem(w);
+        if (s !== w && parts.some(p => p.startsWith(s))) return 2;
+        const max = w.length >= 8 ? 2 : 1;
+        return parts.some(p => Math.abs(p.length - w.length) <= max && editDistance(w, p) <= max
+            // angefangenes Wort mit Tippfehler: „bibilo“ → Bibliothek
+            || (w.length >= 6 && p.length > w.length && editDistance(w, p.slice(0, w.length)) <= max)) ? 1 : 0;
+    }
+
+    // Wie gut trifft der Eintrag die Wörter der Anfrage? (Summe der besten Treffer je Wort)
+    function fuzzyCount(entry, words) {
+        const fields = entry.hay.filter(Boolean);
+        return words.reduce((sum, w) => sum + Math.max(0, ...fields.map(f => wordMatches(w, f))), 0);
+    }
+
     // Treffer im Namen markieren (nur wenn die Schreibweise direkt passt)
     function mark(text, query) {
         if (!query) return esc(text);
@@ -362,11 +423,12 @@ const campusLegend = (() => {
     function renderSearch(query) {
         const q = norm(query.trim());
         const qc = compact(query);
+        const byName = (a, b) => (a.name || a.title).localeCompare(b.name || b.title, CURRENT_LANG);
         const sort = list => list
             .filter(e => matches(e, q, qc))
-            .sort((a, b) => score(a, q) - score(b, q) || (a.name || a.title).localeCompare(b.name || b.title, CURRENT_LANG));
-        const fac = sort(facilityEntries());
-        const bld = sort([...buildingEntries(), ...placeEntries()]).map(e => {
+            .sort((a, b) => score(a, q) - score(b, q) || byName(a, b));
+        let fac = sort(facilityEntries());
+        let bld = sort([...buildingEntries(), ...placeEntries()]).map(e => {
             // Nur über einen Suchbegriff gefunden? Dann den Begriff zeigen,
             // damit klar ist, warum das Gebäude in der Liste steht
             const hit = (e.terms || []).filter(term => norm(term).includes(q) || (qc && compact(term).includes(qc)));
@@ -374,6 +436,25 @@ const campusLegend = (() => {
             // erster Treffer genügt – Begriffe in Seitensprache stehen vorn
             return hit.length && !byName ? { ...e, sub: hit[0] } : e;
         });
+
+        // Nichts gefunden? Dann als Frage bzw. mit Tippfehlern versuchen
+        let fuzzy = false;
+        const words = fac.length + bld.length ? [] : queryWords(query);
+        if (words.length) {
+            const counted = list => list.map(e => ({ e, n: fuzzyCount(e, words) })).filter(x => x.n);
+            const facHits = counted(facilityEntries());
+            const bldHits = counted([...buildingEntries(), ...placeEntries()]);
+            const best = Math.max(0, ...facHits.map(x => x.n), ...bldHits.map(x => x.n));
+            const top = hits => hits.filter(x => x.n === best).map(x => x.e).sort(byName);
+            fac = top(facHits);
+            bld = top(bldHits).map(e => {
+                const hit = (e.terms || []).find(term => words.some(w => wordMatches(w, term)));
+                const named = words.some(w => wordMatches(w, e.title) || (e.sub && wordMatches(w, e.sub)));
+                return hit && !named ? { ...e, sub: hit } : e;
+            });
+            fuzzy = fac.length + bld.length > 0;
+        }
+
         const n = fac.length + bld.length;
         scheduleAnnounce(n ? t('legend.resultsCount', { n }) : t('legend.noResults', { q: query.trim() }));
         if (!n) {
@@ -382,8 +463,10 @@ const campusLegend = (() => {
                 <p class="legend-empty-title">${esc(t('legend.noResults', { q: query.trim() }))}</p>
                 <p>${esc(t('legend.noResultsHint'))}</p></div>`;
         }
-        const raw = query.trim();
-        return (fac.length ? `<h3 class="legend-subhead">${esc(t('legend.facilities'))} <span class="legend-count">${fac.length}</span></h3>
+        // ungefähre Treffer: keine Markierung, dafür ein Hinweis
+        const raw = fuzzy ? '' : query.trim();
+        return (fuzzy ? `<p class="legend-fuzzy-hint">${esc(t('legend.fuzzyHint', { q: query.trim() }))}</p>` : '')
+            + (fac.length ? `<h3 class="legend-subhead">${esc(t('legend.facilities'))} <span class="legend-count">${fac.length}</span></h3>
               <ul class="legend-list">${fac.map(e => resultRow(e, raw)).join('')}</ul>` : '')
             + (bld.length ? `<h3 class="legend-subhead">${esc(t('legend.resultsPlaces'))} <span class="legend-count">${bld.length}</span></h3>
               <ul class="legend-list">${bld.map(e => resultRow(e, raw)).join('')}</ul>` : '');
