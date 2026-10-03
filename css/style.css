@@ -5,6 +5,12 @@
         --transition-normal: all 0.3s ease;
         --color-primary: #4B5459;
         --color-gray: #8D939E;
+        /* Barrierefreiheit: gepruefte Kontrastwerte gegen Weiss (WCAG 2.1 AA) */
+        --color-gray-text: #6A7078;
+        --color-accent: #8C9B39;
+        --color-accent-text: #67732A;
+        --color-border-strong: #8A9099;
+        --focus-ring: #0B5ED7;
         --border-radius-sm: 8px;
         --border-radius-pill: 999px;
         --hover-lift: translateY(-2px);
@@ -54,7 +60,7 @@
         display: block;
         font-weight: 400;
         font-size: 1.0rem;
-        color: #8D939E;
+        color: var(--color-gray-text);
     }
 
     #mapContainer.grabbing {
@@ -91,7 +97,7 @@
         border: 1px solid #d0d4da;
         border-bottom-width: 2px;
         border-radius: 4px;
-        color: #6c757d;
+        color: #495057;
         font-family: inherit;
         font-size: 0.85rem;
         line-height: 1;
@@ -209,9 +215,9 @@
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        color: #8c9b39;
+        color: var(--color-accent-text);
         font-size: 1.4rem;
-        opacity: 0.85;
+        opacity: 1;
     }
 
     .navbar,
@@ -372,9 +378,12 @@
         cursor: pointer;
     }
 
+    .toolbox-btn[hidden] {
+        display: none;
+    }
+
     .toolbox-btn:hover {
         background-color: rgba(75, 84, 89, 0.1);
-        transform: var(--hover-lift);
     }
 
     .toolbox-btn:focus {
@@ -383,7 +392,7 @@
     }
 
     .toolbox-btn:focus-visible {
-        outline: 2px solid rgba(255, 255, 255, 0.5);
+        outline: 3px solid var(--focus-ring);
         outline-offset: 2px;
     }
 
@@ -396,6 +405,49 @@
     .toolbox-btn .fa,
     .toolbox-btn .fas {
         color: var(--color-primary);
+    }
+
+    /* Sprachumschalter (Kopfzeile + Einstellungen) */
+    .lang-switch {
+        display: inline-flex;
+        align-items: stretch;
+        height: 32px;
+        padding: 2px;
+        gap: 2px;
+        border: 1px solid var(--color-border-strong);
+        border-radius: var(--border-radius-pill);
+        background: #fff;
+        margin-right: 4px;
+    }
+
+    .lang-switch-btn {
+        min-width: 34px;
+        padding: 0 8px;
+        border: none;
+        border-radius: var(--border-radius-pill);
+        background: transparent;
+        color: var(--color-primary);
+        font-size: var(--font-size-xsmall);
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        line-height: 1;
+        cursor: pointer;
+        transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .lang-switch-btn:hover {
+        background-color: rgba(75, 84, 89, 0.1);
+    }
+
+    .lang-switch-btn.active {
+        background-color: var(--color-primary);
+        color: #fff;
+        cursor: default;
+    }
+
+    .lang-switch-btn:focus-visible {
+        outline: 3px solid var(--focus-ring);
+        outline-offset: 2px;
     }
 
     .btn-outline-secondary.btn-sm {
@@ -496,6 +548,16 @@
             font-size: var(--font-size-normal);
             width: 28px;
             height: 28px;
+        }
+
+        .lang-switch {
+            height: 28px;
+            margin-right: 2px;
+        }
+
+        .lang-switch-btn {
+            min-width: 30px;
+            padding: 0 6px;
         }
 
         #carouselBuilding .carousel-control-prev {
@@ -758,7 +820,7 @@
 
     .badge-description {
         font-size: var(--font-size-normal);
-        color: #8D939E;
+        color: var(--color-gray-text);
         margin: 0 0 12px 0;
     }
 
@@ -777,7 +839,7 @@
     }
 
     .badge-card.unlocked .progress-text {
-        color: #8c9b39;
+        color: var(--color-accent-text);
     }
 
     .progress-bar-container {
@@ -800,14 +862,14 @@
 
     .badge-date {
         font-size: var(--font-size-xsmall);
-        color: #8c9b39;
+        color: var(--color-accent-text);
         margin-top: 8px;
         font-weight: 500;
     }
 
     .badge-hint {
         font-size: var(--font-size-xsmall);
-        color: #0092c3;
+        color: #0077A3;
         margin-top: 8px;
         font-weight: 500;
     }
@@ -844,7 +906,7 @@
         padding: 10px 10px;
         margin-bottom: 12px;
         transition: all 0.2s ease;
-        border: 2px solid #e0e0e0;
+        border: 2px solid var(--color-border-strong);
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -937,7 +999,7 @@
     .toggle-all-btn {
         width: 100%;
         padding: 14px;
-        background: #9e9ea0;
+        background: #6C7278;
         color: white;
         border: none;
         border-radius: 12px;
@@ -948,7 +1010,7 @@
     }
 
     .toggle-all-btn.active {
-        background: #8c9b39;
+        background: var(--color-accent-text);
     }
 
     .toggle-all-btn i {
@@ -1163,7 +1225,7 @@
         gap: 0.85rem;
         padding: 0.85rem 1rem;
         background: #fff;
-        border: 2px solid #dee2e6;
+        border: 2px solid var(--color-border-strong);
         border-radius: var(--border-radius-sm);
         cursor: pointer;
         transition: var(--transition-fast);
@@ -1188,7 +1250,7 @@
         flex-shrink: 0;
         width: 26px;
         height: 26px;
-        border: 2px solid #ced4da;
+        border: 2px solid var(--color-border-strong);
         border-radius: 6px;
         display: flex;
         align-items: center;
@@ -1293,25 +1355,28 @@
     }
 
     /* ===== Kreuzworträtsel ===== */
+    /* Optik wie die Wortsuche (Quiz 5): weiße Felder auf hellem Grund,
+       Türkis für das aktive Wort, Hinweise als weiße Kapseln. */
     .crossword-container {
         display: flex;
         flex-direction: column;
-        gap: 0.75rem;
+        gap: 0.6rem;
     }
 
     .crossword-grid-wrapper {
         width: 100%;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
+        padding: 0.75rem 0.5rem;
+        background: #f8f9fa;
+        border-radius: var(--border-radius-sm);
     }
 
     .crossword-grid {
         --cw-cell-size: 38px;
         display: grid;
         gap: 2px;
-        background: #cfd4da;
         padding: 2px;
-        border-radius: 4px;
         width: max-content;
         margin: 0 auto;
     }
@@ -1321,13 +1386,16 @@
         width: var(--cw-cell-size);
         height: var(--cw-cell-size);
         background: #fff;
-        border-radius: 2px;
+        border: 1px solid #dee2e6;
+        border-radius: 3px;
+        transition: background-color 0.1s ease;
     }
 
     .cw-cell-empty {
         width: var(--cw-cell-size);
         height: var(--cw-cell-size);
         background: transparent;
+        border: 0;
         border-radius: 0;
     }
 
@@ -1337,7 +1405,7 @@
         left: 2px;
         font-size: 0.55rem;
         font-weight: 700;
-        color: var(--color-gray);
+        color: var(--color-gray-text);
         line-height: 1;
         pointer-events: none;
         z-index: 2;
@@ -1355,7 +1423,7 @@
         text-align: center;
         text-transform: uppercase;
         font-family: inherit;
-        font-size: calc(var(--cw-cell-size) * 0.55);
+        font-size: calc(var(--cw-cell-size) * 0.5);
         line-height: 1;
         font-weight: 700;
         color: var(--color-primary);
@@ -1367,48 +1435,48 @@
         border-radius: 2px;
     }
 
-    .cw-cell-input:focus {
-        background: #c3e4e3;
+    .cw-cell.cw-cell-active {
+        background: #e0f2f1;
+        border-color: #b2dfdb;
     }
 
-    .cw-cell-active .cw-cell-input {
-        background: #e7f4f4;
-    }
-
-    .cw-cell-active .cw-cell-input:focus {
-        background: #c3e4e3;
-    }
-
-    .cw-clue {
-        transition: var(--transition-fast);
-    }
-
-    .cw-clue:hover {
-        color: #1e5e3a;
-    }
-
-    .cw-cell-correct {
+    .cw-cell.cw-cell-correct {
         background: #e6f4ec;
+        border-color: #b7dcc4;
     }
 
-    .cw-cell-correct .cw-cell-input {
+    .cw-cell.cw-cell-correct .cw-cell-input {
         color: #1e5e3a;
     }
 
-    .cw-cell-incorrect {
+    .cw-cell.cw-cell-incorrect {
         background: #fbe9e7;
+        border-color: #efc2bb;
     }
 
-    .cw-cell-incorrect .cw-cell-input {
+    .cw-cell.cw-cell-incorrect .cw-cell-input {
         color: #7a2018;
+    }
+
+    .cw-cell:focus-within {
+        background: #b2dfdb;
+        border-color: #b2dfdb;
+        outline: 3px solid var(--focus-ring);
+        outline-offset: -1px;
+        z-index: 3;
+    }
+
+    .cw-cell-active .cw-cell-input,
+    .cw-cell:focus-within .cw-cell-input {
+        color: #1e4d4a;
     }
 
     .crossword-clues {
         display: grid;
         grid-template-columns: 1fr 1fr;
         gap: 1rem;
+        padding: 0.75rem;
         background: #f8f9fa;
-        padding: 0.85rem;
         border-radius: var(--border-radius-sm);
     }
 
@@ -1416,9 +1484,7 @@
         font-size: 0.95rem;
         font-weight: 700;
         color: var(--color-primary);
-        margin: 0 0 0.4rem 0;
-        padding-bottom: 0.3rem;
-        border-bottom: 1px solid #dee2e6;
+        margin: 0 0 0.5rem 0;
     }
 
     .crossword-clue-list {
@@ -1427,13 +1493,28 @@
         margin: 0;
         display: flex;
         flex-direction: column;
-        gap: 0.3rem;
-        font-size: 0.88rem;
+        gap: 0.4rem;
+        font-size: 0.85rem;
         color: var(--color-primary);
     }
 
     .cw-clue {
         line-height: 1.35;
+        padding: 0.3rem 0.65rem;
+        background: #fff;
+        border: 1px solid #dee2e6;
+        border-radius: var(--border-radius-sm);
+        transition: var(--transition-fast);
+    }
+
+    .cw-clue:hover {
+        border-color: #b2dfdb;
+    }
+
+    .cw-clue.cw-clue-active {
+        background: #e0f2f1;
+        border-color: #b2dfdb;
+        color: #1e4d4a;
     }
 
     .cw-clue-num {
@@ -1442,9 +1523,11 @@
     }
 
     @media (max-width: 575px) {
+        .crossword-grid-wrapper {
+            padding: 0.5rem 0.25rem;
+        }
         .crossword-grid {
             --cw-cell-size: 34px;
-            gap: 3px;
         }
         .cw-cell-number {
             font-size: 0.5rem;
@@ -1455,7 +1538,7 @@
             padding: 0.6rem;
         }
         .crossword-clue-list {
-            font-size: 0.82rem;
+            font-size: 0.78rem;
         }
     }
 
@@ -1762,7 +1845,7 @@
         gap: 0.75rem;
         padding: 0.75rem 0.85rem;
         background: #fff;
-        border: 2px solid #dee2e6;
+        border: 2px solid var(--color-border-strong);
         border-radius: var(--border-radius-sm);
         cursor: grab;
         transition: var(--transition-fast);
@@ -1786,7 +1869,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        color: var(--color-gray);
+        color: var(--color-gray-text);
         font-size: 1rem;
     }
 
@@ -1837,7 +1920,7 @@
     }
 
     .sort-arrow-btn:focus-visible {
-        outline: 2px solid #63b4b8;
+        outline: 3px solid var(--focus-ring);
         outline-offset: 2px;
     }
 
@@ -2015,7 +2098,7 @@
 
     .memory-card-back {
         background: #fff;
-        border: 2px solid #dee2e6;
+        border: 2px solid var(--color-border-strong);
         transform: rotateY(180deg);
         padding: 0.35rem;
     }
@@ -2040,3 +2123,975 @@
         50% { transform: rotateY(180deg) scale(1.06); }
         100% { transform: rotateY(180deg) scale(1); }
     }
+
+    /* ================================================================
+       Barrierefreiheit (WCAG 2.1 AA)
+       ================================================================ */
+
+    /* 2.4.7 Fokus sichtbar - durchgaengiger Indikator, 5.8:1 gegen Weiss */
+    *:focus-visible {
+        outline: 3px solid var(--focus-ring);
+        outline-offset: 2px;
+        border-radius: 4px;
+    }
+
+    /* Bedienelemente mit visuell verstecktem Input: Ring auf die Karte legen */
+    .quiz-option:has(input:focus-visible),
+    .filter-card:has(input:focus-visible) {
+        outline: 3px solid var(--focus-ring);
+        outline-offset: 2px;
+    }
+
+    /* Fallback fuer Browser ohne :has() */
+    @supports not selector(:has(*)) {
+        .quiz-option:focus-within,
+        .filter-card:focus-within {
+            outline: 3px solid var(--focus-ring);
+            outline-offset: 2px;
+        }
+    }
+
+    /* Fokus auf der Karte: Ring folgt der Elementform */
+    .campus-map-svg [tabindex]:focus-visible {
+        outline: 3px solid var(--focus-ring);
+        outline-offset: 3px;
+    }
+
+    /* 1.3.1 Ueberschriftenstruktur korrigiert (h4/h5 -> h2/h3):
+       Groessen bleiben wie zuvor, nur die Ebenen stimmen jetzt. */
+    .offcanvas-title {
+        font-size: 1.5rem;
+    }
+
+    .modal-title {
+        font-size: 1.25rem;
+    }
+
+    .settings-section-title,
+    .danger-zone-title {
+        font-size: 1.25rem;
+    }
+
+    .crossword-clues-title {
+        font-size: 1rem;
+    }
+
+    .accordion-header {
+        font-size: 1rem;
+        margin-bottom: 0;
+    }
+
+    /* Nur fuer Screenreader */
+    .sr-only {
+        position: absolute !important;
+        width: 1px;
+        height: 1px;
+        padding: 0;
+        margin: -1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+        border: 0;
+    }
+
+    /* 2.4.1 Skip-Link */
+    .skip-link {
+        position: absolute;
+        left: 8px;
+        top: -60px;
+        z-index: 2000;
+        background: #fff;
+        color: var(--color-primary);
+        border: 2px solid var(--focus-ring);
+        border-radius: 8px;
+        padding: 10px 16px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: top 0.15s ease;
+    }
+
+    .skip-link:focus {
+        top: 8px;
+    }
+
+    /* Zoom-Schaltflaechen: Alternative zu Mausrad und Pinch (2.5.1) */
+    .map-controls {
+        position: absolute;
+        right: 12px;
+        bottom: 12px;
+        z-index: 20;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+    }
+
+    /* Bewusst nicht groesser als die Kopfzeilen-Icons (36px); 32px liegen
+       weiterhin ueber der Mindest-Zielgroesse von 24px (2.5.8). */
+    .map-zoom-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        /* Dunklerer Rahmen als bei den uebrigen Bedienelementen: Bei 80 %
+           Deckkraft mischt sich der Untergrund ein, --color-border-strong
+           faende dabei auf 2,45:1 ab. Mit --color-primary bleiben 4,6:1. */
+        border: 1.5px solid var(--color-primary);
+        background: #fff;
+        color: var(--color-primary);
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        transition: var(--transition-fast);
+        opacity: 0.8;
+    }
+
+    /* Bei Interaktion voll deckend - dann ist auch der Fokusring ungetruebt.
+       Bewusst :focus statt :focus-visible: In diesem Stylesheet greifen
+       :focus-visible-Regeln an manchen Elementen nicht (siehe .toolbox-btn),
+       und ein voll deckender Button nach einem Mausklick stoert nicht. */
+    .map-zoom-btn:hover,
+    .map-zoom-btn:focus {
+        opacity: 1;
+    }
+
+    .map-zoom-btn:hover {
+        background: #f1f3f5;
+    }
+
+    @media (max-width: 767px) {
+        .map-controls {
+            right: 12px;
+            bottom: 12px;
+        }
+    }
+
+    /* --- Memory: Karten sind jetzt <button> --- */
+    .memory-card {
+        appearance: none;
+        -webkit-appearance: none;
+        padding: 0;
+        border: 0;
+        background: none;
+        width: 100%;
+        display: block;
+        font: inherit;
+        color: inherit;
+    }
+
+    .memory-card-inner {
+        display: block;
+    }
+
+    /* --- Wortsuche: Zeilen sind reine ARIA-Struktur, kein Layout --- */
+    .wordsearch-row {
+        display: contents;
+    }
+
+    .wordsearch-cell[aria-selected="true"] {
+        outline: 3px solid var(--focus-ring);
+        outline-offset: -3px;
+    }
+
+    /* Der Anker (erster Buchstabe) bleibt sichtbar, waehrend man das Wort aufzieht */
+    .wordsearch-cell.ws-anchor {
+        box-shadow: inset 0 0 0 3px var(--focus-ring);
+    }
+
+    /* --- Bild-Hotspot: Tastaturraster ueber dem Bild --- */
+    .hotspot-keyboard-grid {
+        position: absolute;
+        inset: 0;
+    }
+
+    .hotspot-region {
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        cursor: crosshair;
+    }
+
+    /* Unsichtbar, bis der Fokus darauf liegt - die Maus-Variante bleibt
+       optisch unveraendert, Tastaturnutzer sehen aber, wo sie sind. */
+    .hotspot-region:focus {
+        outline: 3px solid var(--focus-ring);
+        outline-offset: -3px;
+        background: rgba(11, 94, 215, 0.12);
+    }
+
+    /* Das Tastaturraster darf Mausklicks nicht abfangen: sonst wuerden
+       Klicks auf Rasterfelder gerundet statt punktgenau ausgewertet.
+       Fokussierbarkeit bleibt davon unberuehrt. */
+    .hotspot-keyboard-grid,
+    .hotspot-region {
+        pointer-events: none;
+    }
+
+    /* Fokusring fuer Buttons mit weisser Schrift.
+       Ihr Outline erbte ueber currentColor die weisse Schriftfarbe und lag
+       damit unsichtbar auf hellem Grund. Der Ring wird deshalb als
+       Pseudo-Element gezeichnet: dessen Rahmenfarbe steht explizit fest und
+       haengt an keiner geerbten Farbe. */
+    .toolbox-btn,
+    .toggle-all-btn {
+        position: relative;
+    }
+
+    .toolbox-btn:focus-visible::after,
+    .toggle-all-btn:focus-visible::after {
+        content: "";
+        position: absolute;
+        inset: -5px;
+        border: 3px solid #0B5ED7;
+        border-radius: 12px;
+        pointer-events: none;
+    }
+
+    /* Der Schalter im Aus-Zustand war nur ein hellgrauer Streifen auf weiss
+       (1,26:1). Ein innenliegender Ring macht die Umrandung wahrnehmbar,
+       ohne das Layout zu veraendern - eine echte Border wuerde den Knopf
+       um die Rahmenbreite verschieben. */
+    .toggle-slider {
+        box-shadow: inset 0 0 0 2px var(--color-border-strong);
+    }
+
+    .filter-toggle input:checked + .toggle-slider {
+        box-shadow: inset 0 0 0 2px var(--color-accent-text);
+    }
+
+/* Info-Schaltfläche im Quiz-Modal: Fokus sichtbar machen */
+.info-icon-trigger:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+/* Pause-Button für das Bilderkarussell (WCAG 2.2.2) */
+.carousel-pause-btn {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    z-index: 5;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel-pause-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.carousel-pause-btn:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+/* Container, die nur programmatisch fokussiert werden (Bootstrap setzt beim
+   Öffnen den Fokus auf das Panel, der Skip-Link auf die Karte): kein Rahmen
+   um die ganze Fläche – der Fokusring gehört an das Bedienelement. */
+.offcanvas:focus-visible,
+.modal:focus-visible,
+#mapContainer:focus-visible,
+#lottieMap svg:focus-visible {
+    outline: none;
+}
+
+/* ============================================================
+   Gebäude & Legende (js/legend.js)
+   Bewusst schlicht, angelehnt an die Legende im gedruckten Campusplan:
+   Farbquadrat, Name, Gebäudenummer rechts – keine Farbbalken/Schatten.
+   ============================================================ */
+
+/* Rechtes Panel schmaler als die linken (600px) – mehr Karte sichtbar */
+#buildingInfoOffcanvas {
+    --bs-offcanvas-width: 460px;
+}
+
+/* --- Kopfzeile des Panels --- */
+#buildingInfoOffcanvas .offcanvas-header {
+    position: relative;
+    gap: 8px;
+}
+
+#buildingInfoOffcanvas .offcanvas-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    outline: none;
+}
+
+#buildingInfoOffcanvas.is-legend .offcanvas-title {
+    color: #212529;
+}
+
+.panel-back-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    flex: 0 0 auto;
+    height: 36px;
+    margin: 0 12px 0 -8px;
+    padding: 0 10px 0 8px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: var(--color-primary);
+    font-size: var(--font-size-small);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+/* Trennstrich zwischen Zurück-Button und Titel */
+.panel-back-btn::after {
+    content: "";
+    position: absolute;
+    top: 8px;
+    bottom: 8px;
+    right: -10px;
+    width: 1px;
+    background: #dee2e6;
+}
+
+.panel-back-btn[hidden] {
+    display: none;
+}
+
+.panel-back-btn:hover {
+    background-color: rgba(75, 84, 89, 0.1);
+}
+
+.panel-back-btn:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+.sheet-handle {
+    display: none;
+}
+
+/* Desktop: Karte hinter der Legende nur leicht abdunkeln, damit das
+   Hervorheben der Gebäude beim Überfahren sichtbar bleibt */
+body.legend-open .offcanvas-backdrop.show {
+    opacity: .18;
+}
+
+/* --- Suche + Ansicht (bleiben beim Scrollen oben) --- */
+.legend-view[hidden] {
+    display: none;
+}
+
+.legend-sticky {
+    position: sticky;
+    top: calc(-1 * var(--bs-offcanvas-padding-y, 1rem));
+    z-index: 3;
+    margin: calc(-1 * var(--bs-offcanvas-padding-y, 1rem)) calc(-1 * var(--bs-offcanvas-padding-x, 1rem)) 0;
+    padding: var(--bs-offcanvas-padding-y, 1rem) var(--bs-offcanvas-padding-x, 1rem) 12px;
+    border-bottom: 1px solid #dee2e6;
+    background: #fff;
+}
+
+.legend-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.legend-search-icon {
+    position: absolute;
+    left: 12px;
+    color: var(--color-gray-text);
+    pointer-events: none;
+}
+
+.legend-search-input {
+    width: 100%;
+    height: 44px;
+    padding: 0 42px 0 38px;
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--border-radius-sm);
+    background: #fff;
+    color: #212529;
+    /* mind. 16px: sonst zoomt iOS beim Antippen in die Seite */
+    font-size: 16px;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.legend-search-input::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+}
+
+.legend-search-input::placeholder {
+    color: var(--color-gray-text);
+}
+
+/* Fokus dezent in der Hausfarbe (wie aktiver DE/EN-Schalter): Rahmen wird
+   dunkel und 2px stark – sichtbar, aber ohne den blauen Fokusring */
+.legend-search-input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: inset 0 0 0 1px var(--color-primary);
+}
+
+.legend-search-clear {
+    position: absolute;
+    right: 2px;
+    width: 40px;
+    height: 40px;
+    border: 0;
+    background: transparent;
+    color: var(--color-gray-text);
+    cursor: pointer;
+}
+
+.legend-search-clear[hidden] {
+    display: none;
+}
+
+.legend-search-clear:hover {
+    color: #212529;
+}
+
+.legend-search-clear:focus-visible {
+    outline: 3px solid var(--focus-ring);
+}
+
+/* --- Inhalt --- */
+.legend-results {
+    padding: 0 0 24px;
+}
+
+.legend-subhead {
+    margin: 18px 0 6px;
+    color: #212529;
+    font-size: var(--font-size-small);
+    font-weight: 700;
+}
+
+.legend-count {
+    color: var(--color-gray-text);
+    font-weight: 400;
+}
+
+/* Schnellzugriff – wie die kleinen Outline-Buttons der App */
+.legend-quick {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.legend-quick-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 36px;
+    padding: 0 12px;
+    border: 1px solid var(--color-gray);
+    border-radius: var(--border-radius-pill);
+    background: #fff;
+    color: #212529;
+    font-size: var(--font-size-small);
+    cursor: pointer;
+}
+
+.legend-quick-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    background: var(--area);
+}
+
+.legend-quick-chip:hover {
+    background-color: #f8f9fa;
+    border-color: #aaa;
+}
+
+.legend-quick-chip:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+/* Listenzeilen (Einrichtungen, Suchtreffer) */
+.legend-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.legend-item {
+    border-bottom: 1px solid #dee2e6;
+}
+
+.legend-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-height: 52px;
+    padding: 8px 4px;
+    border: 0;
+    background: transparent;
+    color: #212529;
+    text-align: left;
+    font-size: var(--font-size-normal);
+}
+
+button.legend-row {
+    cursor: pointer;
+}
+
+button.legend-row:hover,
+.legend-row-multi:hover {
+    background: #f8f9fa;
+}
+
+button.legend-row:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: -3px;
+}
+
+.legend-swatch {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+}
+
+.legend-row-icon {
+    flex: 0 0 auto;
+    width: 20px;
+    height: 20px;
+    margin: 0 -3px;
+}
+
+.legend-thumb {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+.legend-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.legend-row-text {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+    line-height: 1.3;
+}
+
+.legend-row-name {
+    overflow-wrap: anywhere;
+}
+
+.legend-row-name mark,
+.legend-row-meta mark {
+    padding: 0;
+    background: #fff1a8;
+    color: inherit;
+}
+
+.legend-row-meta {
+    display: -webkit-box;
+    overflow: hidden;
+    color: var(--color-gray-text);
+    font-size: var(--font-size-small);
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.legend-sp {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 15px;
+    height: 15px;
+    margin-left: 2px;
+    border-radius: 50%;
+    background: #e30613;
+    color: #fff;
+    font-family: Georgia, serif !important;
+    font-size: 10px;
+    font-style: italic;
+    font-weight: 700;
+    vertical-align: 1px;
+}
+
+.legend-codes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 4px;
+    flex: 0 0 auto;
+    max-width: 50%;
+}
+
+/* Gebäudenummer wie im PDF: fett, rechtsbündig */
+.legend-code {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: #212529;
+    font-size: var(--font-size-normal);
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+/* bei mehreren Gebäuden einzeln antippbar */
+.legend-code-btn {
+    min-width: 48px;
+    height: 36px;
+    padding: 0 8px;
+    border: 1px solid var(--color-gray);
+    border-radius: var(--border-radius-sm);
+    background: #fff;
+    font-size: var(--font-size-small);
+    cursor: pointer;
+}
+
+.legend-code-btn:hover {
+    background-color: #f8f9fa;
+    border-color: #aaa;
+}
+
+.legend-code-btn:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+/* Abkürzungen (wie im PDF unten links) */
+.legend-abbr {
+    margin: 18px 0 0;
+    font-size: var(--font-size-small);
+}
+
+.legend-abbr div {
+    display: flex;
+    gap: 10px;
+}
+
+.legend-abbr dt {
+    min-width: 46px;
+}
+
+.legend-abbr dd {
+    margin: 0;
+    color: var(--color-gray-text);
+}
+
+/* Keine Treffer */
+.legend-empty {
+    padding: 32px 8px;
+    color: var(--color-gray-text);
+    text-align: center;
+}
+
+.legend-empty i {
+    margin-bottom: 10px;
+    font-size: 1.8rem;
+    color: var(--color-gray);
+}
+
+.legend-empty-title {
+    margin-bottom: 4px;
+    color: #212529;
+    font-weight: 700;
+}
+
+/* „Auf Karte zeigen“ – wie der Link-Button unten in den Gebäude-Details */
+.building-actions {
+    display: flex;
+    justify-content: center;
+    margin: 0 0 14px;
+}
+
+.show-on-map-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 42px;
+    padding: 0 18px;
+    border: 1px solid var(--color-primary);
+    border-radius: 20px;
+    background: #fff;
+    color: var(--color-primary);
+    font-size: var(--font-size-small);
+    font-weight: 700;
+    cursor: pointer;
+}
+
+.show-on-map-btn:hover {
+    background-color: rgba(75, 84, 89, 0.1);
+}
+
+.show-on-map-btn:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+/* Pin neben einem Treffer: direkt auf die Karte */
+.legend-item.has-pin {
+    display: flex;
+    align-items: center;
+}
+
+.legend-item.has-pin > .legend-row {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.legend-pin {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--color-primary);
+    font-size: 1.05rem;
+    cursor: pointer;
+}
+
+.legend-pin:hover {
+    background-color: rgba(75, 84, 89, 0.1);
+}
+
+.legend-pin:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: -3px;
+}
+
+/* Mini-Lageplan oben in den Gebäude-Infos (öffnet die große Karte) */
+.mini-map {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    overflow: hidden;
+    border: 1px solid var(--color-border-strong);
+    border-radius: 12px;
+    background: #fff;
+    cursor: pointer;
+}
+
+.mini-map-svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 2.6;
+}
+
+.mini-map-hint {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border: 1px solid var(--color-primary);
+    border-radius: 16px;
+    background: #fff;
+    color: var(--color-primary);
+    font-size: var(--font-size-small);
+    font-weight: 700;
+}
+
+.mini-map:hover .mini-map-hint {
+    background-color: #eceeef;
+}
+
+.mini-map:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+}
+
+/* --- Hervorhebung auf der Karte --- */
+.map-spotlight-ring {
+    fill: var(--spot);
+    fill-opacity: .12;
+    stroke: var(--spot);
+    stroke-width: 3;
+    vector-effect: non-scaling-stroke;
+}
+
+.map-spotlight-wave {
+    fill: none;
+    stroke: var(--spot);
+    stroke-width: 3;
+    vector-effect: non-scaling-stroke;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: map-spot-wave 1.3s ease-out 3;
+    opacity: 0;
+}
+
+@keyframes map-spot-wave {
+    0% { opacity: .9; transform: scale(1); }
+    100% { opacity: 0; transform: scale(1.5); }
+}
+
+body.no-animations .map-spotlight-wave {
+    animation: none !important;
+}
+
+/* --- Leiste nach „Auf Karte zeigen“ (Smartphone) --- */
+.map-return-pill {
+    position: fixed;
+    left: 50%;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    z-index: 1040;
+    display: flex;
+    align-items: stretch;
+    width: min(440px, calc(100% - 24px));
+    border: 1px solid var(--color-border-strong);
+    border-radius: 12px;
+    background: #fff;
+    transform: translate(-50%, 0);
+}
+
+.map-return-pill[hidden] {
+    display: none;
+}
+
+.map-return-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1 1 auto;
+    min-width: 0;
+    min-height: 56px;
+    padding: 6px 8px 6px 14px;
+    border: 0;
+    border-radius: 12px 0 0 12px;
+    background: transparent;
+    color: #212529;
+    text-align: left;
+    cursor: pointer;
+}
+
+.map-return-dot {
+    flex: 0 0 auto;
+    width: 14px;
+    height: 14px;
+    background: var(--spot);
+}
+
+.map-return-text {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-width: 0;
+    line-height: 1.25;
+}
+
+.map-return-name {
+    overflow: hidden;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.map-return-action {
+    color: var(--color-gray-text);
+    font-size: var(--font-size-small);
+}
+
+.map-return-main .fa-chevron-up {
+    color: var(--color-primary);
+}
+
+.map-return-close {
+    flex: 0 0 auto;
+    width: 50px;
+    border: 0;
+    border-left: 1px solid #dee2e6;
+    border-radius: 0 12px 12px 0;
+    background: transparent;
+    color: var(--color-gray-text);
+    cursor: pointer;
+}
+
+.map-return-main:focus-visible,
+.map-return-close:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: -3px;
+}
+
+/* Zoom-Knöpfe weichen der Leiste nach oben aus */
+body.map-pill-open .map-controls {
+    bottom: calc(84px + env(safe-area-inset-bottom, 0px));
+}
+
+/* --- Smartphone: Panel als Bottom-Sheet --- */
+@media (max-width: 767px) {
+    #buildingInfoOffcanvas.offcanvas-end {
+        top: auto;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 88vh;
+        height: 88dvh;
+        max-height: 88dvh;
+        border-left: 0;
+        border-top: 1px solid #dee2e6;
+        border-radius: 12px 12px 0 0;
+        transform: translateY(100%);
+    }
+
+    #buildingInfoOffcanvas.offcanvas-end.showing,
+    #buildingInfoOffcanvas.offcanvas-end.show:not(.hiding) {
+        transform: none;
+    }
+
+    #buildingInfoOffcanvas .offcanvas-header {
+        padding-top: 20px;
+        touch-action: none;
+    }
+
+    #buildingInfoOffcanvas .sheet-handle {
+        display: block;
+        position: absolute;
+        top: 7px;
+        left: 50%;
+        width: 36px;
+        height: 4px;
+        margin-left: -18px;
+        border-radius: 2px;
+        background: #c9cdd2;
+    }
+
+    #buildingInfoOffcanvas .offcanvas-title {
+        font-size: 1.25rem;
+    }
+
+    #buildingInfoOffcanvas .offcanvas-body {
+        padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    }
+
+}
+
+@media (max-width: 360px) {
+    .legend-codes {
+        max-width: 45%;
+    }
+}

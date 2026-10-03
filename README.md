@@ -4,7 +4,7 @@ An interactive campus map application for Technische Hochschule Lübeck (THL) fe
 
 ## Features
 
-- **Interactive Campus Map**: Animated Lottie-based campus map with smooth zoom and pan controls
+- **Interactive Campus Map**: SVG campus map with an animated intro and smooth zoom and pan controls
 - **Building Information**: Detailed information for each building including opening hours and descriptions
 - **Native Quiz Engine**: 10 self-contained quizzes covering several interaction types:
   - Single choice and multiple choice (with modern card-style options)
@@ -33,7 +33,7 @@ An interactive campus map application for Technische Hochschule Lübeck (THL) fe
 
 - **Frontend**: Pure HTML, CSS, JavaScript (no framework, no build step)
 - **UI Framework**: Bootstrap 5.3.2 (CDN) for responsive components and modals
-- **Animation**: Lottie-web for interactive SVG animations
+- **Animation**: Web Animations API directly on the map SVG (no animation library)
 - **Icons**: Font Awesome 5.15.4
 - **Quiz utility libraries** (all loaded from CDN, MIT licensed):
   - [SortableJS](https://github.com/SortableJS/Sortable) — drag-and-drop for the sort quiz
@@ -51,7 +51,6 @@ isy-thl-campus-map/
 │   ├── config.js       # Configuration data (buildings, quizzes, badges)
 │   └── main.js         # Application logic, quiz engine, badge system
 ├── assets/
-│   ├── campus_map_intro.json  # Lottie animation data
 │   ├── campus_map.svg          # Static campus map SVG
 │   ├── badge_*.svg             # Badge SVG assets
 │   └── [building & quiz images]
@@ -121,7 +120,7 @@ There is no build step — files are served as-is and all dependencies come from
   - Badge definitions
 
 - **`js/main.js`**: Application logic including:
-  - Lottie animation initialization
+  - Map loading and intro animation (`runMapIntro`)
   - Filter system
   - Event handlers for map interactions
   - Quiz engine (renderers, interaction logic, validation)
@@ -146,18 +145,28 @@ Each quiz in `quizModals` (in `js/config.js`) has a `content` object whose `type
 
 The quiz `id` (e.g. `'Frage'`, `'Frage2'`) is the unique key used to track completion in localStorage and to identify the marker on the map.
 
+### Languages (German / English)
+
+German is the default. Users switch via the `DE | EN` toggle next to the gear icon or in the settings panel; the choice is stored and the page reloads without replaying the intro. For embeds, `?lang=en` (or `?lang=de`) in the URL forces a language.
+
+- **`js/i18n.js`**: language detection, `t('key')` for UI strings (`UI_STRINGS.de` / `UI_STRINGS.en`), `data-i18n*` attributes for static text in `index.html`
+- **`js/content_en.js`**: English texts for quizzes, buildings, filters and badges, laid over `js/config_v2.js` at load time. It mirrors the German structure with text fields only; arrays are merged by index, so keep order and length in sync when editing the German content. Missing entries simply fall back to German.
+
+Text baked into the map graphic (SVG) stays German.
+
 ### Local Storage
 
 The application persists state under these keys:
 - `quiz_completed_ids` — array of completed quiz IDs (string IDs like `Frage`, `Frage2`, …)
 - `filter_settings` — visibility preferences for map element categories
+- `campusmap_lang` — selected language (`de` / `en`)
 
 ### Customization
 
 To customize the map:
 1. Update building data in `js/config.js`
 2. Add/modify images in the `assets/` folder
-3. Adjust the Lottie animation in `assets/campus_map_intro.json` if needed
+3. The intro animates `assets/campus_map_v2.svg` directly (`runMapIntro` in `js/main.js`): new buildings join the area they sit in, new top-level layers fade in at the end – no extra work needed
 4. Edit individual quizzes by tweaking their entry in `quizModals` (in `js/config.js`)
 
 For the image hotspot quiz, set `debug: true` on the quiz config to visualize hotspot zones and log click coordinates to the browser console — useful for tuning positions.

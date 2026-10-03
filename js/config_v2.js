@@ -344,7 +344,7 @@ const campusBuildings = [
             "assets/gebaeude_G_1_04.jpg",
             "assets/gebaeude_G_1_05.jpg"
         ],
-        description: "Gebäude G.1 ist ein Laborgebäude des Fachbereichs Angewandte Naturwissenschaften (AN). Hier befindet sich auch das Centrum Industrielle Biotechnologie (CIB).",
+        description: "Gebäude G.1 ist ein Laborgebäude des Fachbereichs Angewandte Naturwissenschaften (AN). Hier befinden sich auch das Sekretariat des Fachbereichs AN und das Centrum Industrielle Biotechnologie (CIB).",
         openingHours: {
             label: "Öffnungszeiten",
             bgColor: "#b57393",
@@ -365,7 +365,7 @@ const campusBuildings = [
             "assets/gebaeude_G_2_03.jpg",
             "assets/gebaeude_G_2_04.jpg"
         ],
-        description: "Gebäude G.2 ist ein Laborgebäude der Fachbereiche Angewandte Naturwissenschaften (AN) und Maschinenbau und Wirtschaft (MW).",
+        description: "Gebäude G.2 ist ein Laborgebäude der Fachbereiche Angewandte Naturwissenschaften (AN) und Maschinenbau und Wirtschaft (MW). Hier gibt es außerdem einen Still- und Wickelraum.",
         openingHours: {
             label: "Öffnungszeiten",
             bgColor: "#b57393",
@@ -427,15 +427,7 @@ const campusBuildings = [
             "assets/gebaeude_E_5_03.jpg",
             "assets/gebaeude_E_5_04.jpg"
         ],
-        description: "Im Gebäude E.5 ist der Betriebsarzt ansässig.",
-        openingHours: {
-            label: "Öffnungszeiten",
-            bgColor: "#8197b9",
-            color: "#212529",
-            slots: [
-                { label: "Fr - Mo:", time: "" }
-            ]
-        }
+        description: "Im Gebäude E.5 befinden sich Teile der Hochschulverwaltung sowie das Büro des Betriebsarztes. Das Gebäude ist nicht ebenerdig zugänglich und hat keinen Aufzug."
     },
 
     {
@@ -532,20 +524,15 @@ const campusBuildings = [
             "assets/gebaeude_A_1_03.jpg",
             "assets/gebaeude_A_1_04.jpg"
         ],
-        description: "Im Gebäude A.1 befinden sich die zentralen Verwaltungseinheiten der TH Lübeck. Darunter Personal, Finanzen, Studierendensekretariat, das International Office und das Präsidium mit Besuchersekretariat im 1. Obergeschoss. <br><br>Ein zentraler Service Point steht ebenfalls als erste Kontaktstelle für allgemeine Anfragen zur Verfügung. Das Serviceangebot umfasst administrative und studienbezogene Anliegen.",
+        description: "Im Gebäude A.1 befinden sich die zentralen Verwaltungseinheiten der TH Lübeck. Darunter Personal, Finanzen, Studierendensekretariat, das International Office und das Präsidium mit Besuchersekretariat im 1. Obergeschoss. Außerdem findest du hier die Studienberatung, die Zulassungsstelle, das Sprachenzentrum, die Stabsstelle Forschung und Transfer sowie die Druckerei. <br><br>Ein zentraler Service Point steht ebenfalls als erste Kontaktstelle für allgemeine Anfragen zur Verfügung. Das Serviceangebot umfasst administrative und studienbezogene Anliegen.",
         openingHours: {
             label: "Öffnungszeiten",
             bgColor: "#f0847f",
             color: "#212529",
             slots: [
-                { label: "Mo - Fr:", time: "06:00 - 19:30 Uhr" }
-            ],
-            label: "Öffnungszeiten Service Point",
-            bgColor: "#f0847f",
-            color: "#212529",
-            slots: [
-                { label: "Mo u. Mi:", time: "13:00 - 15:00 Uhr" },
-                { label: "Do:", time: "09:00 - 12:00 Uhr" },
+                { label: "Gebäude Mo - Fr:", time: "06:00 - 19:30 Uhr" },
+                { label: "Service Point Mo u. Mi:", time: "13:00 - 15:00 Uhr" },
+                { label: "Service Point Do:", time: "09:00 - 12:00 Uhr" },
                 { label: "Telefon:", time: "+49 451 300 6" },
                 { label: "E-Mail:", time: "kontakt(at)th-luebeck.de" }
             ]
@@ -561,7 +548,7 @@ const campusBuildings = [
             "assets/gebaeude_D_4_02.jpg",
             "assets/gebaeude_D_4_03.jpg"
         ],
-        description: "Gebäude D.4 ist ein zentrales Hörsaalgebäude auf dem Campus und verfügt über Vorlesungssäle sowie studentische Arbeitsplätze, die häufig für Veranstaltungen wie das Lübecker Orientierungssemester (LOS) genutzt werden.",
+        description: "Gebäude D.4 ist ein zentrales Hörsaalgebäude auf dem Campus und verfügt über Vorlesungssäle sowie studentische Arbeitsplätze, die häufig für Veranstaltungen wie das Lübecker Orientierungssemester (LOS) genutzt werden. <br><br>Außerdem findest du hier die AStA-Cafeteria mit dem AStA-Shop, den IT-Support, die Pressestelle sowie einen Still- und Wickelraum.",
         openingHours: {
             label: "Öffnungszeiten",
             bgColor: "#cad391",
@@ -643,7 +630,7 @@ const campusBuildings = [
             "assets/gebaeude_C_5_05.jpg",
             "assets/gebaeude_C_5_06.jpg"
         ],
-        description: "Das Gebäude C.4 beherbergt viele Seminar- und Vorlesungsräume. Außerdem dient das Atrium der Technischen Hochschule Lübeck als zentrales Foyer und Kommunikationstreffpunkt im Hochschulgebäude. <br><br>Hier ist auch die Café-Lounge Bits+Bytes zu finden.",
+        description: "Das Gebäude C.4 beherbergt viele Seminar- und Vorlesungsräume. Außerdem dient das Atrium der Technischen Hochschule Lübeck als zentrales Foyer und Kommunikationstreffpunkt im Hochschulgebäude. <br><br>Hier ist auch die Cafeteria, die Café-Lounge Bits+Bytes, zu finden. Außerdem sitzt im Gebäude C.4 die Haustechnik.",
         openingHours: {
             label: "Öffnungszeiten",
             bgColor: "#8fbbdb",
@@ -788,7 +775,7 @@ const campusBuildings = [
         images: [
             "assets/gebaeude_F_7_01.jpg"
         ],
-        description: "Gebäude F.7 ist eine Materialprüfanstalt (MPA).",
+        description: "Im Gebäude F.7 befindet sich die Marktüberwachung Schleswig-Holstein.",
         openingHours: {
             label: "Öffnungszeiten",
             bgColor: "#96b98d",
@@ -1016,16 +1003,6 @@ const campusBuildings = [
         description: "Am Wohnheim befindet sich eine öffentliche Fahrradreparaturstation. Diese Station ermöglicht kleinere Selbstreparaturen. Zur Ausstattung gehören diverse Werkzeuge wie Konusschlüssel, Zange, Sechskantschlüssel sowie eine Pumpe mit Manometer, um den Reifendruck einfach zu prüfen und anzupassen.",
     },
     {
-        id: "Fahrradstation_Gebaeude_C_4",
-        title: "Fahrradstation am Gebaeude C.4",
-        icon: "assets/fahrradstation.svg",
-        iconHeight: "90px",
-        images: [
-            "assets/fahrradstation_gebaeude_C_4.jpg"
-        ],
-        description: "Am Gebäude C.4, am Hauptzugang, befindet sich eine Fahrradreparaturstation. Diese Station ermöglicht kleinere Selbstreparaturen. Zur Ausstattung gehören diverse Werkzeuge wie Konusschlüssel, Zange, Sechskantschlüssel sowie eine Pumpe mit Manometer, um den Reifendruck einfach zu prüfen und anzupassen.",
-    },
-    {
         id: "Fahrradstation_Studentendorf",
         title: "Fahrradstation am Studentendorf",
         icon: "assets/fahrradstation.svg",
@@ -1176,6 +1153,11 @@ const filters = [
     { label: 'Bushaltestelle', icon: 'assets/bus_icon_einstellungen_an.svg', id: ['Bushaltestellen'], defaultVisible: true },
     { label: 'Kiosk & Café', icon: 'assets/kaffee_icon_einstellungen_an.svg', id: ['Kaffee'], defaultVisible: true },
     { label: 'Buttons', icon: 'assets/butten_icon_einstellungen_an.svg', id: ['Buttons'], defaultVisible: true },
+    // Ebenen aus dem offiziellen Campusplan (nur in der Karte nach dem Intro vorhanden)
+    { label: 'Info & Sammelplatz', icon: 'assets/info_icon_einstellungen_an.svg', id: ['Infopunkte'], defaultVisible: false },
+    { label: 'WC', icon: 'assets/wc_icon_einstellungen_an.svg', id: ['WC'], defaultVisible: false },
+    { label: 'Barrierefreiheit', icon: 'assets/barrierefreiheit_icon_einstellungen_an.svg', id: ['Barrierefreiheit', 'Aufzuege'], defaultVisible: false },
+    { label: 'Schranken & Zufahrt', icon: 'assets/schranke_icon_einstellungen_an.svg', id: ['Zufahrt'], defaultVisible: false },
 ];
 
 const CLICKABLE_Geb_CONFIG = {
@@ -1197,7 +1179,7 @@ const CLICKABLE_Geb_CONFIG = {
             "Audimax_B_65", "Bibliothek_B_60", "Mensa_B_59",
             "Gebaeude_B_64",
             "Gebaeude_A_1", "Gebaeude_G_3", "_Uebergang_bei_Gebaeude_G_3_und_G_2",
-            "Gebaeude_G_2", "_Uebergang_bei_Gebaeude_G_2_und_G_1", "Gebaeude_G_1", "Frage", "Frage-2", "Frage-3", "Frage-4", "Frage-5", "Frage-6", "Frage-7", "Frage-8", "Frage-9", "Frage-10", "Button_FabLab", "Button_Speiseplan", "Button_Erkundungstour", "Button_Innenstadt", "Button_Studium", "Button_Hochschulsport", "Kaffee_Campus_Taste", "Kaffee_Cafeteria", "Kaffee_Kiosk", "Kaffee_Bits_Bytes", "Logo", "Fahrradstation_Wohnheim", "Fahrradstation_Studentendorf", "Fahrradstation_Gebaeude_C_4", "Fahrradstation_Gebaeude_C_5", "Fahrradstation_Gebaeude_G_1", "Fahrradstation_Audimax", "Bus_Stephensonstraße", "Bus_Technische_Hochschule_Grillenweg", "Bus_Technische_Hochschule_Sereetz", "Bus_Bessemer_Straße_Sereetz", "Bus_Bessemer_Straße_Bornkamp"
+            "Gebaeude_G_2", "_Uebergang_bei_Gebaeude_G_2_und_G_1", "Gebaeude_G_1", "Frage", "Frage-2", "Frage-3", "Frage-4", "Frage-5", "Frage-6", "Frage-7", "Frage-8", "Frage-9", "Frage-10", "Button_FabLab", "Button_Speiseplan", "Button_Erkundungstour", "Button_Innenstadt", "Button_Studium", "Button_Hochschulsport", "Kaffee_Campus_Taste", "Kaffee_Cafeteria", "Kaffee_Kiosk", "Kaffee_Bits_Bytes", "Logo", "Fahrradstation_Wohnheim", "Fahrradstation_Studentendorf", "Fahrradstation_Gebaeude_C_4","Fahrradstation_Gebaeude_G_1", "Fahrradstation_Audimax", "Bus_Stephensonstraße", "Bus_Technische_Hochschule_Grillenweg", "Bus_Technische_Hochschule_Sereetz", "Bus_Bessemer_Straße_Sereetz", "Bus_Bessemer_Straße_Bornkamp"
         ],
         excludeMatches: [
         ]

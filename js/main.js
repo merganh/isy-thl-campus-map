@@ -5,7 +5,10 @@ const ANIMATIONS_STORAGE_KEY = 'animations_enabled';
 
 function areAnimationsEnabled() {
     const stored = localStorage.getItem(ANIMATIONS_STORAGE_KEY);
-    return stored === null ? true : stored === 'true';
+    if (stored !== null) return stored === 'true';
+    // Ohne eigene Wahl in den Einstellungen gilt die Systemeinstellung
+    // „Bewegung reduzieren“: dann kein Intro-Zoom und keine Animationen.
+    return !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 }
 
 function applyAnimationsPreference() {
@@ -41,18 +44,18 @@ function renderCrosswordBody(quiz) {
             </div>
             <div class="crossword-clues">
                 <div class="crossword-clues-section">
-                    <h6 class="crossword-clues-title">Waagerecht</h6>
+                    <h3 class="crossword-clues-title">${t('cw.across')}</h3>
                     <ol class="crossword-clue-list crossword-clues-across"></ol>
                 </div>
                 <div class="crossword-clues-section">
-                    <h6 class="crossword-clues-title">Senkrecht</h6>
+                    <h3 class="crossword-clues-title">${t('cw.down')}</h3>
                     <ol class="crossword-clue-list crossword-clues-down"></ol>
                 </div>
             </div>
-            <div class="quiz-feedback"></div>
+            <div class="quiz-feedback" role="status" aria-live="polite"></div>
             <div class="quiz-actions">
-                <button type="button" class="btn btn-primary quiz-submit-btn">Prüfen</button>
-                <button type="button" class="btn btn-outline-secondary quiz-reset-btn" style="display:none;">Nochmal versuchen</button>
+                <button type="button" class="btn btn-primary quiz-submit-btn">${t('quiz.check')}</button>
+                <button type="button" class="btn btn-outline-secondary quiz-reset-btn" style="display:none;">${t('quiz.retry')}</button>
             </div>
         </div>
     `;
@@ -64,15 +67,15 @@ function renderHotspotBody(quiz) {
     return `
         <div class="quiz-container hotspot-container" data-quiz-id="${quiz.id}" data-quiz-type="hotspot">
             <p class="quiz-question">${c.question}</p>
-            <div class="hotspot-progress">0 / ${c.hotspots.length} gefunden</div>
+            <div class="hotspot-progress">${t('quiz.found', { n: 0, total: c.hotspots.length })}</div>
             <div class="hotspot-image-wrapper">
-                <img src="${c.image}" alt="" class="hotspot-image" draggable="false">
+                <img src="${c.image}" alt="${c.imageAlt || ''}" class="hotspot-image" draggable="false">
                 <div class="hotspot-overlay"></div>
             </div>
-            <div class="quiz-feedback"></div>
+            <div class="quiz-feedback" role="status" aria-live="polite"></div>
             <div class="quiz-actions">
                 <button type="button" class="btn btn-sm btn-outline-secondary quiz-reset-btn">
-                    <i class="fas fa-redo me-1"></i>Neu starten
+                    <i class="fas fa-redo me-1"></i>${t('quiz.restart')}
                 </button>
             </div>
         </div>
@@ -87,13 +90,13 @@ function renderWordSearchBody(quiz) {
             <div class="wordsearch-grid" role="grid"></div>
             <div class="wordsearch-progress"></div>
             <div class="wordsearch-words"></div>
-            <div class="quiz-feedback"></div>
+            <div class="quiz-feedback" role="status" aria-live="polite"></div>
             <div class="quiz-actions">
-                <button type="button" class="btn btn-sm btn-outline-warning wordsearch-hint-btn">
-                    <i class="fas fa-lightbulb me-1"></i>Hilfe
+                <button type="button" class="btn btn-sm btn-warning wordsearch-hint-btn">
+                    <i class="fas fa-lightbulb me-1" aria-hidden="true"></i>${t('ws.hint')}
                 </button>
                 <button type="button" class="btn btn-sm btn-outline-secondary quiz-reset-btn">
-                    <i class="fas fa-redo me-1"></i>Neu starten
+                    <i class="fas fa-redo me-1"></i>${t('quiz.restart')}
                 </button>
             </div>
         </div>
@@ -108,9 +111,9 @@ function renderImageGridBody(quiz) {
 
     const optionsHTML = c.options.map((opt, idx) => `
         <label class="quiz-option quiz-option-image" title="${opt.label || ''}">
-            <input type="checkbox" name="${groupName}" value="${idx}">
-            <span class="quiz-option-marker"><i class="fas fa-check"></i></span>
-            <img src="${opt.image}" alt="${opt.label || ''}" class="quiz-option-img">
+            <input type="checkbox" name="${groupName}" value="${idx}" aria-label="${opt.label || ''}">
+            <span class="quiz-option-marker" aria-hidden="true"><i class="fas fa-check"></i></span>
+            <img src="${opt.image}" alt="" class="quiz-option-img">
         </label>
     `).join('');
 
@@ -118,10 +121,10 @@ function renderImageGridBody(quiz) {
         <div class="quiz-container" data-quiz-id="${quiz.id}" data-quiz-type="imageGrid">
             <p class="quiz-question">${c.question}</p>
             <div class="quiz-image-grid" style="grid-template-columns: repeat(${cols}, 1fr);">${optionsHTML}</div>
-            <div class="quiz-feedback"></div>
+            <div class="quiz-feedback" role="status" aria-live="polite"></div>
             <div class="quiz-actions">
-                <button type="button" class="btn btn-primary quiz-submit-btn">Prüfen</button>
-                <button type="button" class="btn btn-outline-secondary quiz-reset-btn" style="display:none;">Nochmal versuchen</button>
+                <button type="button" class="btn btn-primary quiz-submit-btn">${t('quiz.check')}</button>
+                <button type="button" class="btn btn-outline-secondary quiz-reset-btn" style="display:none;">${t('quiz.retry')}</button>
             </div>
         </div>
     `;
@@ -145,10 +148,10 @@ function renderChoiceBody(quiz) {
         <div class="quiz-container" data-quiz-id="${quiz.id}" data-quiz-type="${c.type}">
             <p class="quiz-question">${c.question}</p>
             <div class="quiz-options">${optionsHTML}</div>
-            <div class="quiz-feedback"></div>
+            <div class="quiz-feedback" role="status" aria-live="polite"></div>
             <div class="quiz-actions">
-                <button type="button" class="btn btn-primary quiz-submit-btn">Prüfen</button>
-                <button type="button" class="btn btn-outline-secondary quiz-reset-btn" style="display:none;">Nochmal versuchen</button>
+                <button type="button" class="btn btn-primary quiz-submit-btn">${t('quiz.check')}</button>
+                <button type="button" class="btn btn-outline-secondary quiz-reset-btn" style="display:none;">${t('quiz.retry')}</button>
             </div>
         </div>
     `;
@@ -160,10 +163,10 @@ function renderSortBody(quiz) {
         <div class="quiz-container sort-container" data-quiz-id="${quiz.id}" data-quiz-type="sort">
             <p class="quiz-question">${quiz.content.question}</p>
             <ul class="sort-list" role="list"></ul>
-            <div class="quiz-feedback"></div>
+            <div class="quiz-feedback" role="status" aria-live="polite"></div>
             <div class="quiz-actions">
-                <button type="button" class="btn btn-primary quiz-submit-btn">Prüfen</button>
-                <button type="button" class="btn btn-outline-secondary quiz-reset-btn" style="display:none;">Nochmal versuchen</button>
+                <button type="button" class="btn btn-primary quiz-submit-btn">${t('quiz.check')}</button>
+                <button type="button" class="btn btn-outline-secondary quiz-reset-btn" style="display:none;">${t('quiz.retry')}</button>
             </div>
         </div>
     `;
@@ -175,13 +178,13 @@ function renderMemoryBody(quiz) {
     return `
         <div class="quiz-container memory-container" data-quiz-id="${quiz.id}" data-quiz-type="memory">
             <div class="memory-status">
-                <span class="memory-progress">0 / ${total} Paaren</span>
+                <span class="memory-progress">${t('memory.pairs', { n: 0, total })}</span>
                 <button type="button" class="btn btn-sm btn-outline-secondary memory-reset-btn">
-                    <i class="fas fa-redo me-1"></i>Neu mischen
+                    <i class="fas fa-redo me-1"></i>${t('memory.reshuffle')}
                 </button>
             </div>
             <div class="memory-grid"></div>
-            <div class="quiz-feedback"></div>
+            <div class="quiz-feedback" role="status" aria-live="polite"></div>
         </div>
     `;
 }
@@ -194,7 +197,7 @@ function generateQuizModals() {
         const labelId = `${quiz.id}_Label`;
         let campusInfoContent = '';
         if (quiz.campusInfo.hasAccordion) {
-            campusInfoContent = `<div class="accordion" id="campusAccordionOverlay">${quiz.campusInfo.accordionItems.map(item => `<div class="accordion-item"><h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${item.id}Overlay">${item.title}</button></h2><div id="${item.id}Overlay" class="accordion-collapse collapse" data-bs-parent="#campusAccordionOverlay"><div class="accordion-body"><p>${item.text}</p>${item.link ? `<a href="${item.link.url}" target="_blank" class="erkundungstour-btn"><p>${item.link.text}</p></a>` : ''}</div></div></div>`).join('')}</div>`;
+            campusInfoContent = `<div class="accordion" id="campusAccordionOverlay">${quiz.campusInfo.accordionItems.map(item => `<div class="accordion-item"><h3 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#${item.id}Overlay">${item.title}</button></h3><div id="${item.id}Overlay" class="accordion-collapse collapse" data-bs-parent="#campusAccordionOverlay"><div class="accordion-body"><p>${item.text}</p>${item.link ? `<a href="${item.link.url}" target="_blank" class="erkundungstour-btn"><p>${item.link.text}</p></a>` : ''}</div></div></div>`).join('')}</div>`;
         } else if (quiz.campusInfo.hasMultipleLinks) {
             campusInfoContent = quiz.campusInfo.items.map(item => `<p${item.className ? ` class="${item.className}"` : ''}>${item.text}</p>${item.link ? `<a href="${item.link.url}" target="_blank" class="erkundungstour-btn"><p>${item.link.text}</p></a>` : ''}`).join('');
         } else {
@@ -203,7 +206,7 @@ function generateQuizModals() {
 
         const bodyContent = renderQuizBody(quiz);
 
-        container.insertAdjacentHTML('beforeend', `<div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${labelId}" aria-hidden="true"><div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down modal-lg"><div class="modal-content"><div class="modal-header"><h5 id="${labelId}" class="modal-title">${quiz.title}</h5><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div><div class="modal-body frageModalBody${quiz.bodyClass ? ' ' + quiz.bodyClass : ''}">${quiz.description ? `<p class="quiz-question">${quiz.description}</p>` : ''}${bodyContent}</div><div class="campus-info-overlay"><div class="info-icon-trigger" data-bs-toggle="collapse" data-bs-target="#campusInfosOverlay" aria-expanded="false"><i class="fas fa-info-circle campus-info-icon"></i></div><div class="collapse mt-2" id="campusInfosOverlay"><div class="card campus-info-card"><div class="card-body p-2">${campusInfoContent}</div></div></div></div></div></div></div>`);
+        container.insertAdjacentHTML('beforeend', `<div class="modal fade" id="${modalId}" tabindex="-1" aria-labelledby="${labelId}" aria-hidden="true"><div class="modal-dialog modal-dialog-centered modal-fullscreen-md-down modal-lg"><div class="modal-content"><div class="modal-header"><h2 id="${labelId}" class="modal-title">${quiz.title}</h2><button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="${t('quiz.close')}"></button></div><div class="modal-body frageModalBody${quiz.bodyClass ? ' ' + quiz.bodyClass : ''}">${quiz.description ? `<p class="quiz-question">${quiz.description}</p>` : ''}${bodyContent}</div><div class="campus-info-overlay"><div class="info-icon-trigger" data-bs-toggle="collapse" data-bs-target="#campusInfosOverlay" aria-expanded="false"><i class="fas fa-info-circle campus-info-icon"></i></div><div class="collapse mt-2" id="campusInfosOverlay"><div class="card campus-info-card"><div class="card-body p-2">${campusInfoContent}</div></div></div></div></div></div></div>`);
     });
 }
 generateQuizModals();
@@ -256,7 +259,7 @@ function evaluateQuiz(container) {
     const resetBtn = container.querySelector('.quiz-reset-btn');
 
     if (allCorrect) {
-        const msg = quiz.content.successMessage || 'Richtig!';
+        const msg = quiz.content.successMessage || t('quiz.correct');
         feedback.className = 'quiz-feedback show success';
         feedback.innerHTML = `<i class="fas fa-check-circle me-2"></i>${msg}`;
         submitBtn.style.display = 'none';
@@ -264,7 +267,7 @@ function evaluateQuiz(container) {
         if (addCompletedQuizId(quizId)) showBadgeNotification();
     } else {
         feedback.className = 'quiz-feedback show error';
-        feedback.innerHTML = '<i class="fas fa-times-circle me-2"></i>Leider falsch. Versuche es noch einmal.';
+        feedback.innerHTML = `<i class="fas fa-times-circle me-2"></i>${t('quiz.wrong')}`;
         submitBtn.style.display = 'none';
         resetBtn.style.display = 'inline-block';
     }
@@ -328,10 +331,10 @@ function initSortQuiz(container) {
             <span class="sort-handle" aria-hidden="true"><i class="fas fa-grip-vertical"></i></span>
             <span class="sort-text">${correctItems[originalIdx]}</span>
             <span class="sort-arrows">
-                <button type="button" class="sort-arrow-btn" data-direction="up" aria-label="Schritt nach oben">
+                <button type="button" class="sort-arrow-btn" data-direction="up" aria-label="${t('sort.up', { item: correctItems[originalIdx] })}">
                     <i class="fas fa-chevron-up"></i>
                 </button>
-                <button type="button" class="sort-arrow-btn" data-direction="down" aria-label="Schritt nach unten">
+                <button type="button" class="sort-arrow-btn" data-direction="down" aria-label="${t('sort.down', { item: correctItems[originalIdx] })}">
                     <i class="fas fa-chevron-down"></i>
                 </button>
             </span>
@@ -426,13 +429,13 @@ function evaluateSortQuiz(container) {
 
     if (allCorrect) {
         feedback.className = 'quiz-feedback show success';
-        feedback.innerHTML = '<i class="fas fa-check-circle me-2"></i>Richtige Reihenfolge!';
+        feedback.innerHTML = `<i class="fas fa-check-circle me-2"></i>${t('sort.correct')}`;
         submitBtn.style.display = 'none';
         resetBtn.style.display = 'none';
         if (addCompletedQuizId(quizId)) showBadgeNotification();
     } else {
         feedback.className = 'quiz-feedback show error';
-        feedback.innerHTML = '<i class="fas fa-times-circle me-2"></i>Noch nicht ganz. Schau dir die rot markierten Schritte an und versuche es noch einmal.';
+        feedback.innerHTML = `<i class="fas fa-times-circle me-2"></i>${t('sort.wrong')}`;
         submitBtn.style.display = 'none';
         resetBtn.style.display = 'inline-block';
     }
@@ -445,7 +448,7 @@ function initCrossword(container) {
         const fb = container.querySelector('.quiz-feedback');
         if (fb && typeof generateLayout === 'undefined') {
             fb.className = 'quiz-feedback show error';
-            fb.innerHTML = '<i class="fas fa-times-circle me-2"></i>Kreuzworträtsel-Bibliothek konnte nicht geladen werden.';
+            fb.innerHTML = `<i class="fas fa-times-circle me-2"></i>${t('cw.libError')}`;
         }
         return;
     }
@@ -480,9 +483,13 @@ function renderCrosswordGrid(container, layout) {
         const isMobile = window.innerWidth < 576;
         const idealMax = isMobile ? 36 : 42;
         const minSize = 22;
-        const gap = isMobile ? 3 : 2;
-        // verfügbare Breite minus wrapper-padding (8) und grid-padding (4) und Puffer (4)
-        const available = wrapper.clientWidth - 16;
+        const wrapperCs = getComputedStyle(wrapper);
+        const gridCs = getComputedStyle(grid);
+        const gap = parseFloat(gridCs.columnGap) || 0;
+        // verfügbare Breite minus wrapper-padding, grid-padding und Puffer (4)
+        const available = wrapper.clientWidth
+            - parseFloat(wrapperCs.paddingLeft) - parseFloat(wrapperCs.paddingRight)
+            - parseFloat(gridCs.paddingLeft) - parseFloat(gridCs.paddingRight) - 4;
         const fitting = Math.floor((available - (layout.cols - 1) * gap) / layout.cols);
         const size = Math.max(minSize, Math.min(idealMax, fitting));
         grid.style.setProperty('--cw-cell-size', size + 'px');
@@ -503,6 +510,25 @@ function renderCrosswordGrid(container, layout) {
         }
     });
 
+    // Pro Feld: welche Wörter laufen hindurch? Daraus entsteht der Name,
+    // den Screenreader vorlesen ("6 waagerecht, Buchstabe 2 von 9"), und
+    // der Verweis auf den zugehörigen Hinweis (aria-describedby).
+    const quizId = container.dataset.quizId || 'cw';
+    const cellWords = {};
+    layout.result.forEach(word => {
+        if (word.startx === undefined || word.starty === undefined) return;
+        for (let i = 0; i < word.answer.length; i++) {
+            const key = `${word.starty - 1 + (word.orientation === 'down' ? i : 0)},${word.startx - 1 + (word.orientation === 'across' ? i : 0)}`;
+            (cellWords[key] = cellWords[key] || []).push({ word, i });
+        }
+    });
+    const cellLabel = key => (cellWords[key] || [])
+        .map(({ word, i }) => t('cw.cell', { num: word.position, dir: t(word.orientation === 'across' ? 'cw.dirAcross' : 'cw.dirDown'), i: i + 1, n: word.answer.length }))
+        .join('; ');
+    const cellClueIds = key => (cellWords[key] || [])
+        .map(({ word }) => `${quizId}-clue-${word.orientation}-${word.position}`)
+        .join(' ');
+
     let html = '';
     for (let r = 0; r < layout.rows; r++) {
         for (let c = 0; c < layout.cols; c++) {
@@ -510,11 +536,12 @@ function renderCrosswordGrid(container, layout) {
             if (!letter || letter === '-') {
                 html += `<div class="cw-cell cw-cell-empty"></div>`;
             } else {
-                const number = numberMap[`${r},${c}`];
+                const key = `${r},${c}`;
+                const number = numberMap[key];
                 html += `
                     <div class="cw-cell" data-row="${r}" data-col="${c}" data-letter="${letter.toUpperCase()}">
                         ${number ? `<span class="cw-cell-number">${number}</span>` : ''}
-                        <input type="text" maxlength="1" class="cw-cell-input" autocapitalize="characters" autocomplete="off" inputmode="text">
+                        <input type="text" maxlength="1" class="cw-cell-input" aria-label="${cellLabel(`${r},${c}`)}" aria-describedby="${cellClueIds(`${r},${c}`)}" autocapitalize="characters" autocomplete="off" inputmode="text">
                     </div>
                 `;
             }
@@ -534,7 +561,8 @@ function renderCrosswordClues(container, layout) {
         .filter(w => w.orientation === 'down')
         .sort((a, b) => a.position - b.position);
 
-    const tpl = w => `<li class="cw-clue" value="${w.position}"><span class="cw-clue-num">${w.position}.</span> ${w.clue}</li>`;
+    const quizId = container.dataset.quizId || 'cw';
+    const tpl = w => `<li class="cw-clue" id="${quizId}-clue-${w.orientation}-${w.position}" value="${w.position}"><span class="cw-clue-num">${w.position}.</span> ${w.clue}</li>`;
     acrossEl.innerHTML = across.map(tpl).join('');
     downEl.innerHTML = down.map(tpl).join('');
 }
@@ -566,6 +594,7 @@ function setupCrosswordInput(container) {
     // Highlight des aktiven Wortes
     function highlightActiveWord() {
         container.querySelectorAll('.cw-cell.cw-cell-active').forEach(c => c.classList.remove('cw-cell-active'));
+        container.querySelectorAll('.cw-clue.cw-clue-active').forEach(li => li.classList.remove('cw-clue-active'));
         const focusedInput = container.querySelector('.cw-cell-input:focus');
         if (!focusedInput) return;
         const focusedCell = focusedInput.closest('.cw-cell');
@@ -575,6 +604,7 @@ function setupCrosswordInput(container) {
         const wordInfo = info[dir] || info.across || info.down;
         if (!wordInfo) return;
         const { word } = wordInfo;
+        container.querySelector(`.crossword-clues-${word.orientation} .cw-clue[value="${word.position}"]`)?.classList.add('cw-clue-active');
         for (let i = 0; i < word.answer.length; i++) {
             const r = word.starty - 1 + (word.orientation === 'down' ? i : 0);
             const c = word.startx - 1 + (word.orientation === 'across' ? i : 0);
@@ -709,7 +739,7 @@ function evaluateCrossword(container) {
 
     if (allCorrect && allFilled) {
         feedback.className = 'quiz-feedback show success';
-        feedback.innerHTML = '<i class="fas fa-check-circle me-2"></i>Super! Kreuzworträtsel gelöst.';
+        feedback.innerHTML = `<i class="fas fa-check-circle me-2"></i>${t('cw.solved')}`;
         submitBtn.style.display = 'none';
         resetBtn.style.display = 'none';
         cells.forEach(c => {
@@ -719,10 +749,10 @@ function evaluateCrossword(container) {
         if (addCompletedQuizId(container.dataset.quizId)) showBadgeNotification();
     } else if (!allFilled) {
         feedback.className = 'quiz-feedback show error';
-        feedback.innerHTML = '<i class="fas fa-times-circle me-2"></i>Es fehlen noch Buchstaben.';
+        feedback.innerHTML = `<i class="fas fa-times-circle me-2"></i>${t('cw.missing')}`;
     } else {
         feedback.className = 'quiz-feedback show error';
-        feedback.innerHTML = '<i class="fas fa-times-circle me-2"></i>Ein paar Buchstaben sind noch falsch (rot markiert).';
+        feedback.innerHTML = `<i class="fas fa-times-circle me-2"></i>${t('cw.wrongLetters')}`;
         resetBtn.style.display = 'inline-block';
     }
 }
@@ -738,7 +768,7 @@ function initHotspotQuiz(container) {
     const hotspots = quiz?.content?.hotspots || [];
     const total = hotspots.length;
     const progressEl = container.querySelector('.hotspot-progress');
-    if (progressEl) progressEl.textContent = `0 / ${total} gefunden`;
+    if (progressEl) progressEl.textContent = t('quiz.found', { n: 0, total });
 
     const feedback = container.querySelector('.quiz-feedback');
     if (feedback) {
@@ -807,7 +837,7 @@ function handleHotspotClick(overlay, evt) {
         container._hotspotFound = found;
 
         const progressEl = container.querySelector('.hotspot-progress');
-        if (progressEl) progressEl.textContent = `${found.size} / ${hotspots.length} gefunden`;
+        if (progressEl) progressEl.textContent = t('quiz.found', { n: found.size, total: hotspots.length });
 
         if (found.size === hotspots.length) completeHotspotQuiz(container);
     } else {
@@ -825,7 +855,7 @@ function completeHotspotQuiz(container) {
     const quizId = container.dataset.quizId;
     const feedback = container.querySelector('.quiz-feedback');
     feedback.className = 'quiz-feedback show success';
-    feedback.innerHTML = '<i class="fas fa-check-circle me-2"></i>Super! Alle Sicherheitsmängel gefunden.';
+    feedback.innerHTML = `<i class="fas fa-check-circle me-2"></i>${t('hotspot.done')}`;
     if (addCompletedQuizId(quizId)) showBadgeNotification();
 }
 
@@ -864,7 +894,7 @@ function initWordSearch(container) {
             const fb = container.querySelector('.quiz-feedback');
             if (fb) {
                 fb.className = 'quiz-feedback show error';
-                fb.innerHTML = '<i class="fas fa-times-circle me-2"></i>Wortsuch-Bibliothek konnte nicht geladen werden.';
+                fb.innerHTML = `<i class="fas fa-times-circle me-2"></i>${t('ws.libError')}`;
             }
         }
         return;
@@ -887,7 +917,7 @@ function initWordSearch(container) {
         const fb = container.querySelector('.quiz-feedback');
         if (fb) {
             fb.className = 'quiz-feedback show error';
-            fb.innerHTML = '<i class="fas fa-times-circle me-2"></i>Rätsel konnte nicht erstellt werden.';
+            fb.innerHTML = `<i class="fas fa-times-circle me-2"></i>${t('ws.createError')}`;
         }
         return;
     }
@@ -910,11 +940,15 @@ function initWordSearch(container) {
     const actualWidth = puzzle[0].length;
     const actualHeight = puzzle.length;
     gridEl.style.gridTemplateColumns = `repeat(${actualWidth}, 1fr)`;
+    // Zeilen-Wrapper mit display:contents – die Zellen bleiben dadurch direkte
+    // Grid-Items (Layout unveraendert), das Raster bekommt aber die von
+    // role="grid" geforderte Zeilen-/Zellenstruktur.
     gridEl.innerHTML = puzzle.map((row, r) =>
-        row.map((letter, col) =>
-            `<div class="wordsearch-cell" data-row="${r}" data-col="${col}">${letter.toUpperCase()}</div>`
-        ).join('')
+        `<div class="wordsearch-row" role="row">` + row.map((letter, col) =>
+            `<div class="wordsearch-cell" role="gridcell" tabindex="-1" data-row="${r}" data-col="${col}" aria-label="${t('ws.cell', { letter: letter.toUpperCase(), r: r + 1, c: col + 1 })}">${letter.toUpperCase()}</div>`
+        ).join('') + `</div>`
     ).join('');
+    gridEl.setAttribute('aria-label', t('ws.gridLabel'));
 
     // Wortliste rendern – (SEARCH)-Zusatz nur, wenn Anzeige ≠ Suche
     const wordsEl = container.querySelector('.wordsearch-words');
@@ -927,7 +961,7 @@ function initWordSearch(container) {
 
     // Fortschritt
     const progressEl = container.querySelector('.wordsearch-progress');
-    progressEl.textContent = `0 / ${c.words.length} gefunden`;
+    progressEl.textContent = t('quiz.found', { n: 0, total: c.words.length });
 
     // Feedback zurücksetzen
     const feedback = container.querySelector('.quiz-feedback');
@@ -1051,7 +1085,7 @@ function checkWordSearchSelection(container, selectedCells) {
 
             container._wsFoundCount++;
             const progressEl = container.querySelector('.wordsearch-progress');
-            if (progressEl) progressEl.textContent = `${container._wsFoundCount} / ${container._wsTotal} gefunden`;
+            if (progressEl) progressEl.textContent = t('quiz.found', { n: container._wsFoundCount, total: container._wsTotal });
 
             if (container._wsFoundCount === container._wsTotal) {
                 completeWordSearch(container);
@@ -1065,7 +1099,7 @@ function completeWordSearch(container) {
     const quizId = container.dataset.quizId;
     const feedback = container.querySelector('.quiz-feedback');
     feedback.className = 'quiz-feedback show success';
-    feedback.innerHTML = '<i class="fas fa-check-circle me-2"></i>Super! Alle Begriffe gefunden.';
+    feedback.innerHTML = `<i class="fas fa-check-circle me-2"></i>${t('ws.done')}`;
     if (addCompletedQuizId(quizId)) showBadgeNotification();
 }
 
@@ -1139,13 +1173,18 @@ function initMemoryGame(container) {
     }
 
     const grid = container.querySelector('.memory-grid');
-    const deckHTML = deck.map(card => `
-        <div class="memory-card" data-pair-id="${card.pairId}">
-            <div class="memory-card-inner">
-                <div class="memory-card-front"><i class="fas fa-question"></i></div>
-                <div class="memory-card-back"><img src="${card.image}" alt="${card.label}"></div>
-            </div>
-        </div>
+    // <button> statt <div>: damit sind die Karten ohne Zusatzcode per Tab
+    // erreichbar und reagieren von Haus aus auf Enter und Leertaste.
+    // Innen <span>, weil <button> nur Phrasing-Content enthalten darf.
+    const deckHTML = deck.map((card, i) => `
+        <button type="button" class="memory-card" data-pair-id="${card.pairId}"
+                data-card-label="${card.label}"
+                aria-label="${t('memory.cardHidden', { pos: t('memory.card', { i: i + 1, n: deck.length }) })}">
+            <span class="memory-card-inner">
+                <span class="memory-card-front"><i class="fas fa-question" aria-hidden="true"></i></span>
+                <span class="memory-card-back"><img src="${card.image}" alt=""></span>
+            </span>
+        </button>
     `).join('');
 
     const feedback = container.querySelector('.quiz-feedback');
@@ -1176,7 +1215,7 @@ function updateMemoryProgress(container) {
     const matched = parseInt(container.dataset.memoryMatched || '0', 10);
     const total = container.querySelectorAll('.memory-card').length / 2;
     const el = container.querySelector('.memory-progress');
-    if (el) el.textContent = `${matched} / ${total} Paaren`;
+    if (el) el.textContent = t('memory.pairs', { n: matched, total });
 }
 
 function handleMemoryCardClick(card) {
@@ -1219,7 +1258,7 @@ function completeMemoryGame(container) {
     const quizId = container.dataset.quizId;
     const feedback = container.querySelector('.quiz-feedback');
     feedback.className = 'quiz-feedback show success';
-    feedback.innerHTML = '<i class="fas fa-check-circle me-2"></i>Super! Alle Paare gefunden.';
+    feedback.innerHTML = `<i class="fas fa-check-circle me-2"></i>${t('memory.done')}`;
     if (addCompletedQuizId(quizId)) showBadgeNotification();
 }
 
@@ -1281,70 +1320,54 @@ document.head.appendChild(filterStyleEl);
 const filterState = {};
 
 function updateFilterStyles() {
+    // Ohne sichtbare Quizze ist auch das Badge-Icon überflüssig
+    const badgeBtn = document.getElementById('toolboxBadgesBtn');
+    if (badgeBtn) badgeBtn.hidden = filterState['Studierende_mit_Fragen'] === false;
+
     filters.forEach(({ id }) => {
         const key = Array.isArray(id) ? id.join(',') : id;
         const visible = filterState[key];
         const ids = Array.isArray(id) ? id : [id];
 
         ids.forEach(singleId => {
-            // SVG-Elemente filtern (nach dem Intro)
             document.querySelectorAll(`#lottieMap svg #${singleId} > *`)
                 .forEach(el => {
                     el.style.display = visible ? '' : 'none';
                 });
-
-            // Lottie/JSON-Elemente filtern (während des Intros)
-            if (window.lottieMapInstance) {
-                // Methode 1: Über renderer.elements
-                if (window.lottieMapInstance.renderer && window.lottieMapInstance.renderer.elements) {
-                    window.lottieMapInstance.renderer.elements.forEach(element => {
-                        if (element && element.data) {
-                            let elementId = element.data.nm || element.data.id;
-
-                            if (singleId === 'Studierende_mit_Fragen' && elementId === 'Studierende mit Fragen') {
-                                elementId = singleId;
-                            }
-
-                            if (elementId === singleId) {
-                                if (element.setVisible) element.setVisible(visible);
-                            }
-                        }
-                    });
-                }
-
-                // Methode 2: Über animationData und Layer
-                if (window.lottieMapInstance.animationData && window.lottieMapInstance.animationData.layers) {
-                    window.lottieMapInstance.animationData.layers.forEach(layer => {
-                        let layerId = layer.nm || layer.id;
-
-                        if (singleId === 'Studierende_mit_Fragen' && layerId === 'Studierende mit Fragen') {
-                            layerId = singleId;
-                        }
-
-                        if (layerId === singleId) {
-
-                            // Layer-Sichtbarkeit direkt in der Animation setzen
-                            if (window.lottieMapInstance.renderer && window.lottieMapInstance.renderer.elements) {
-                                // ALLE Elemente mit dem gleichen Namen finden (nicht nur das erste)
-                                const elements = window.lottieMapInstance.renderer.elements.filter(el => {
-                                    if (!el || !el.data) return false;
-                                    let elId = el.data.nm || el.data.id;
-                                    if (singleId === 'Studierende_mit_Fragen' && elId === 'Studierende mit Fragen') {
-                                        elId = singleId;
-                                    }
-                                    return elId === singleId;
-                                });
-
-                                elements.forEach(el => {
-                                    if (el.setVisible) el.setVisible(visible);
-                                });
-                            }
-                        }
-                    });
-                }
-            }
         });
     });
+
+    layoutMapLegends();
+}
+
+// Legenden der Kartenebenen (Barrierefreiheit, WC, Aufzüge, Info, …) liegen in
+// ihrer Ebene und werden mit ihr ein- und ausgeblendet. Die sichtbaren
+// Legenden rücken hier lückenlos zusammen (Masonry): in der Reihenfolge
+// data-legend-row/-order kommt jede Legende in die aktuell kürzeste Spalte.
+// Spaltenanzahl = Anzahl der unterschiedlichen data-legend-x im SVG.
+const LEGEND_GAP = 6;
+
+function layoutMapLegends() {
+    const legends = Array.from(document.querySelectorAll('#lottieMap svg .legende'));
+    if (!legends.length) return;
+    const num = (el, key) => Number(el.dataset[key]);
+
+    const left = Math.min(...legends.map(l => num(l, 'legendX')));
+    const top = Math.min(...legends.map(l => num(l, 'legendY')));
+    const colWidth = Math.max(...legends.map(l => num(l, 'legendW'))) + LEGEND_GAP;
+    const colCount = new Set(legends.map(l => num(l, 'legendX'))).size;
+    const colHeights = new Array(colCount).fill(top);
+
+    legends
+        .filter(l => getComputedStyle(l).display !== 'none')
+        .sort((a, b) => num(a, 'legendRow') - num(b, 'legendRow') || num(a, 'legendOrder') - num(b, 'legendOrder'))
+        .forEach(legend => {
+            const col = colHeights.indexOf(Math.min(...colHeights));
+            const dx = left + col * colWidth - num(legend, 'legendX');
+            const dy = colHeights[col] - num(legend, 'legendY');
+            legend.setAttribute('transform', `translate(${dx} ${dy})`);
+            colHeights[col] += num(legend, 'legendH') + LEGEND_GAP;
+        });
 }
 
 // Filter-UI initialisieren
@@ -1356,7 +1379,7 @@ function initFilters() {
     container.innerHTML = '';
 
     // Gespeicherte Einstellungen laden
-    const savedSettings = localStorage.getItem('filter_settings');
+    const savedSettings = localStorage.getItem('filter_settings_v3');
     const savedState = savedSettings ? JSON.parse(savedSettings) : {};
 
     filters.forEach((filter, index) => {
@@ -1375,7 +1398,7 @@ function initFilters() {
         const html = `
       <label class="filter-card ${isChecked ? 'active' : ''}" for="${filterId}">
         <div class="filter-card-content">
-          <img src="${filter.icon}" alt="${filter.label}" class="filter-icon">
+          <img src="${filter.icon}" alt="" class="filter-icon">
           <span class="filter-label-text">${filter.label}</span>
         </div>
         <div class="filter-toggle">
@@ -1401,7 +1424,7 @@ function initFilters() {
             }
 
             // Einstellungen speichern
-            localStorage.setItem('filter_settings', JSON.stringify(filterState));
+            localStorage.setItem('filter_settings_v3', JSON.stringify(filterState));
 
             updateFilterStyles();
             updateToggleAllButton();
@@ -1442,7 +1465,7 @@ function initFilters() {
                 }
             });
 
-            localStorage.setItem('filter_settings', JSON.stringify(filterState));
+            localStorage.setItem('filter_settings_v3', JSON.stringify(filterState));
             updateFilterStyles();
             updateToggleAllButton();
         });
@@ -1464,10 +1487,10 @@ function updateToggleAllButton() {
 
     if (allVisible) {
         toggleAllBtn.classList.add('active');
-        toggleAllBtn.innerHTML = '<i class="fas fa-eye-slash me-2"></i>Alle ausblenden';
+        toggleAllBtn.innerHTML = `<i class="fas fa-eye-slash me-2" aria-hidden="true"></i>${t('filters.hideAll')}`;
     } else {
         toggleAllBtn.classList.remove('active');
-        toggleAllBtn.innerHTML = '<i class="fas fa-eye me-2"></i>Alle einblenden';
+        toggleAllBtn.innerHTML = `<i class="fas fa-eye me-2" aria-hidden="true"></i>${t('filters.showAll')}`;
     }
 }
 
@@ -1538,7 +1561,7 @@ function renderBuildingOffcanvas(b) {
     if (b.images?.length === 1) {
         html += `
       <div class="mb-3">
-        <img src="${b.images[0]}" class="d-block w-100 mb-0 building-carousel-img">
+        <img src="${b.images[0]}" alt="${b.title}" class="d-block w-100 mb-0 building-carousel-img">
       </div>`;
     } else if (b.images?.length > 1) {
         html += `
@@ -1546,19 +1569,19 @@ function renderBuildingOffcanvas(b) {
         <div class="carousel-inner">
           ${b.images.map((src, i) => `
             <div class="carousel-item${i === 0 ? ' active' : ''}">
-              <img src="${src}" class="d-block w-100 mb-0"
-                   class="building-carousel-img">
+              <img src="${src}" alt="${t('building.imageAlt', { title: b.title, i: i + 1, n: b.images.length })}"
+                   class="d-block w-100 mb-0 building-carousel-img">
             </div>`).join("")}
         </div>
         <button class="carousel-control-prev" type="button"
                 data-bs-target="#carouselBuilding" data-bs-slide="prev">
-          <span class="carousel-control-prev-icon"></span>
-          <span class="visually-hidden">Zurück</span>
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">${t('carousel.prev')}</span>
         </button>
         <button class="carousel-control-next" type="button"
                 data-bs-target="#carouselBuilding" data-bs-slide="next">
-          <span class="carousel-control-next-icon"></span>
-          <span class="visually-hidden">Weiter</span>
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">${t('carousel.next')}</span>
         </button>
       </div>`;
     }
@@ -1575,7 +1598,7 @@ function renderBuildingOffcanvas(b) {
             ${b.icon
                 ? `<img 
   src="${b.icon}" 
-  alt="${b.title} Icon"
+  alt=""
   class="building-icon-img" style="height:${b.iconHeight || 'auto'};">
 `
                 : ""}
@@ -1637,17 +1660,65 @@ function renderBuildingOffcanvas(b) {
  * Holt das passende Objekt aus campusBuildings, rendert es
  * mit renderBuildingOffcanvas() und zeigt das Offcanvas an.
  * @param {string} id – die SVG-ID des angeklickten Gebäudes
+ * @param {Object} [opts]
+ * @param {boolean} [opts.fromLegend] – aus der Legende geöffnet: Zurück-Knopf
+ *    und „Auf Karte zeigen“ einblenden (siehe legend.js)
  */
-function openBuildingInfo(id) {
+function openBuildingInfo(id, opts = {}) {
     const b = campusBuildings.find(x => x.id === id);
     if (!b) return;
 
+    const panel = document.getElementById('buildingInfoOffcanvas');
     const header = document.getElementById('buildingInfoLabel');
     header.textContent = b.title;
-    if (b.titleColor) header.style.color = b.titleColor;
+    header.style.color = b.titleColor || '';
 
     renderBuildingOffcanvas(b);
-    new bootstrap.Offcanvas(document.getElementById('buildingInfoOffcanvas')).show();
+    window.campusLegend?.onDetailShown(id, opts.fromLegend);
+
+    // Panel schon offen (Wechsel aus der Legende): kein shown-Ereignis,
+    // also das Karussell hier starten
+    if (panel.classList.contains('show')) {
+        startBuildingCarousel();
+        if (typeof enhanceBuildingCarousel === 'function') window.setTimeout(enhanceBuildingCarousel, 0);
+    } else {
+        bootstrap.Offcanvas.getOrCreateInstance(panel).show();
+    }
+}
+
+function startBuildingCarousel() {
+    const el = document.getElementById('carouselBuilding');
+    if (!el) return;
+
+    const inst = bootstrap.Carousel.getOrCreateInstance(el, {
+        interval: 3000,
+        pause: false,
+        wrap: true,
+        touch: true
+    });
+    inst.cycle();
+
+    // Für den nächsten Wechsel alle Transition-Dauern auf 0 setzen
+    const disableOnce = () => {
+        // sofort vor Bootstrap-Handler aktiv
+        el.classList.add('no-anim');
+        const onSlid = () => {
+            el.classList.remove('no-anim');   // Auto-Wechsel wieder mit Fade
+            el.removeEventListener('slid.bs.carousel', onSlid);
+        };
+        el.addEventListener('slid.bs.carousel', onSlid);
+    };
+
+    const prev = el.querySelector('.carousel-control-prev');
+    const next = el.querySelector('.carousel-control-next');
+
+    prev?.addEventListener('pointerdown', disableOnce);
+    next?.addEventListener('pointerdown', disableOnce);
+
+    // Optional: Tastatur
+    el.addEventListener('keydown', e => {
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') disableOnce();
+    });
 }
 
 /**
@@ -1673,8 +1744,12 @@ function runIntroZoom(svg, orig, durationMs = 3000) {
     // Für Mobile: längere Dauer (2 Sekunden)
     const actualDuration = isMobile ? 3000 : durationMs;
 
+    let cancelled = false;
     const start = performance.now();
     (function anim(now) {
+        // Beim Überspringen bleibt das SVG dasselbe – ohne Abbruch würde
+        // der laufende Zoom den Endzustand gleich wieder überschreiben.
+        if (cancelled) return;
         const t = Math.min(1, (now - start) / actualDuration);
         const ease = t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
 
@@ -1722,6 +1797,8 @@ function runIntroZoom(svg, orig, durationMs = 3000) {
             }, 100);
         }
     })(start);
+
+    return { cancel: () => { cancelled = true; } };
 }
 
 const clickGroups = [
@@ -1789,6 +1866,7 @@ function setupZoomPan() {
 
     let lastPtr = null;
     container.addEventListener('pointerdown', e => {
+        if (e.target.closest && e.target.closest('.map-controls')) return;
         if (e.pointerType === 'mouse' || e.pointerType === 'pen') {
             e.preventDefault();
             lastPtr = { x: e.clientX, y: e.clientY };
@@ -1824,6 +1902,7 @@ function setupZoomPan() {
     );
     const ts = { mode: null, startTouch: null, startDist: 0, startVBs: null };
     container.addEventListener('touchstart', e => {
+        if (e.target.closest && e.target.closest('.map-controls')) return;
         e.preventDefault();
         const t = e.touches;
         interactionType = 'tap';
@@ -1883,365 +1962,507 @@ function setupZoomPan() {
         if (!['mouse', 'touch', 'pen'].includes(e.pointerType) || interactionType !== 'tap') {
             return;
         }
+        // Die Zoom-Schaltflächen liegen im Kartencontainer, sind aber keine Kartenelemente
+        if (e.target.closest && e.target.closest('.map-controls')) return;
 
-        // 1) Spezieller Logo-Fall (kein Child-Loop)
-        const logoEl = document.getElementById('Logo');
-        if (logoEl && logoEl.contains(e.target)) {
-            // öffnet nur einmal
-            window.open('https://www.th-luebeck.de/', '_blank');
-            interactionType = null;
-            return;
-        }
-
-        // 2) Alle anderen clickGroups wie gehabt
-        for (const { containerId, prefix, modalSuffix, handler } of clickGroups) {
-            if (containerId === 'Logo') continue; // Logo haben wir schon behandelt
-
-            const containerEl = document.getElementById(containerId);
-            if (!containerEl) continue;
-
-            // Ersetze die Child-Loop durch direkte Container-Prüfung
-            if (containerEl.contains(e.target)) {
-                e.stopPropagation();
-                interactionType = null;
-
-                // ID aus containerId ableiten
-                let itemId;
-                if (prefix) {
-                    // Für Frage-X: "Frage-5" → "Frage5"
-                    itemId = containerId.replace('-', '');
-                    const modalId = `${itemId}${modalSuffix}`;
-                    handler(itemId, modalId);
-                } else {
-                    // Für andere Container: Alle direkten Kinder durchgehen
-                    for (const child of containerEl.children) {
-                        if (child.contains(e.target)) {
-                            if (child.id) {
-                                const modalId = `${child.id}${modalSuffix}`;
-                                handler(child.id, modalId);
-                                break;
-                            }
-                        }
-                    }
-                }
-                return;
-            }
-        }
-
-        // 3) Gebäude-Offcanvas danach
-        const elGeb = e.target.closest(clickableSelectorMap);
-        if (elGeb) {
-            const gebId = elGeb.id;
-            if (campusBuildings.some(b => b.id === gebId)) {
-                openBuildingInfo(gebId);
-            }
-        }
+        activateMapTarget(e.target, e);
         interactionType = null;
     });
+
+    // Zoom-Logik nach außen geben: Die Schaltflächen in a11y.js brauchen sie
+    // als Alternative zu Mausrad und Pinch (2.5.1 Zeigergesten).
+    window.mapZoomControls = {
+        zoomIn: () => doZoom(1.3, window.innerWidth / 2, window.innerHeight / 2),
+        zoomOut: () => doZoom(1 / 1.3, window.innerWidth / 2, window.innerHeight / 2),
+        reset: () => {
+            svgs.forEach((svg, i) => {
+                const vb = svg.viewBox.baseVal;
+                vb.x = 0;
+                vb.y = 0;
+                vb.width = orig[i].width;
+                vb.height = orig[i].height;
+            });
+        },
+        // Verschiebt den Ausschnitt, bis das Element sichtbar ist (Tastaturfokus
+        // bei hineingezoomter Karte). Nicht gezoomt: nichts zu tun.
+        panToElement: (el) => {
+            const svg = svgs[0];
+            if (!svg || !el) return;
+            const vb = svg.viewBox.baseVal;
+            if (vb.width >= orig[0].width) return;
+            const box = el.getBoundingClientRect();
+            const view = container.getBoundingClientRect();
+            const rand = 40;
+            if (box.left >= view.left + rand && box.right <= view.right - rand &&
+                box.top >= view.top + rand && box.bottom <= view.bottom - rand) return;
+            const scale = svg.getScreenCTM().a;
+            const dx = (box.left + box.width / 2) - (view.left + view.width / 2);
+            const dy = (box.top + box.height / 2) - (view.top + view.height / 2);
+            vb.x += dx / scale;
+            vb.y += dy / scale;
+            clamp(vb, orig[0].width, orig[0].height);
+        },
+        // Fliegt zum Element (Legende: „Auf Karte zeigen“). region ist der
+        // freie Teil des Bildschirms (ohne Kopfzeile/Panel), dort landet das
+        // Element mittig. Hineingezoomt wird nur, nie heraus.
+        flyToElement: (el, { region, zoom = 2, animate = true, duration = 700 } = {}) => {
+            const svg = svgs[0];
+            if (!svg || !el) return Promise.resolve();
+            const box = el.getBoundingClientRect();
+            if (!box.width && !box.height) return Promise.resolve();
+            const area = region || container.getBoundingClientRect();
+            const vb = svg.viewBox.baseVal;
+            const from = { x: vb.x, y: vb.y, width: vb.width, height: vb.height };
+
+            const toSvg = (x, y, ctm) => {
+                const p = svg.createSVGPoint(); p.x = x; p.y = y;
+                return p.matrixTransform(ctm.inverse());
+            };
+            const c = toSvg(box.left + box.width / 2, box.top + box.height / 2, svg.getScreenCTM());
+
+            // Zielausschnitt berechnen: erst Größe, dann so verschieben,
+            // dass das Element in der Mitte der freien Fläche liegt
+            const nz = Math.min(maxZoom, Math.max(minZoom, zoom, orig[0].width / vb.width));
+            vb.width = orig[0].width / nz;
+            vb.height = orig[0].height / nz;
+            vb.x = c.x - vb.width / 2;
+            vb.y = c.y - vb.height / 2;
+            const ctm = svg.getScreenCTM();
+            const p = svg.createSVGPoint(); p.x = c.x; p.y = c.y;
+            const s = p.matrixTransform(ctm);
+            vb.x -= (area.left + area.width / 2 - s.x) / ctm.a;
+            vb.y -= (area.top + area.height / 2 - s.y) / ctm.d;
+            // Liegt das Element am Kartenrand, nicht über den Rand hinaus
+            // schieben (sonst bleibt ein leerer weißer Streifen stehen)
+            const edge = svg.getScreenCTM();
+            const mapL = edge.e, mapR = edge.e + orig[0].width * edge.a;
+            const mapT = edge.f, mapB = edge.f + orig[0].height * edge.d;
+            const areaR = area.left + area.width, areaB = area.top + area.height;
+            if (mapR - mapL >= area.width) {
+                if (mapL > area.left) vb.x += (mapL - area.left) / edge.a;
+                else if (mapR < areaR) vb.x -= (areaR - mapR) / edge.a;
+            }
+            if (mapB - mapT >= area.height) {
+                if (mapT > area.top) vb.y += (mapT - area.top) / edge.d;
+                else if (mapB < areaB) vb.y -= (areaB - mapB) / edge.d;
+            }
+            clamp(vb, orig[0].width, orig[0].height);
+            const to = { x: vb.x, y: vb.y, width: vb.width, height: vb.height };
+
+            if (!animate) return Promise.resolve();
+            Object.assign(vb, from);
+            return new Promise(resolve => {
+                const start = performance.now();
+                (function step(now) {
+                    const k = Math.min(1, (now - start) / duration);
+                    const e = k < 0.5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+                    vb.x = from.x + (to.x - from.x) * e;
+                    vb.y = from.y + (to.y - from.y) * e;
+                    vb.width = from.width + (to.width - from.width) * e;
+                    vb.height = from.height + (to.height - from.height) * e;
+                    if (k < 1) requestAnimationFrame(step);
+                    else resolve();
+                })(start);
+            });
+        },
+        zoomText: () => {
+            const svg = svgs[0];
+            if (!svg) return '';
+            const stufe = orig[0].width / svg.viewBox.baseVal.width;
+            return `Zoomstufe ${Math.round(stufe * 100)} Prozent`;
+        }
+    };
 }//setupZoomPan
 
-// OPTIMIERTE Lottie-Initialisierung - Verhindert doppeltes Laden
-let lottieInstance = null; // Globale Instanz-Verwaltung
+/**
+ * Führt die Aktion aus, die zu einem Kartenelement gehört.
+ *
+ * Maus/Touch (pointerup) und Tastatur (Enter/Leertaste in a11y.js) rufen
+ * beide hier herein, damit sie garantiert dasselbe tun und nicht
+ * auseinanderlaufen können.
+ *
+ * @param {Element} target - das angetippte bzw. fokussierte SVG-Element
+ * @param {Event}  [evt]   - das auslösende Event, falls vorhanden
+ */
+function activateMapTarget(target, evt) {
+    if (!target) return;
 
-async function initAnimations() {
-    if (lottieInstance && !lottieInstance.isDestroyed) {
+    // 1) Spezieller Logo-Fall (kein Child-Loop)
+    const logoEl = document.getElementById('Logo');
+    if (logoEl && logoEl.contains(target)) {
+        window.open('https://www.th-luebeck.de/', '_blank');
         return;
     }
 
-    if (lottieInstance) {
-        try {
-            lottieInstance.destroy();
-        } catch (e) {
-        }
-    }
+    // 2) Alle anderen clickGroups wie gehabt
+    for (const { containerId, prefix, modalSuffix, handler } of clickGroups) {
+        if (containerId === 'Logo') continue; // Logo haben wir schon behandelt
 
-    document.getElementById('lottieMap').innerHTML = '';
+        const containerEl = document.getElementById(containerId);
+        if (!containerEl) continue;
 
-    // 3. JSON nur einmal laden (mit Cache)
-    const [dataMap] = await Promise.all([
-        loadJSON('assets/campus_map_intro.json')
-    ]);
+        if (containerEl.contains(target)) {
+            if (evt) evt.stopPropagation();
 
-    const animationsOn = areAnimationsEnabled();
-
-    // Campus-SVG vorladen. Bei deaktivierten Animationen müssen wir warten,
-    // weil showCampusSVG sofort (ohne 5s-Intro) aufgerufen wird.
-    const svgFetchPromise = (!cachedCampusMapSvg)
-        ? fetch('assets/campus_map.svg')
-            .then(r => r.text())
-            .then(svgText => { cachedCampusMapSvg = svgText; })
-            .catch(() => { })
-        : Promise.resolve();
-
-    if (!animationsOn) {
-        await svgFetchPromise;
-    }
-
-    lottieInstance = lottie.loadAnimation({
-        container: document.getElementById('lottieMap'),
-        renderer: 'svg',
-        loop: false,
-        autoplay: animationsOn,
-        rendererSettings: {
-            preserveAspectRatio: 'xMidYMid meet',
-            progressiveLoad: true,
-            hideOnTransparent: true,
-            className: 'lottie-optimized'
-        },
-        animationData: dataMap
-    });
-
-    window.lottieMapInstance = lottieInstance;
-
-    const durationMs = 5000;
-
-    // 2) Sobald Lottie sein DOM fertig geladen hat:
-    window.lottieMapInstance.addEventListener('DOMLoaded', () => {
-        const container = document.getElementById('lottieMap');
-
-        // Filter für Intro-Animation anwenden
-        updateFilterStyles();
-
-
-        // 1) Auslagerung des Destroy-&-Insert-Logik in eine Funktion
-        function showCampusSVG() {
-            if (!window.lottieMapInstance) return;
-
-            // Aktuellen Zoom-Zustand speichern
-            const currentSvg = document.querySelector('#lottieMap svg');
-            let savedViewBox = null;
-            if (currentSvg) {
-                const vb = currentSvg.viewBox.baseVal;
-                savedViewBox = {
-                    x: vb.x,
-                    y: vb.y,
-                    width: vb.width,
-                    height: vb.height
-                };
-            }
-
-            window.lottieMapInstance.destroy();
-
-            const container = document.getElementById('lottieMap');
-            container.innerHTML = cachedCampusMapSvg || '<p>SVG nicht verfügbar.</p>';
-
-            // Zoom-Zustand wiederherstellen, falls vorhanden
-            if (savedViewBox) {
-                const newSvg = document.querySelector('#lottieMap svg');
-                if (newSvg) {
-                    const newVb = newSvg.viewBox.baseVal;
-                    newVb.x = savedViewBox.x;
-                    newVb.y = savedViewBox.y;
-                    newVb.width = savedViewBox.width;
-                    newVb.height = savedViewBox.height;
+            // ID aus containerId ableiten
+            let itemId;
+            if (prefix) {
+                // Für Frage-X: "Frage-5" → "Frage5"
+                itemId = containerId.replace('-', '');
+                const modalId = `${itemId}${modalSuffix}`;
+                handler(itemId, modalId);
+            } else {
+                // Für andere Container: Alle direkten Kinder durchgehen
+                for (const child of containerEl.children) {
+                    if (child.contains(target)) {
+                        if (child.id) {
+                            const modalId = `${child.id}${modalSuffix}`;
+                            handler(child.id, modalId);
+                            break;
+                        }
+                    }
                 }
             }
-
-            document.getElementById('Button_Pausen')?.remove();
-
-            // Frage-Elemente basierend auf Completion-Status einfärben
-            if (typeof window.colorQuizElements === 'function') {
-                window.colorQuizElements();
-            }
-
-            // Kaffee & Geb hover
-            const gebChildren = Array.from(
-                document.querySelectorAll('#lottieMap svg g#Gebaeude > g')
-            ).map(el => el.id);
-            const kaffeeChildren = Array.from(
-                document.querySelectorAll('#lottieMap svg g#Kaffee > g')
-            ).map(el => el.id);
-            const FahrradstationenChildren = Array.from(
-                document.querySelectorAll('#lottieMap svg g#Fahrradstationen> g')
-            ).map(el => el.id);
-            const BushaltestellenChildren = Array.from(
-                document.querySelectorAll('#lottieMap svg g#Bushaltestellen> g')
-            ).map(el => el.id);
-
-            const hoverSelectors = [
-                '#lottieMap svg g#Logo:hover',
-                ...CLICKABLE_Geb_CONFIG.lottieMap.exactMatches
-                    .filter(id => gebChildren.includes(id))
-                    .map(id => `#lottieMap svg g#Gebaeude > g#${id}:hover`),
-                ...CLICKABLE_Geb_CONFIG.lottieMap.exactMatches
-                    .filter(id => kaffeeChildren.includes(id))
-                    .map(id => `#lottieMap svg g#Kaffee > g#${id}:hover`),
-                ...CLICKABLE_Geb_CONFIG.lottieMap.exactMatches
-                    .filter(id => FahrradstationenChildren.includes(id))
-                    .map(id => `#lottieMap svg g#Fahrradstationen> g#${id}:hover`),
-                ...CLICKABLE_Geb_CONFIG.lottieMap.exactMatches
-                    .filter(id => BushaltestellenChildren.includes(id))
-                    .map(id => `#lottieMap svg g#Bushaltestellen> g#${id}:hover`),
-            ].join(',\n');
-
-
-            // Erstelle ein neues <style> und injiziere nur DIESEN Rule-Block
-            const hoverStyle = document.createElement('style');
-            hoverStyle.textContent = `
-    ${hoverSelectors} {
-      filter: brightness(0.9);
+            return;
+        }
     }
-    `;
-            document.head.appendChild(hoverStyle);
 
-            (function makeLogoFullyClickable() {
-                const svg = container.querySelector('svg');
-                const logoGroup = svg.querySelector('g#Logo');
-                if (!logoGroup) return;
-                const bbox = logoGroup.getBBox();
-                const rect = document.createElementNS(svg.namespaceURI, 'rect');
-                rect.setAttribute('x', bbox.x);
-                rect.setAttribute('y', bbox.y);
-                rect.setAttribute('width', bbox.width);
-                rect.setAttribute('height', bbox.height);
-                rect.setAttribute('fill', 'transparent');
-                rect.setAttribute('pointer-events', 'all');
-                // ganz nach oben im <g id="Logo">
-                logoGroup.insertBefore(rect, logoGroup.firstChild);
-            })();
-
-            // Hover-Styles, viewBox-Klasse, Logo-Hitbox, Zoom/Pan und Filter initialisieren
-            document.querySelector('svg')?.classList.add('campus-map-svg');
-
-            setupZoomPan();
-            initFilters();
+    // 3) Gebäude-Offcanvas danach
+    const elGeb = target.closest(clickableSelectorMap);
+    if (elGeb) {
+        const gebId = elGeb.id;
+        if (campusBuildings.some(b => b.id === gebId)) {
+            openBuildingInfo(gebId);
         }
+    }
+}
 
-        // 2) Timeout speichern, damit wir ihn abbrechen können
-        // Wenn Animationen deaktiviert sind, direkt überspringen
-        const introDelay = animationsOn ? durationMs : 0;
+// Seitenverhältnis der Karte: Auf Laptop-Bildschirmen, die etwas breiter als
+// 16:9 sind, füllt die Karte die volle Breite (keine weißen Ränder links/rechts)
+// und wird nur oben beschnitten – dort liegt ohnehin die Kopfzeile, unten
+// bleibt das Logo ganz. Große Bildschirme und schmalere Fenster zeigen die
+// Karte weiterhin vollständig (mit Rand).
+const MAP_FILL_MAX_WIDTH = 1800;
+const MAP_FILL_MAX_RATIO = 2.1;
 
-        // Skip-Hinweis (nur wenn Animation läuft)
-        const skipHint = document.getElementById('skipIntroHint');
-        const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-        if (skipHint && animationsOn) {
-            // In iframes erreicht keydown das iframe-Dokument oft nicht
-            // (kein Fokus). Dann nur Klick anbieten.
-            const inIframe = window.self !== window.top;
-            skipHint.innerHTML = isTouchDevice
-                ? 'Tippen zum Überspringen'
-                : inIframe
-                    ? 'Klicken zum Überspringen'
-                    : 'Klicken oder <kbd>Leertaste</kbd> zum Überspringen';
-            // Nach kurzer Verzögerung einblenden, damit Animation Zeit hat zu starten
-            setTimeout(() => { if (!introSkipped) skipHint.classList.add('visible'); }, 400);
+function mapAspectRatio() {
+    const box = document.getElementById('mapContainer');
+    if (!box || !box.clientHeight) return 'xMidYMid meet';
+    const ratio = box.clientWidth / box.clientHeight;
+    const fill = box.clientWidth < MAP_FILL_MAX_WIDTH
+        && ratio > 1920 / 1080 && ratio <= MAP_FILL_MAX_RATIO;
+    return fill ? 'xMidYMax slice' : 'xMidYMid meet';
+}
+
+function applyMapAspectRatio() {
+    document.querySelector('#lottieMap svg')?.setAttribute('preserveAspectRatio', mapAspectRatio());
+}
+
+window.addEventListener('resize', applyMapAspectRatio);
+
+// ============================================================
+// Karte laden und Intro abspielen
+// ============================================================
+//
+// Das Intro läuft direkt auf campus_map_v2.svg (früher: eigene Lottie-
+// Animation, danach Wechsel auf die SVG). So zeigt das Intro immer genau die
+// aktuelle Karte – neue Gebäude, Icons und Größen sind automatisch dabei, und
+// am Ende springt nichts mehr.
+
+const INTRO_DURATION_MS = 5000;
+// Zeitpunkte stammen aus dem früheren Lottie-Intro (25 Bilder/s = 40 ms)
+const introFrame = n => n * 40;
+
+// Reihenfolge, in der die Bereiche erscheinen (Bild im alten Intro)
+const INTRO_BEREICHE = {
+    Bereich_E: 18, Bereich_A: 21, Bereich_B: 38, Bereich_F: 48,
+    Bereich_G: 61, Bereich_D: 76, Interimsbau: 76, Bereich_C: 78, Bereich_MFC: 90
+};
+
+// Ebenen, die nicht einzeln animiert werden: Sie blenden am Ende gemeinsam ein
+// (Straßen, Beschriftungen, Buttons, Quizfiguren, Legenden …). Neue Ebenen in
+// der SVG landen automatisch hier.
+const INTRO_EIGENE_ANIMATION = ['Hg', 'Logo', 'Bereiche', 'Gebaeude', 'Kaffee', 'Bushaltestellen', 'Fahrradstationen'];
+
+/**
+ * Spielt das Intro auf der fertigen Karte ab.
+ * @returns {{finish: Function}} – finish() springt sofort ans Ende
+ */
+function runMapIntro(svg) {
+    const animationen = [];
+
+    // Gruppen mit eigenem transform-Attribut (z. B. skalierte Icons) dürfen
+    // keine CSS-Transformation bekommen – die würde das Attribut ersetzen.
+    // Deshalb wird dort ein innerer Wrapper animiert.
+    const ziel = el => {
+        if (!el.hasAttribute('transform')) return el;
+        const innen = document.createElementNS(svg.namespaceURI, 'g');
+        // Nur Gruppen können Kinder-<g> tragen; z. B. <text> bekommt stattdessen
+        // einen Wrapper drumherum (sonst wird sein Inhalt nicht gezeichnet).
+        if (el.tagName.toLowerCase() !== 'g') {
+            el.replaceWith(innen);
+            innen.appendChild(el);
+            return innen;
         }
-        let introSkipped = false;
-        const hideSkipHint = () => {
-            introSkipped = true;
-            skipHint?.classList.remove('visible');
-        };
+        while (el.firstChild) innen.appendChild(el.firstChild);
+        el.appendChild(innen);
+        return innen;
+    };
+    const animiere = (el, keyframes, delay, duration, easing = 'ease-out', origin = '50% 100%') => {
+        if (!el || !el.animate) return;
+        el.style.transformBox = 'fill-box';
+        el.style.transformOrigin = origin;
+        // fill 'backwards': vor dem Start unsichtbar, danach wieder der
+        // normale Zustand (keine Inline-Transformation bleibt hängen)
+        animationen.push(el.animate(keyframes, { delay, duration, easing, fill: 'backwards' }));
+    };
+    const kinder = id => Array.from(svg.querySelectorAll(`g#${id} > *`));
 
-        const introTimeout = setTimeout(() => {
-            if (!animationsOn) jumpToFinalZoom();
-            showCampusSVG();
-            hideSkipHint();
-        }, introDelay);
-
-        // Funktion um zum finalen Zoom-Zustand zu springen
-        function jumpToFinalZoom() {
-            const svg = document.querySelector('#lottieMap svg');
-            if (!svg) return;
-
-            const vb = svg.viewBox.baseVal;
-            const orig = { width: 1920, height: 1080 };
-
-            // Mobile-Erkennung
-            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
-                window.innerWidth <= 768;
-
-            let finalZoom, centerX, centerY;
-
-            if (isMobile) {
-                // Für Mobile: 2.8x Zoom (wie im Intro: 0.5 + 2.3 * 1 = 2.8)
-                finalZoom = 2.8;
-                centerX = orig.width * 0.62;
-                centerY = orig.height * 0.42;
-            } else {
-                // Für Desktop: 1.0x Zoom (normale Größe)
-                finalZoom = 1.0;
-                centerX = orig.width / 2;
-                centerY = orig.height / 2;
-            }
-
-            // Finalen Zoom-Zustand setzen
-            const newW = orig.width / finalZoom;
-            const newH = orig.height / finalZoom;
-            vb.width = newW;
-            vb.height = newH;
-            vb.x = centerX - newW / 2;
-            vb.y = centerY - newH / 2;
-        }
-
-        // 3) Skip-Listener für Desktop (Leertaste)
-        document.addEventListener('keydown', e => {
-            if (e.code === 'Space' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
-                e.preventDefault();
-                clearTimeout(introTimeout);
-                jumpToFinalZoom();
-                showCampusSVG();
-                hideSkipHint();
-            }
+    // 1) Bereiche erscheinen nacheinander, die Buchstaben springen kurz auf
+    const bereiche = [];
+    Object.entries(INTRO_BEREICHE).forEach(([id, bild]) => {
+        const g = svg.querySelector(`g#${id}`);
+        if (!g) return;
+        const flaeche = g.querySelector(`g#${id}-2`) || g;
+        bereiche.push({ start: introFrame(bild), box: flaeche.getBBox() });
+        animiere(g, [{ opacity: 0 }, { opacity: 1 }], introFrame(bild), 120, 'linear');
+        Array.from(g.children).filter(c => c !== flaeche).forEach(buchstabe => {
+            animiere(buchstabe,
+                [{ transform: 'scale(1)' }, { transform: 'scale(1.5)' }, { transform: 'scale(1)' }],
+                introFrame(bild + 1), 320, 'ease-in-out', '50% 50%');
         });
-
-        // 4) Skip-Listener für Touchscreen + Maus (einmaliger Tap/Klick).
-        //    Klick ist nötig, weil in Cross-Origin-iframes (z.B. train-on.net)
-        //    keine keydown-Events ankommen, solange das iframe keinen Fokus hat.
-        //    pointerdown statt mousedown, weil setupZoomPan() auf dem mapContainer
-        //    bereits einen pointerdown-Handler mit preventDefault() registriert hat.
-        //    Das unterdrueckt per Spec die nachfolgenden mousedown/click-Events.
-        //    Capture-Phase auf document feuert VOR dem Container-Handler.
-        let skipPointerHandled = false;
-        function onFirstPointer(e) {
-            if (skipPointerHandled) return;
-
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-
-            skipPointerHandled = true;
-            clearTimeout(introTimeout);
-            jumpToFinalZoom();
-            showCampusSVG();
-            hideSkipHint();
-
-            window.removeEventListener('touchstart', onFirstPointer, { capture: true });
-            document.removeEventListener('touchstart', onFirstPointer, { capture: true });
-            window.removeEventListener('pointerdown', onFirstPointer, { capture: true });
-            document.removeEventListener('pointerdown', onFirstPointer, { capture: true });
-        }
-        window.addEventListener('touchstart', onFirstPointer, { passive: false, capture: true });
-        document.addEventListener('touchstart', onFirstPointer, { passive: false, capture: true });
-        window.addEventListener('pointerdown', onFirstPointer, { passive: false, capture: true });
-        document.addEventListener('pointerdown', onFirstPointer, { passive: false, capture: true });
     });
 
+    // 2) Gebäude wachsen in ihrem Bereich nacheinander hoch. Der Bereich wird
+    //    über die Lage bestimmt – so sind neue Gebäude ohne Pflege dabei.
+    const bereichVon = el => {
+        const b = el.getBBox();
+        const x = b.x + b.width / 2, y = b.y + b.height / 2;
+        const drin = bereiche
+            .filter(({ box }) => x >= box.x && x <= box.x + box.width && y >= box.y && y <= box.y + box.height)
+            .sort((p, q) => p.box.width * p.box.height - q.box.width * q.box.height);
+        if (drin.length) return drin[0];
+        // außerhalb aller Bereiche: der nächstgelegene
+        return bereiche.slice().sort((p, q) => {
+            const d = ({ box }) => Math.hypot(box.x + box.width / 2 - x, box.y + box.height / 2 - y);
+            return d(p) - d(q);
+        })[0];
+    };
+    // Sonstiges in der Bereiche-Ebene (z. B. Beschriftung „Campuswiese“)
+    // erscheint zusammen mit dem Bereich, in dem es liegt
+    if (bereiche.length) {
+        kinder('Bereiche')
+            .filter(el => !(el.id in INTRO_BEREICHE))
+            .forEach(el => animiere(el, [{ opacity: 0 }, { opacity: 1 }], bereichVon(el).start, 120, 'linear'));
+    }
 
-    window.lottieMapInstance.addEventListener('complete', () => {
-        window.lottieMapInstance.goToAndStop(window.lottieMapInstance.totalFrames - 1, true);
+    const proBereich = new Map();
+    kinder('Gebaeude').forEach(geb => {
+        const bereich = bereiche.length ? bereichVon(geb) : { start: 0 };
+        const nr = proBereich.get(bereich) || 0;
+        proBereich.set(bereich, nr + 1);
+        animiere(ziel(geb), [
+            { opacity: 0, transform: 'translateY(18px) scaleY(0.6)' },
+            { opacity: 1, transform: 'translateY(-4px) scaleY(1.06)', offset: 0.6 },
+            { opacity: 1, transform: 'none' }
+        ], bereich.start + 40 + nr * 60, 360);
     });
 
-    const mL = new Promise(r => window.lottieMapInstance.addEventListener('DOMLoaded', r));
-    const container = document.getElementById('mapContainer');
-    // Ein SVG-Element statt eines Arrays
-    const svg = document.querySelector('#lottieMap svg');
+    // 3) Icons fallen ein: zuerst die Cafés, dann Bus und Fahrrad
+    const einfallen = (el, delay) => animiere(ziel(el), [
+        { opacity: 0, transform: 'translateY(-40px) scale(0.6)' },
+        { opacity: 1, transform: 'translateY(4px) scale(1.05)', offset: 0.7 },
+        { opacity: 1, transform: 'none' }
+    ], delay, 420);
+    kinder('Kaffee').forEach((el, i) => einfallen(el, introFrame(38) + i * 120));
+    [...kinder('Bushaltestellen'), ...kinder('Fahrradstationen')]
+        .forEach((el, i) => einfallen(el, introFrame(60) + i * 80));
+
+    // 4) Logo, dann alle übrigen Ebenen blenden ein
+    animiere(svg.querySelector('g#Logo'),
+        [{ opacity: 0 }, { opacity: 0.5, offset: 0.7 }, { opacity: 1 }],
+        introFrame(84), introFrame(17), 'linear');
+    const keineGrafik = ['defs', 'style', 'title', 'desc', 'metadata'];
+    Array.from(svg.children)
+        .filter(el => !keineGrafik.includes(el.tagName.toLowerCase()) && !INTRO_EIGENE_ANIMATION.includes(el.id))
+        .forEach(el => animiere(el,
+            [{ opacity: 0 }, { opacity: 0.4, offset: 0.75 }, { opacity: 1 }],
+            introFrame(93), introFrame(28), 'linear'));
+
+    return { finish: () => animationen.forEach(a => { try { a.finish(); } catch (e) { } }) };
+}
+
+/** Setzt die Kartenansicht auf den Endzustand des Intros. */
+function jumpToFinalZoom(svg) {
+    if (!svg) return;
     const vb = svg.viewBox.baseVal;
-    // Ursprungsgröße fest definieren (wie in jumpToFinalZoom und setupZoomPan)
-    // Dies verhindert Race-Conditions beim Refresh auf Android
-    const orig = {
-        width: 1920,
-        height: 1080
+    const orig = { width: 1920, height: 1080 };
+
+    // Mobile-Erkennung
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+        window.innerWidth <= 768;
+
+    // Mobile: 2.8x Zoom (wie im Intro: 0.5 + 2.3 * 1), Desktop: normale Größe
+    const finalZoom = isMobile ? 2.8 : 1.0;
+    const centerX = isMobile ? orig.width * 0.62 : orig.width / 2;
+    const centerY = isMobile ? orig.height * 0.42 : orig.height / 2;
+
+    vb.width = orig.width / finalZoom;
+    vb.height = orig.height / finalZoom;
+    vb.x = centerX - vb.width / 2;
+    vb.y = centerY - vb.height / 2;
+}
+
+/** Fügt die Karte ein und verdrahtet Hover, Logo, Zoom/Pan und Filter. */
+function insertCampusSVG() {
+    const container = document.getElementById('lottieMap');
+    container.innerHTML = cachedCampusMapSvg || `<p>${t('map.unavailable')}</p>`;
+    const svg = container.querySelector('svg');
+    if (!svg) return null;
+
+    localizeMapTexts(container);
+    svg.classList.add('campus-map-svg');
+    applyMapAspectRatio();
+
+    document.getElementById('Button_Pausen')?.remove();
+
+    // Frage-Elemente basierend auf Completion-Status einfärben
+    if (typeof window.colorQuizElements === 'function') {
+        window.colorQuizElements();
+    }
+
+    // Hover-Effekt für alle anklickbaren Elemente
+    const kinderIds = id => Array.from(svg.querySelectorAll(`g#${id} > g`)).map(el => el.id);
+    const hoverSelectors = [
+        '#lottieMap svg g#Logo:hover',
+        ...['Gebaeude', 'Kaffee', 'Fahrradstationen', 'Bushaltestellen'].flatMap(gruppe => {
+            const ids = kinderIds(gruppe);
+            return CLICKABLE_Geb_CONFIG.lottieMap.exactMatches
+                .filter(id => ids.includes(id))
+                .map(id => `#lottieMap svg g#${gruppe} > g#${id}:hover`);
+        })
+    ].join(',\n');
+    const hoverStyle = document.createElement('style');
+    hoverStyle.textContent = `${hoverSelectors} { filter: brightness(0.9); }`;
+    document.head.appendChild(hoverStyle);
+
+    // Logo vollständig klickbar machen (auch die Lücken zwischen den Buchstaben)
+    const logoGroup = svg.querySelector('g#Logo');
+    if (logoGroup) {
+        const bbox = logoGroup.getBBox();
+        const rect = document.createElementNS(svg.namespaceURI, 'rect');
+        rect.setAttribute('x', bbox.x);
+        rect.setAttribute('y', bbox.y);
+        rect.setAttribute('width', bbox.width);
+        rect.setAttribute('height', bbox.height);
+        rect.setAttribute('fill', 'transparent');
+        rect.setAttribute('pointer-events', 'all');
+        logoGroup.insertBefore(rect, logoGroup.firstChild);
+    }
+
+    setupZoomPan();
+    initFilters();
+    return svg;
+}
+
+let mapInitialized = false;
+
+async function initAnimations() {
+    if (mapInitialized) return;
+    mapInitialized = true;
+
+    // Nach einem Sprachwechsel (Seiten-Reload) das Intro nicht erneut zeigen
+    const animationsOn = areAnimationsEnabled() && !CAME_FROM_LANG_SWITCH;
+
+    if (!cachedCampusMapSvg) {
+        try {
+            const r = await fetch('assets/campus_map_v2.svg?v=20261003m');
+            if (r.ok) cachedCampusMapSvg = await r.text();
+        } catch (e) { }
+    }
+
+    const svg = insertCampusSVG();
+    if (!svg) return;
+
+    if (!animationsOn) {
+        jumpToFinalZoom(svg);
+        return;
+    }
+
+    const intro = runMapIntro(svg);
+    const zoom = runIntroZoom(svg, { width: 1920, height: 1080 }, 3000);
+
+    // Skip-Hinweis
+    const skipHint = document.getElementById('skipIntroHint');
+    const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+    let introVorbei = false;
+    if (skipHint) {
+        // In iframes erreicht keydown das iframe-Dokument oft nicht
+        // (kein Fokus). Dann nur Klick anbieten.
+        const inIframe = window.self !== window.top;
+        skipHint.innerHTML = isTouchDevice
+            ? t('intro.skipTap')
+            : inIframe
+                ? t('intro.skipClick')
+                : t('intro.skipKey');
+        // Nach kurzer Verzögerung einblenden, damit Animation Zeit hat zu starten
+        setTimeout(() => { if (!introVorbei) skipHint.classList.add('visible'); }, 400);
+    }
+
+    const introBeenden = () => {
+        introVorbei = true;
+        clearTimeout(introTimeout);
+        skipHint?.classList.remove('visible');
+        // Die Überspringen-Handler gelten nur während des Intros. Bleiben
+        // sie aktiv, schluckt die Leertaste später jeden Button-Druck und
+        // der erste Klick nach dem Intro geht verloren.
+        document.removeEventListener('keydown', onSkipKey);
+        window.removeEventListener('touchstart', onFirstPointer, { capture: true });
+        document.removeEventListener('touchstart', onFirstPointer, { capture: true });
+        window.removeEventListener('pointerdown', onFirstPointer, { capture: true });
+        document.removeEventListener('pointerdown', onFirstPointer, { capture: true });
+    };
+    const ueberspringen = () => {
+        intro.finish();
+        zoom.cancel();
+        jumpToFinalZoom(svg);
+        introBeenden();
     };
 
-    Promise.all([mL]).then(() => {
-        setupZoomPan();
-        if (animationsOn) {
-            runIntroZoom(svg, orig, 3000);
+    const introTimeout = setTimeout(introBeenden, INTRO_DURATION_MS);
+
+    // Überspringen per Leertaste (Desktop)
+    function onSkipKey(e) {
+        if (e.code === 'Space' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+            e.preventDefault();
+            ueberspringen();
         }
-        setTimeout(async () => {
-            initFilters();
-        }, 300);
-    });
+    }
+    document.addEventListener('keydown', onSkipKey);
+
+    // Überspringen per Tap/Klick. Klick ist nötig, weil in Cross-Origin-iframes
+    // (z.B. train-on.net) keine keydown-Events ankommen, solange das iframe
+    // keinen Fokus hat. pointerdown statt mousedown, weil setupZoomPan() auf
+    // dem mapContainer einen pointerdown-Handler mit preventDefault() hat –
+    // das unterdrückt per Spec mousedown/click. Capture-Phase auf document
+    // feuert VOR dem Container-Handler.
+    function onFirstPointer(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        ueberspringen();
+
+        // Die Karte liegt schon während des Intros darunter: Das Loslassen
+        // desselben Tipps/Klicks würde sonst das Element an dieser Stelle
+        // öffnen. Also das zugehörige pointerup/click einmalig verschlucken.
+        const schlucken = ev => { ev.stopPropagation(); ev.stopImmediatePropagation(); };
+        ['pointerup', 'click'].forEach(typ => document.addEventListener(typ, schlucken, { capture: true, once: true }));
+        setTimeout(() => ['pointerup', 'click'].forEach(typ => document.removeEventListener(typ, schlucken, { capture: true })), 800);
+    }
+    window.addEventListener('touchstart', onFirstPointer, { passive: false, capture: true });
+    document.addEventListener('touchstart', onFirstPointer, { passive: false, capture: true });
+    window.addEventListener('pointerdown', onFirstPointer, { passive: false, capture: true });
+    document.addEventListener('pointerdown', onFirstPointer, { passive: false, capture: true });
 }//initAnimations
 
 // 4) DOMContentLoaded: initAnimations + Overlays + Rest
@@ -2249,44 +2470,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     const el = document.getElementById("footer-container");
     if (el) el.remove(); // sofort weg, Inhalt wird nie aufgebaut
 
-    // Starte Lottie & Map
+    // Karte laden und Intro starten
     initAnimations();
 
     const offcanvasEl = document.getElementById('buildingInfoOffcanvas');
-    offcanvasEl.addEventListener('shown.bs.offcanvas', () => {
-        const el = document.getElementById('carouselBuilding');
-        if (!el) return;
-
-        const inst = bootstrap.Carousel.getOrCreateInstance(el, {
-            interval: 3000,
-            pause: false,
-            wrap: true,
-            touch: true
-        });
-        inst.cycle();
-
-        // Für den nächsten Wechsel alle Transition-Dauern auf 0 setzen
-        const disableOnce = () => {
-            // sofort vor Bootstrap-Handler aktiv
-            el.classList.add('no-anim');
-            const onSlid = () => {
-                el.classList.remove('no-anim');   // Auto-Wechsel wieder mit Fade
-                el.removeEventListener('slid.bs.carousel', onSlid);
-            };
-            el.addEventListener('slid.bs.carousel', onSlid);
-        };
-
-        const prev = el.querySelector('.carousel-control-prev');
-        const next = el.querySelector('.carousel-control-next');
-
-        prev?.addEventListener('pointerdown', disableOnce);
-        next?.addEventListener('pointerdown', disableOnce);
-
-        // Optional: Tastatur
-        el.addEventListener('keydown', e => {
-            if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') disableOnce();
-        });
-    });
+    offcanvasEl.addEventListener('shown.bs.offcanvas', startBuildingCarousel);
 
 }); //DOMContentLoaded
 
@@ -2309,7 +2497,7 @@ function setupAccordionToggle(modal) {
         // Funktion zum Aktualisieren der UI
         function updateUI() {
             if (freshCollapseElement.classList.contains('show')) {
-                freshContainer.innerHTML = '<div class="campus-accordion-close"><i class="fas fa-info-circle campus-info-icon"></i><span>Schließen</span></div>';
+                freshContainer.innerHTML = `<div class="campus-accordion-close"><i class="fas fa-info-circle campus-info-icon"></i><span>${t('common.close')}</span></div>`;
                 freshContainer.style.padding = '10px 12px';
 
                 // Event-Listener für das neue Icon hinzufügen
@@ -2522,21 +2710,10 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Entferne Focus von Buttons nach Schließen der Offcanvas
-    const badgesOffcanvasEl = document.getElementById('badgesOffcanvas');
-    if (badgesOffcanvasEl) {
-        badgesOffcanvasEl.addEventListener('hidden.bs.offcanvas', function () {
-            if (badgeBtn) badgeBtn.blur();
-        });
-    }
-
-    const filterOffcanvasEl = document.getElementById('filterOffcanvas');
-    const filterBtn = document.querySelector('[data-bs-target="#filterOffcanvas"]');
-    if (filterOffcanvasEl && filterBtn) {
-        filterOffcanvasEl.addEventListener('hidden.bs.offcanvas', function () {
-            filterBtn.blur();
-        });
-    }
+    // Kein blur() nach dem Schließen der Panels: Tastaturnutzer verlören sonst
+    // ihre Position (Fokus auf <body>). Den Fokusrahmen nach Mausklicks
+    // unterdrückt bereits :focus-visible im CSS. Den Fokus auf den
+    // Badges-Button zurückzugeben übernimmt a11y.js.
 
     // Animationen-Toggle
     const animationsToggle = document.getElementById('animationsToggle');
@@ -2568,7 +2745,7 @@ document.addEventListener('DOMContentLoaded', function () {
     if (confirmResetBtn) {
         confirmResetBtn.addEventListener('click', function () {
             localStorage.removeItem(COMPLETED_QUIZZES_STORAGE_KEY);
-            localStorage.removeItem('filter_settings');
+            localStorage.removeItem('filter_settings_v3');
             localStorage.removeItem(ANIMATIONS_STORAGE_KEY);
             window.location.reload();
         });
@@ -2601,14 +2778,14 @@ function renderBadgesOverview() {
         html += `
   <div class="badge-card ${isUnlocked ? 'unlocked' : 'locked'}">
     <div class="badge-icon-container">
-      <img src="${badge.url}" alt="${badge.name}">
+      <img src="${badge.url}" alt="">
     </div>
     <div class="badge-info">
       <h3 class="badge-name">${badge.name}</h3>
       <p class="badge-description">${badge.description}</p>
       <div class="badge-progress">
         <div class="progress-text">
-          <span>${progress}/${badge.milestone} Quizze</span>
+          <span>${t('badges.quizzes', { n: progress, total: badge.milestone })}</span>
           <span>${Math.round(progressPercent)}%</span>
         </div>
         <div class="progress-bar-container">
@@ -2616,9 +2793,9 @@ function renderBadgesOverview() {
         </div>
       </div>
       ${isUnlocked
-                ? '<div class="badge-date">Erreicht!</div>'
+                ? `<div class="badge-date">${t('badges.achieved')}</div>`
                 : remaining > 0
-                    ? `<div class="badge-hint">Noch ${remaining} Quiz${remaining === 1 ? '' : 'ze'}!</div>`
+                    ? `<div class="badge-hint">${remaining === 1 ? t('badges.remainingOne') : t('badges.remainingMany', { n: remaining })}</div>`
                     : ''
             }
     </div>
@@ -2639,15 +2816,17 @@ function showBadgeNotification() {
 
     const notification = document.createElement('div');
     notification.className = 'badge-notification';
+    notification.setAttribute('role', 'status');
+    notification.setAttribute('aria-live', 'polite');
 
     notification.innerHTML = `
 <div class="badge-content">
-  <img src="${badge.url}" alt="Badge" class="badge-svg">
+  <img src="${badge.url}" alt="" class="badge-svg">
   <div class="badge-text">
-    Badge erhalten: <span class="badge-name">${badge.name}</span>
+    ${t('badges.earned')} <span class="badge-name">${badge.name}</span>
   </div>
 </div>
-<button class="close-btn" onclick="closeBadgeNotification()">&times;</button>
+<button type="button" class="close-btn" aria-label="${t('badges.closeNotification')}" onclick="closeBadgeNotification()">&times;</button>
 <div class="countdown-timer" id="countdown-timer"></div>
 `;
 

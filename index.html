@@ -5,58 +5,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="color-scheme" content="only light">
-    <title>Campus Map</title>
+    <title>Campusplan – Technische Hochschule Lübeck</title>
     <!-- Lokale Bibliotheken (vendor/) -->
-    <script src="vendor/lottie/lottie.min.js"></script>
     <link href="vendor/bootstrap/bootstrap.min.css" rel="stylesheet" />
     <script src="vendor/bootstrap/bootstrap.bundle.min.js"></script>
     <script src="vendor/sortablejs/Sortable.min.js"></script>
     <script src="vendor/wordfind/wordfind.js"></script>
     <script src="vendor/crossword/layout_generator.js"></script>
     <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css?v=20261003n">
 </head>
 
 <body>
 
+    <a href="#mapContainer" class="skip-link" data-i18n="skip.toMap">Direkt zur Karte</a>
+
+    <!-- Statusmeldungen für Screenreader (4.1.3) -->
+    <div id="a11yLive" class="sr-only" role="status" aria-live="polite"></div>
+
     <!-- Titel -->
-    <div id="allcontent-title"
+    <header id="allcontent-title"
         class="w-100 py-2 pt-md-2 px-2 px-md-2 pb-md-2 d-flex align-items-center justify-content-between">
         <div class="py-2 px-2">
             <h1 class="title-heading mb-0">
-                Campusplan
+                <span data-i18n="header.title">Campusplan</span>
                 <small class="title-sub">Technische Hochschule Lübeck (THL)</small>
             </h1>
         </div>
 
         <div id="toolbox" class="toolbox-container">
-            <button class="toolbox-btn" title="Einstellungen" data-bs-toggle="offcanvas"
-                data-bs-target="#filterOffcanvas">
-                <i class="fas fa-cog"></i>
+            <div class="lang-switch" role="group" aria-label="Sprache / Language">
+                <button type="button" class="lang-switch-btn" data-lang-option="de" lang="de" title="Deutsch">
+                    DE<span class="visually-hidden"> – Deutsch</span>
+                </button>
+                <button type="button" class="lang-switch-btn" data-lang-option="en" lang="en" title="English">
+                    EN<span class="visually-hidden"> – English</span>
+                </button>
+            </div>
+            <button class="toolbox-btn" type="button" id="toolboxBadgesBtn" title="Badges" data-i18n-title="toolbox.badges">
+                <i class="fas fa-medal" aria-hidden="true"></i>
+                <span class="visually-hidden" data-i18n="toolbox.badges">Badges</span>
             </button>
-            <button class="toolbox-btn" id="toolboxBadgesBtn" title="Badges">
-                <i class="fas fa-medal"></i>
+            <button class="toolbox-btn" type="button" title="Einstellungen" data-i18n-title="toolbox.settings"
+                data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas">
+                <i class="fas fa-cog" aria-hidden="true"></i>
+                <span class="visually-hidden" data-i18n="toolbox.settings">Einstellungen</span>
             </button>
         </div>
-    </div>
+    </header>
 
-    <div class="offcanvas offcanvas-start modal-offcanvas" tabindex="-1" id="filterOffcanvas">
+    <div class="offcanvas offcanvas-start modal-offcanvas" tabindex="-1" id="filterOffcanvas" aria-labelledby="filterOffcanvasLabel">
         <div class="offcanvas-header">
-            <h4 class="offcanvas-title with-padding">
-                <i class="fas fa-cog me-2"></i>Einstellungen
-            </h4>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+            <h2 id="filterOffcanvasLabel" class="offcanvas-title with-padding">
+                <i class="fas fa-cog me-2" aria-hidden="true"></i><span data-i18n="settings.title">Einstellungen</span>
+            </h2>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Einstellungen schließen" data-i18n-aria-label="settings.close"></button>
         </div>
         <div class="offcanvas-body p-3">
             <!-- Anzeige Sektion -->
             <div class="settings-section">
-                <h5 class="settings-section-title">
+                <h3 class="settings-section-title" data-i18n="settings.display">
                     Anzeige
-                </h5>
+                </h3>
                 <label class="filter-card" for="animationsToggle">
                     <div class="filter-card-content">
                         <span class="filter-icon-fa"><i class="fas fa-film"></i></span>
-                        <span class="filter-label-text">Animationen</span>
+                        <span class="filter-label-text" data-i18n="settings.animations">Animationen</span>
                     </div>
                     <div class="filter-toggle">
                         <input type="checkbox" id="animationsToggle" checked>
@@ -67,25 +81,25 @@
 
             <!-- Filter Sektion -->
             <div class="settings-section">
-                <h5 class="settings-section-title">
+                <h3 class="settings-section-title" data-i18n="settings.mapElements">
                     Kartenelemente
-                </h5>
-                <button class="toggle-all-btn" id="toggleAllBtn">
-                    <i class="fas fa-eye me-2"></i>Alle einblenden
+                </h3>
+                <button class="toggle-all-btn" type="button" id="toggleAllBtn">
+                    <i class="fas fa-eye me-2" aria-hidden="true"></i><span data-i18n="filters.showAll">Alle einblenden</span>
                 </button>
                 <div class="filter-section" id="filterOptions"></div>
             </div>
 
             <!-- Reset Bereich -->
             <div class="danger-zone">
-                <h5 class="danger-zone-title">
-                    <i class="fas fa-sync-alt me-2"></i>Fortschritt zurücksetzen
-                </h5>
-                <p class="danger-zone-description">
+                <h3 class="danger-zone-title">
+                    <i class="fas fa-sync-alt me-2" aria-hidden="true"></i><span data-i18n="reset.title">Fortschritt zurücksetzen</span>
+                </h3>
+                <p class="danger-zone-description" data-i18n="reset.question">
                     Möchtest du nochmal von vorne beginnen?
                 </p>
-                <button class="danger-zone-btn" id="resetProgressBtn">
-                    <i class="fas fa-redo me-2"></i>Fortschritt zurücksetzen
+                <button class="danger-zone-btn" type="button" id="resetProgressBtn">
+                    <i class="fas fa-redo me-2" aria-hidden="true"></i><span data-i18n="reset.title">Fortschritt zurücksetzen</span>
                 </button>
             </div>
         </div>
@@ -94,10 +108,32 @@
     <!-- Offcanvas Right für Gebäude-Details -->
     <div class="offcanvas offcanvas-end" tabindex="-1" id="buildingInfoOffcanvas" aria-labelledby="buildingInfoLabel">
         <div class="offcanvas-header">
-            <h4 id="buildingInfoLabel" class="offcanvas-title">Titel</h4>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Schließen"></button>
+            <span class="sheet-handle" aria-hidden="true"></span>
+            <button type="button" class="panel-back-btn" id="buildingInfoBack" hidden
+                aria-label="Zurück zur Gebäudeübersicht" data-i18n-aria-label="legend.backLabel">
+                <i class="fas fa-chevron-left" aria-hidden="true"></i><span data-i18n="legend.back">Gebäude</span>
+            </button>
+            <h2 id="buildingInfoLabel" class="offcanvas-title">Titel</h2>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Schließen" data-i18n-aria-label="common.close"></button>
         </div>
         <div class="offcanvas-body">
+            <!-- Gebäude & Legende (legend.js) -->
+            <div id="legendView" class="legend-view" hidden>
+                <div class="legend-sticky">
+                    <div class="legend-search" role="search">
+                        <i class="fas fa-search legend-search-icon" aria-hidden="true"></i>
+                        <input type="search" id="legendSearch" class="legend-search-input" autocomplete="off"
+                            enterkeyhint="search" spellcheck="false"
+                            placeholder="Gebäude, Einrichtung oder Nummer" data-i18n-placeholder="legend.searchPlaceholder"
+                            aria-label="Campus durchsuchen" data-i18n-aria-label="legend.searchLabel">
+                        <button type="button" class="legend-search-clear" id="legendSearchClear" hidden
+                            aria-label="Suche leeren" data-i18n-aria-label="legend.clear">
+                            <i class="fas fa-times" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                </div>
+                <div id="legendResults" class="legend-results" role="region"></div>
+            </div>
             <div id="buildingInfoContent"></div>
         </div>
     </div>
@@ -105,10 +141,10 @@
     <!-- Offcanvas Left für Badges -->
     <div class="offcanvas offcanvas-start" tabindex="-1" id="badgesOffcanvas" aria-labelledby="badgesOffcanvasLabel">
         <div class="offcanvas-header">
-            <h4 id="badgesOffcanvasLabel" class="offcanvas-title with-padding">
-                <i class="fas fa-medal me-2"></i>Badges
-            </h4>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Schließen"></button>
+            <h2 id="badgesOffcanvasLabel" class="offcanvas-title with-padding">
+                <i class="fas fa-medal me-2" aria-hidden="true"></i>Badges
+            </h2>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Schließen" data-i18n-aria-label="common.close"></button>
         </div>
         <div class="offcanvas-body p-3">
             <div id="badgesContent"></div>
@@ -123,24 +159,24 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 id="resetConfirmLabel" class="modal-title">
-                        <i class="fas fa-exclamation-triangle me-2 text-warning"></i>Fortschritt zurücksetzen?
-                    </h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen"></button>
+                    <h2 id="resetConfirmLabel" class="modal-title">
+                        <i class="fas fa-exclamation-triangle me-2 text-warning" aria-hidden="true"></i><span data-i18n="reset.confirmTitle">Fortschritt zurücksetzen?</span>
+                    </h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Schließen" data-i18n-aria-label="common.close"></button>
                 </div>
                 <div class="modal-body">
-                    <p class="mb-2">Möchtest du nochmal von vorne beginnen?</p>
+                    <p class="mb-2" data-i18n="reset.question">Möchtest du nochmal von vorne beginnen?</p>
                     <ul class="reset-modal-list mb-3">
-                        <li>Alle abgeschlossenen Quizze werden zurückgesetzt</li>
-                        <li>Alle freigeschalteten Badges werden zurückgesetzt</li>
-                        <li>Du kannst die Badges erneut freischalten</li>
+                        <li data-i18n="reset.item1">Alle abgeschlossenen Quizze werden zurückgesetzt</li>
+                        <li data-i18n="reset.item2">Alle freigeschalteten Badges werden zurückgesetzt</li>
+                        <li data-i18n="reset.item3">Du kannst die Badges erneut freischalten</li>
                     </ul>
-                    <p class="mb-0 fw-bold">Jetzt zurücksetzen?</p>
+                    <p class="mb-0 fw-bold" data-i18n="reset.confirmQuestion">Jetzt zurücksetzen?</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Abbrechen</button>
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" data-i18n="reset.cancel">Abbrechen</button>
                     <button type="button" class="btn btn-danger" id="confirmResetBtn">
-                        <i class="fas fa-redo me-2"></i>Zurücksetzen
+                        <i class="fas fa-redo me-2" aria-hidden="true"></i><span data-i18n="reset.confirm">Zurücksetzen</span>
                     </button>
                 </div>
             </div>
@@ -148,13 +184,17 @@
     </div>
 
     <!-- Map-Container -->
-    <div id="mapContainer">
+    <main id="mapContainer" tabindex="-1">
         <div id="lottieMap"></div>
         <div id="skipIntroHint" class="skip-intro-hint" aria-hidden="true"></div>
-    </div>
+    </main>
 
-    <script src="js/config.js?v=20260515b"></script>
-    <script src="js/main.js?v=20260515b"></script>
+    <script src="js/i18n.js?v=20261003l"></script>
+    <script src="js/config_v2.js?v=20261003a"></script>
+    <script src="js/content_en.js?v=20261002e"></script>
+    <script src="js/main.js?v=20261003f"></script>
+    <script src="js/legend.js?v=20261003q"></script>
+    <script src="js/a11y.js?v=20261003b"></script>
 
 </body>
 
