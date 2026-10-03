@@ -81,6 +81,11 @@ const UI_STRINGS = {
         'legend.pillInfo': 'Infos anzeigen',
         'legend.pillMarked': '{n} Stationen markiert',
         'legend.pillMarkedPlaces': '{n} Orte markiert',
+        'share.title': 'Link zu diesem Ort',
+        'share.button': 'Link teilen',
+        'share.copied': 'Link kopiert',
+        'share.copyFailed': 'Link markiert – mit Strg+C / ⌘C kopieren',
+        'share.copy': 'Link kopieren',
         'legend.markAll': 'Alle {n} Stationen auf der Karte markieren',
         'legend.pillClose': 'Hinweis schließen',
 
@@ -257,6 +262,11 @@ const UI_STRINGS = {
         'legend.pillInfo': 'Show info',
         'legend.pillMarked': '{n} stations marked',
         'legend.pillMarkedPlaces': '{n} places marked',
+        'share.title': 'Link to this place',
+        'share.button': 'Share link',
+        'share.copied': 'Link copied',
+        'share.copyFailed': 'Link selected – press Ctrl+C / ⌘C to copy',
+        'share.copy': 'Copy link',
         'legend.markAll': 'Mark all {n} stations on the map',
         'legend.pillClose': 'Dismiss',
 

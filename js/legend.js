@@ -493,6 +493,7 @@ const campusLegend = (() => {
         titleEl.style.color = '';
         backBtn.hidden = mode !== 'detail' || !state.fromLegend;
         panel.classList.toggle('is-legend', mode === 'legend');
+        updateShareButton();
     }
 
     function openLegend() {
@@ -558,6 +559,117 @@ const campusLegend = (() => {
                 <i class="fas fa-map-marker-alt" aria-hidden="true"></i><span>${esc(t('legend.showOnMap'))}</span></button>`;
             detailView.prepend(bar);
         }
+        updateShareButton();
+    }
+
+    // --- Teilen (Icon links neben „Schließen“) -----------------------------
+    // Das Icon öffnet ein kleines Fenster mit dem Link. Kopiert wird erst
+    // beim Klick ins Linkfeld oder aufs Kopier-Icon darin. Klappt das nicht
+    // (fremdes iframe ohne Erlaubnis), bleibt der Link markiert stehen.
+    let shareBtn, sharePop, shareReset;
+
+    // Kurz und lesbar: Gebäudenummer (B.59, MFC1), sonst die ID (Kaffee_Cafeteria)
+    function shareUrl(id) {
+        const url = new URL(window.location.href);
+        url.search = '';
+        url.hash = '';
+        url.pathname = url.pathname.replace(/index\.html$/, '');
+        url.searchParams.set('show', buildingById(id)?.code.replace(/\s+/g, '') || id);
+        if (CURRENT_LANG !== DEFAULT_LANG) url.searchParams.set('lang', CURRENT_LANG);
+        return url.toString();
+    }
+
+    // Nur in den Gebäude-Infos, und nur wenn es den Ort auf der Karte gibt
+    function updateShareButton() {
+        closeSharePop();
+        shareBtn.hidden = !(state.mode === 'detail' && state.detailId && mapElement(state.detailId));
+    }
+
+    // Hängt am Panel, nicht in der Kopfzeile: die ist auf dem Handy der Zieh-Griff
+    function ensureSharePop() {
+        if (sharePop) return sharePop;
+        sharePop = document.createElement('div');
+        sharePop.id = 'sharePop';
+        sharePop.className = 'share-pop';
+        sharePop.hidden = true;
+        sharePop.setAttribute('role', 'dialog');
+        sharePop.setAttribute('aria-label', t('share.title'));
+        sharePop.innerHTML = `
+          <p class="share-pop-status"></p>
+          <div class="share-pop-field">
+            <input class="share-pop-input" type="text" readonly aria-label="${esc(t('share.title'))}">
+            <button type="button" class="share-pop-copy" aria-label="${esc(t('share.copy'))}" title="${esc(t('share.copy'))}">
+              <i class="fas fa-copy" aria-hidden="true"></i></button>
+          </div>`;
+        const input = sharePop.querySelector('.share-pop-input');
+        input.addEventListener('click', () => copyLink());
+        input.addEventListener('focus', () => input.select());
+        sharePop.querySelector('.share-pop-copy').addEventListener('click', () => copyLink());
+        // direkt hinter der Kopfzeile: Tab führt vom Icon gleich hinein
+        panel.querySelector('.offcanvas-header').after(sharePop);
+        return sharePop;
+    }
+
+    function setShareStatus(mode) {
+        const status = sharePop.querySelector('.share-pop-status');
+        const icon = sharePop.querySelector('.share-pop-copy i');
+        status.className = `share-pop-status is-${mode}`;
+        status.innerHTML = mode === 'ok'
+            ? `<i class="fas fa-check" aria-hidden="true"></i> ${esc(t('share.copied'))}`
+            : esc(t(mode === 'failed' ? 'share.copyFailed' : 'share.title'));
+        icon.className = mode === 'ok' ? 'fas fa-check' : 'fas fa-copy';
+    }
+
+    // Zwischenablage-API fehlt ohne https und ist in fremden iframes oft
+    // gesperrt – dann der alte Weg über die markierte Eingabe
+    async function copyLink() {
+        const input = sharePop.querySelector('.share-pop-input');
+        let ok = false;
+        try {
+            await navigator.clipboard.writeText(input.value);
+            ok = true;
+        } catch (e) {
+            input.focus();
+            input.select();
+            try { ok = document.execCommand('copy'); } catch (e2) { }
+        }
+        setShareStatus(ok ? 'ok' : 'failed');
+        if (typeof announce === 'function') announce(t(ok ? 'share.copied' : 'share.copyFailed'));
+        clearTimeout(shareReset);
+        if (ok) shareReset = setTimeout(() => setShareStatus('idle'), 2500);
+    }
+
+    function openSharePop() {
+        const pop = ensureSharePop();
+        pop.querySelector('.share-pop-input').value = shareUrl(state.detailId);
+        clearTimeout(shareReset);
+        setShareStatus('idle');
+        pop.style.top = `${panel.querySelector('.offcanvas-header').offsetHeight}px`;
+        pop.hidden = false;
+        shareBtn.setAttribute('aria-expanded', 'true');
+        // Fokus aufs Kopier-Icon: mit der Tastatur genügt dann Enter
+        pop.querySelector('.share-pop-copy').focus({ preventScroll: true });
+    }
+
+    function closeSharePop(returnFocus) {
+        if (!sharePop || sharePop.hidden) return;
+        sharePop.hidden = true;
+        shareBtn.setAttribute('aria-expanded', 'false');
+        if (returnFocus) shareBtn.focus();
+    }
+
+    function bindShareEvents() {
+        shareBtn.addEventListener('click', () => (sharePop && !sharePop.hidden ? closeSharePop() : openSharePop()));
+        document.addEventListener('pointerdown', e => {
+            if (sharePop && !sharePop.hidden && !sharePop.contains(e.target) && !shareBtn.contains(e.target)) closeSharePop();
+        });
+        // Escape schließt erst das kleine Fenster, nicht gleich das ganze Panel
+        document.addEventListener('keydown', e => {
+            if (e.key !== 'Escape' || !sharePop || sharePop.hidden) return;
+            e.stopPropagation();
+            closeSharePop(true);
+        }, true);
+        panel.addEventListener('hide.bs.offcanvas', () => closeSharePop());
     }
 
     function openDetail(id, trigger) {
@@ -1009,8 +1121,10 @@ const campusLegend = (() => {
         searchInput = document.getElementById('legendSearch');
         clearBtn = document.getElementById('legendSearchClear');
         resultsEl = document.getElementById('legendResults');
+        shareBtn = document.getElementById('buildingInfoShare');
         titleEl.tabIndex = -1;
         bindEvents();
+        bindShareEvents();
         renderResults();
     }
 
