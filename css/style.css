@@ -3063,7 +3063,7 @@ button.legend-row:focus-visible {
     vector-effect: non-scaling-stroke;
     transform-box: fill-box;
     transform-origin: center;
-    animation: map-spot-wave 1.3s ease-out 3;
+    animation: map-spot-wave 1.3s ease-out 1;
     opacity: 0;
 }
 
