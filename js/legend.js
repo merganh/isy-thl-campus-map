@@ -948,6 +948,56 @@ const campusLegend = (() => {
         enableSheetDrag();
     }
 
+    // --- Direktlinks: ?show=… (Karte) und ?info=… (Gebäude-Infos) ---------
+    // Als Ziel geht: interne ID (Mensa_B_59), neue oder alte Gebäudenummer
+    // (B.59, b59, 36), Name (Mensa, Bibliothek) oder Einrichtung
+    // (International Office). Schreibweise und Satzzeichen sind egal, Tippfehler
+    // werden aber bewusst nicht geraten – ein Link soll eindeutig sein.
+    function resolveTarget(raw) {
+        const c = compact(raw || '');
+        if (!c) return null;
+        const single = id => ({ ids: [id], title: contentOf(id)?.title || id });
+        const byId = campusBuildings.find(b => compact(b.id) === c);
+        if (byId) return single(byId.id);
+        const bld = LEGEND_BUILDINGS.find(b => compact(b.code) === c || b.old === c
+            || (b.name && [b.name.de, b.name.en].some(n => compact(n) === c)));
+        if (bld && contentOf(bld.id)) return single(bld.id);
+        const byTitle = campusBuildings.find(b => compact(b.title) === c);
+        if (byTitle) return single(byTitle.id);
+        const fac = LEGEND_FACILITIES.find(f => [f.de, f.en].some(n => compact(n) === c));
+        if (!fac) return null;
+        const ids = fac.mark || fac.in.map(buildingByCode).filter(b => b && contentOf(b.id)).map(b => b.id);
+        // Leiste zeigt den gesuchten Namen („International Office“), nicht „Gebäude A.1“
+        return ids.length ? { ids, title: L(fac), stations: !!fac.mark } : null;
+    }
+
+    // Läuft einmal, sobald die Karte steht (main.js überspringt dann das Intro)
+    function openFromUrl() {
+        const params = new URLSearchParams(window.location.search);
+        const raw = params.get('info') || params.get('show');
+        const target = resolveTarget(raw);
+        if (!target) {
+            if (raw) console.warn(`Campusplan: Ziel „${raw}“ nicht gefunden`);
+            return;
+        }
+        const { ids, title } = target;
+        ids.map(mapElement).filter(Boolean).forEach(ensureLayerVisible);
+
+        if (params.get('info') && ids.length === 1) {
+            // Infos öffnen; wo daneben Platz ist, fliegt die Karte mit hin
+            panel.addEventListener('shown.bs.offcanvas', () => { if (!panelCoversMap()) flyTo(ids[0]); }, { once: true });
+            openBuildingInfo(ids[0], { fromLegend: true });
+        } else if (ids.length === 1) {
+            showPill({ title, action: t('legend.pillInfo'), color: colorFor(ids[0]),
+                open: () => openBuildingInfo(ids[0], { fromLegend: true }) });
+            flyTo(ids[0]);
+        } else {
+            const action = t(target.stations ? 'legend.pillMarked' : 'legend.pillMarkedPlaces', { n: ids.length });
+            showPill({ title, action, color: colorFor(ids[0]), open: openLegend });
+            spotlight(ids, 'pulse');
+        }
+    }
+
     function init() {
         panel = document.getElementById('buildingInfoOffcanvas');
         if (!panel) return;
@@ -964,7 +1014,7 @@ const campusLegend = (() => {
         renderResults();
     }
 
-    return { init, open: openLegend, openSearch, onDetailShown, showOnMap };
+    return { init, open: openLegend, openSearch, onDetailShown, showOnMap, openFromUrl, resolveTarget };
 })();
 
 window.campusLegend = campusLegend;

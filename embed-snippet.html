@@ -49,6 +49,44 @@ Erlaubte Einbettungs-Domains sind in .htaccess festgelegt:
 
 
 <!-- ============================================================ -->
+<!-- VARIANTE C: Direkt auf ein Gebaeude (Direktlink)              -->
+<!-- Ohne Intro, Karte fliegt zum Ziel und hebt es hervor.         -->
+<!-- ============================================================ -->
+<!--
+  ?show=ZIEL   Karte zeigt das Ziel, unten Leiste "Infos anzeigen"
+  ?info=ZIEL   oeffnet gleich die Gebaeude-Infos
+  &lang=en     englische Oberflaeche (kombinierbar)
+
+  ZIEL darf sein (Gross-/Kleinschreibung und Punkte egal):
+    - Gebaeudenummer neu:  B.59  b59  A.1  MFC 8
+    - Gebaeudenummer alt:  36
+    - Name:                Mensa  Bibliothek  Library  Audimax
+    - Einrichtung:         International Office  Studienberatung  IT-Support
+                           Verwaltung  (mehrere Gebaeude -> alle markiert)
+                           Fahrradreparaturpunkte  (alle Stationen markiert)
+    - interne ID:          Mensa_B_59  Kaffee_Cafeteria
+  Leerzeichen im Link als %20 schreiben. Unbekanntes Ziel: normale Karte.
+-->
+
+<!-- Link (z.B. auf einer THL-Seite) -->
+<a href="https://www.hm-techlab.de/campus-map/?show=B.59">Wo ist die Mensa? Auf dem Campusplan zeigen</a>
+<a href="https://www.hm-techlab.de/campus-map/?info=International%20Office">International Office auf dem Campusplan</a>
+<a href="https://www.hm-techlab.de/campus-map/?show=Bibliothek&amp;lang=en">Library on the campus map</a>
+
+<!-- iframe, das gleich auf ein Gebaeude zeigt -->
+<iframe
+    src="https://www.hm-techlab.de/campus-map/?show=Bibliothek"
+    title="Campus Map - TH Luebeck: Bibliothek"
+    width="100%"
+    height="700"
+    style="border:0; display:block; max-width:100%;"
+    loading="lazy"
+    allowfullscreen
+    referrerpolicy="no-referrer-when-downgrade">
+</iframe>
+
+
+<!-- ============================================================ -->
 <!-- HINWEISE                                                      -->
 <!-- ============================================================ -->
 <!--

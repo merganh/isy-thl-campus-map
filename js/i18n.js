@@ -80,6 +80,7 @@ const UI_STRINGS = {
         'legend.pinLabel': '{name} auf der Karte zeigen',
         'legend.pillInfo': 'Infos anzeigen',
         'legend.pillMarked': '{n} Stationen markiert',
+        'legend.pillMarkedPlaces': '{n} Orte markiert',
         'legend.markAll': 'Alle {n} Stationen auf der Karte markieren',
         'legend.pillClose': 'Hinweis schließen',
 
@@ -255,6 +256,7 @@ const UI_STRINGS = {
         'legend.pinLabel': 'Show {name} on the map',
         'legend.pillInfo': 'Show info',
         'legend.pillMarked': '{n} stations marked',
+        'legend.pillMarkedPlaces': '{n} places marked',
         'legend.markAll': 'Mark all {n} stations on the map',
         'legend.pillClose': 'Dismiss',
 

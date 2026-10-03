@@ -2371,8 +2371,11 @@ async function initAnimations() {
     if (mapInitialized) return;
     mapInitialized = true;
 
-    // Nach einem Sprachwechsel (Seiten-Reload) das Intro nicht erneut zeigen
-    const animationsOn = areAnimationsEnabled() && !CAME_FROM_LANG_SWITCH;
+    // Nach einem Sprachwechsel (Seiten-Reload) das Intro nicht erneut zeigen.
+    // Direktlink (?show=… / ?info=…): ohne Intro gleich zum Ziel
+    const params = new URLSearchParams(window.location.search);
+    const hasDirectLink = params.has('show') || params.has('info');
+    const animationsOn = areAnimationsEnabled() && !CAME_FROM_LANG_SWITCH && !hasDirectLink;
 
     if (!cachedCampusMapSvg) {
         try {
@@ -2386,6 +2389,8 @@ async function initAnimations() {
 
     if (!animationsOn) {
         jumpToFinalZoom(svg);
+        // ein Frame Pause, damit die Karte Maße hat (Hinfliegen misst das Ziel)
+        if (hasDirectLink) requestAnimationFrame(() => window.campusLegend?.openFromUrl());
         return;
     }
 
