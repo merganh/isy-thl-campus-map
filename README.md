@@ -81,6 +81,21 @@ isy-thl-campus-map/
 
 There is no build step — files are served as-is and all dependencies come from CDNs.
 
+## Deployment
+
+Every push to `main` goes live automatically: the GitHub Action `.github/workflows/deploy.yml` uploads the changed files to IONOS via SFTP (`.github/deploy.sh`). Files on the server are never deleted. The last deployed commit is stored on the server in `.deploy-sha`; to upload everything again, use Actions → Deploy → "Run workflow" with "Alle Dateien hochladen".
+
+One-time setup (repository secrets):
+
+```bash
+gh secret set SFTP_HOST      # e.g. access-5012345678.webspace-host.com
+gh secret set SFTP_USER
+gh secret set SFTP_PASSWORD
+gh secret set SFTP_PATH      # target folder on the server, e.g. /campus-map
+```
+
+Without these secrets the action skips the upload with a warning.
+
 ## Usage
 
 ### Navigation
