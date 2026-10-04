@@ -578,6 +578,10 @@
             z-index: 100;
         }
 
+        #allcontent-title > div:first-child {
+            background: linear-gradient(rgba(255, 255, 255, .95) 80%, transparent);
+        }
+
         #lottieMap {
             position: absolute;
             top: 45%;
@@ -730,6 +734,10 @@
 
         #allcontent-title {
             background: transparent;
+        }
+
+        #allcontent-title > div:first-child {
+            background: linear-gradient(rgba(255, 255, 255, .95) 70%, transparent);
         }
 
         #allcontent-title .py-2 {
