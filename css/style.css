@@ -53,8 +53,6 @@
     }
 
     .title-heading {
-        /* Der Header hat keinen Hintergrund mehr, der helle Schein haelt den Titel auf der Karte lesbar. */
-        text-shadow: 0 0 6px #fff, 0 0 12px #fff;
         font-weight: 700;
         color: #343a40;
         font-size: 1.9rem;
@@ -73,6 +71,11 @@
     #allcontent-title,
     #allcontent-title > div:first-child {
         padding-top: 0.25rem !important;
+    }
+
+    /* Der Nebel sitzt nur hinter Titel und Untertitel, damit die Buttons rechts auf der Karte liegen. */
+    #allcontent-title > div:first-child {
+        background: linear-gradient(rgba(255, 255, 255, .95) 75%, transparent);
     }
 
     .partner-home {
