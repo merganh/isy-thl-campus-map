@@ -393,19 +393,22 @@
         align-items: center;
     }
 
+    /* Wie die Zoom-Buttons unten rechts: weisse Flaeche, Rahmen, Schatten, leicht transparent. */
     .toolbox-btn {
-        background: none;
-        border: none;
-        color: white;
-        font-size: var(--font-size-large);
-        padding: 6px;
+        background: #fff;
+        border: 1.5px solid var(--color-primary);
+        color: var(--color-primary);
+        font-size: 0.85rem;
+        padding: 0;
         border-radius: var(--border-radius-sm);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        opacity: 0.8;
         transition: var(--transition-normal);
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 36px;
-        height: 36px;
+        width: 32px;
+        height: 32px;
         cursor: pointer;
     }
 
@@ -413,13 +416,17 @@
         display: none;
     }
 
+    .toolbox-btn:hover,
+    .toolbox-btn:focus {
+        opacity: 1;
+    }
+
     .toolbox-btn:hover {
-        background-color: rgba(75, 84, 89, 0.1);
+        background-color: #f1f3f5;
     }
 
     .toolbox-btn:focus {
         outline: none;
-        background-color: transparent;
     }
 
     .toolbox-btn:focus-visible {
@@ -449,6 +456,19 @@
         border-radius: var(--border-radius-pill);
         background: #fff;
         margin-right: 4px;
+    }
+
+    /* In der Kopfzeile wie die Zoom-Buttons unten rechts. */
+    #toolbox .lang-switch {
+        border: 1.5px solid var(--color-primary);
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        opacity: 0.8;
+        transition: opacity 0.2s ease;
+    }
+
+    #toolbox .lang-switch:hover,
+    #toolbox .lang-switch:focus-within {
+        opacity: 1;
     }
 
     .lang-switch-btn {
@@ -576,7 +596,6 @@
         }
 
         .toolbox-btn {
-            font-size: var(--font-size-normal);
             width: 28px;
             height: 28px;
         }
