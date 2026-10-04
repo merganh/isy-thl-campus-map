@@ -59,14 +59,36 @@
         margin: 0;
     }
 
-    .partner-logo {
+    .partner-brand {
         display: none;
-        height: 2rem;
-        width: auto;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
     }
 
-    .partner-kis .partner-logo {
+    .partner-kis .partner-brand {
+        display: flex;
+    }
+
+    .partner-back {
+        font-size: 0.8rem;
+        color: var(--color-gray-text);
+        text-decoration: none;
+    }
+
+    .partner-back:hover,
+    .partner-back:focus-visible {
+        text-decoration: underline;
+    }
+
+    .partner-home {
         display: block;
+    }
+
+    .partner-logo {
+        display: block;
+        height: 2rem;
+        width: auto;
     }
 
     .title-sub {
