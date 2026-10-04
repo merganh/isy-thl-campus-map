@@ -1064,7 +1064,8 @@ const campusLegend = (() => {
                 pendingAction = null;
                 action();
                 pill.querySelector('.map-return-main').focus({ preventScroll: true });
-            } else {
+            } else if (!pill || pill.hidden) {
+                // Die Markierung bleibt, solange die Leiste unten sie noch trägt
                 clearSpotlight();
             }
             state.mode = 'closed';
