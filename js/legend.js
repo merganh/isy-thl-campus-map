@@ -1081,12 +1081,6 @@ const campusLegend = (() => {
     // (International Office). Schreibweise und Satzzeichen sind egal, Tippfehler
     // werden aber bewusst nicht geraten – ein Link soll eindeutig sein.
     function resolveTarget(raw) {
-        // Mehrere Orte in einem Link: Kürzel mit Komma getrennt, alle werden markiert
-        if (raw && raw.includes(',')) {
-            const ids = [...new Set(raw.split(',').flatMap(part => resolveTarget(part.trim())?.ids || []))];
-            if (ids.length > 1) return { ids, title: t('legend.pillSelection') };
-            return ids.length ? resolveTarget(raw.split(',')[0].trim()) : null;
-        }
         const c = compact(raw || '');
         if (!c) return null;
         const single = id => ({ ids: [id], title: contentOf(id)?.title || id });
