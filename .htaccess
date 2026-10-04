@@ -11,7 +11,7 @@
 <IfModule mod_headers.c>
     # Moderne, von allen aktuellen Browsern unterstuetzte Regel.
     # 'self' = gleicher Host (hm-techlab.de)
-    Header always set Content-Security-Policy "frame-ancestors 'self' https://train-on.net https://www.train-on.net https://hm-techlab.de https://www.hm-techlab.de https://th-luebeck.de https://www.th-luebeck.de"
+    Header always set Content-Security-Policy "frame-ancestors 'self' https://train-on.net https://www.train-on.net https://hm-techlab.de https://www.hm-techlab.de https://th-luebeck.de https://www.th-luebeck.de https://kis.th-luebeck.de http://localhost:3000"
 
     # X-Frame-Options entfernen (laesst nur eine Domain zu und wuerde CSP widersprechen).
     Header always unset X-Frame-Options
