@@ -1155,7 +1155,7 @@ const filters = [
     { label: 'Buttons', icon: 'assets/butten_icon_einstellungen_an.svg', id: ['Buttons'], defaultVisible: true },
     // Ebenen aus dem offiziellen Campusplan (nur in der Karte nach dem Intro vorhanden)
     { label: 'Info & Sammelplatz', icon: 'assets/info_icon_einstellungen_an.svg', id: ['Infopunkte'], defaultVisible: true },
-    { label: 'WC', icon: 'assets/wc_icon_einstellungen_an.svg', id: ['WC'], defaultVisible: false },
+    { label: 'WC', icon: 'assets/wc_icon_einstellungen_an.svg', id: ['WC'], defaultVisible: true },
     { label: 'Barrierefreiheit', icon: 'assets/barrierefreiheit_icon_einstellungen_an.svg', id: ['Barrierefreiheit', 'Aufzuege'], defaultVisible: false },
     { label: 'Schranken & Zufahrt', icon: 'assets/schranke_icon_einstellungen_an.svg', id: ['Zufahrt'], defaultVisible: false },
 ];
