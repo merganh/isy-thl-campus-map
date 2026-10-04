@@ -44,6 +44,9 @@
         position: relative;
         width: 100vw;
         height: 100vh;
+        /* Mobil ist 100vh die Hoehe bei eingeklappter Browserleiste - die
+           Zoom-Knoepfe unten rechts laegen sonst hinter der Leiste. */
+        height: 100dvh;
         overflow: hidden;
         touch-action: none;
         cursor: grab;
@@ -1039,6 +1042,11 @@
     /* Settings Section */
     .settings-section {
         margin-bottom: 30px;
+    }
+
+    .legal-section {
+        margin-top: 30px;
+        margin-bottom: 0;
     }
 
     .settings-section-title {
