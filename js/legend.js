@@ -107,7 +107,7 @@ const LEGEND_FACILITIES = [
 ];
 
 // Schnellzugriff oben in „Einrichtungen“ (deutscher Name aus der Liste)
-const LEGEND_POPULAR = ['Mensa', 'Bibliothek', 'Service-Point', 'Audimax', 'International Office', 'Studienberatung'];
+const LEGEND_POPULAR = ['Mensa', 'Audimax', 'Bibliothek', 'International Office', 'Service-Point', 'Studienberatung', 'Druckerei'];
 
 // Weitere Orte aus campusBuildings (eigene Detailseiten, keine Gebäude)
 const LEGEND_PLACE_GROUPS = [
@@ -405,7 +405,7 @@ const campusLegend = (() => {
                 const b = buildingByCode(f.in[0]);
                 const a = areaOf(b.area);
                 return `<button type="button" class="legend-quick-chip" style="--area:${a.color};--area-tint:${a.tint}"
-                    data-open="${b.id}" data-highlight="${b.id}"><span class="legend-quick-dot" aria-hidden="true"></span>${esc(L(f))}</button>`;
+                    data-open="${b.id}" data-highlight="${b.id}"><span class="legend-quick-dot" aria-hidden="true"></span>${esc(L(f).replace(/\s*\(.*\)$/, ''))}</button>`;
             }).join('');
         const abbr = LEGEND_ABBREVIATIONS.map(x => `<div><dt>${esc(x.abbr)}</dt><dd>${esc(L(x))}</dd></div>`).join('');
         return `
