@@ -67,6 +67,12 @@
         display: flex;
     }
 
+    /* Auf der KIS-Seite sitzt der Titel ohne Abstand nach oben, die Bootstrap-Klassen brauchen !important. */
+    .partner-kis #allcontent-title,
+    .partner-kis #allcontent-title > div:first-child {
+        padding-top: 0 !important;
+    }
+
     .partner-home {
         display: block;
     }
