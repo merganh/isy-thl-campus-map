@@ -2402,14 +2402,8 @@ async function initAnimations() {
     const isTouchDevice = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
     let introVorbei = false;
     if (skipHint) {
-        // In iframes erreicht keydown das iframe-Dokument oft nicht
-        // (kein Fokus). Dann nur Klick anbieten.
-        const inIframe = window.self !== window.top;
-        skipHint.innerHTML = isTouchDevice
-            ? t('intro.skipTap')
-            : inIframe
-                ? t('intro.skipClick')
-                : t('intro.skipKey');
+        // Überspringen nur per Klick/Tippen – die Leertaste öffnet die Suche (legend.js).
+        skipHint.textContent = isTouchDevice ? t('intro.skipTap') : t('intro.skipClick');
         // Nach kurzer Verzögerung einblenden, damit Animation Zeit hat zu starten
         setTimeout(() => { if (!introVorbei) skipHint.classList.add('visible'); }, 400);
     }
@@ -2419,9 +2413,7 @@ async function initAnimations() {
         clearTimeout(introTimeout);
         skipHint?.classList.remove('visible');
         // Die Überspringen-Handler gelten nur während des Intros. Bleiben
-        // sie aktiv, schluckt die Leertaste später jeden Button-Druck und
-        // der erste Klick nach dem Intro geht verloren.
-        document.removeEventListener('keydown', onSkipKey);
+        // sie aktiv, geht der erste Klick nach dem Intro verloren.
         window.removeEventListener('touchstart', onFirstPointer, { capture: true });
         document.removeEventListener('touchstart', onFirstPointer, { capture: true });
         window.removeEventListener('pointerdown', onFirstPointer, { capture: true });
@@ -2435,15 +2427,6 @@ async function initAnimations() {
     };
 
     const introTimeout = setTimeout(introBeenden, INTRO_DURATION_MS);
-
-    // Überspringen per Leertaste (Desktop)
-    function onSkipKey(e) {
-        if (e.code === 'Space' && !['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
-            e.preventDefault();
-            ueberspringen();
-        }
-    }
-    document.addEventListener('keydown', onSkipKey);
 
     // Überspringen per Tap/Klick. Klick ist nötig, weil in Cross-Origin-iframes
     // (z.B. train-on.net) keine keydown-Events ankommen, solange das iframe

@@ -992,6 +992,17 @@ const campusLegend = (() => {
             searchInput.focus();
         });
 
+        // Leertaste öffnet die Suche – aber nur, wenn sie gerade nichts anderes
+        // tut: kein Eingabefeld, Button, Link oder Kartenelement im Fokus und
+        // kein Quiz, Einstellungs- oder Badges-Fenster offen.
+        document.addEventListener('keydown', e => {
+            if (e.key !== ' ' || e.repeat || e.ctrlKey || e.metaKey || e.altKey || e.defaultPrevented) return;
+            if (e.target.closest?.('input, textarea, select, button, a, [contenteditable], [tabindex]:not(#mapContainer), .modal, .offcanvas')) return;
+            if (document.querySelector('.modal.show, .offcanvas.show:not(#buildingInfoOffcanvas)')) return;
+            e.preventDefault();
+            openSearch();
+        });
+
         resultsEl.addEventListener('click', e => {
             const pinBtn = e.target.closest('[data-pin]');
             if (pinBtn) {

@@ -362,7 +362,7 @@ function setupMapZoomControls() {
     gruppe.setAttribute('role', 'group');
     gruppe.setAttribute('aria-label', t('map.controls'));
     gruppe.innerHTML = `
-        <button type="button" class="map-zoom-btn" data-map-search aria-label="${t('legend.searchLabel')}" title="${t('legend.searchLabel')}">
+        <button type="button" class="map-zoom-btn" data-map-search aria-label="${t('legend.searchLabel')}" title="${t('legend.searchButtonTitle')}" aria-keyshortcuts="Space">
             <i class="fas fa-search" aria-hidden="true"></i>
         </button>
         <button type="button" class="map-zoom-btn" data-zoom="in" aria-label="${t('map.zoomIn')}">

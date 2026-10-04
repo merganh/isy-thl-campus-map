@@ -62,6 +62,10 @@ const UI_STRINGS = {
         'legend.title': 'Gebäude',
         'legend.searchPlaceholder': 'Gebäude, Einrichtung oder Nummer',
         'legend.searchLabel': 'Campus durchsuchen',
+        'legend.searchButtonTitle': 'Campus durchsuchen (Leertaste)',
+        'legend.searchKey': 'Leertaste',
+        'legend.shortcutTip': 'Tipp:',
+        'legend.shortcutText': 'öffnet das Suchfenster',
         'legend.searchResults': 'Suchergebnisse',
         'legend.clear': 'Suche leeren',
         'legend.facilities': 'Einrichtungen',
@@ -113,7 +117,6 @@ const UI_STRINGS = {
         // Intro
         'intro.skipTap': 'Tippen zum Überspringen',
         'intro.skipClick': 'Klicken zum Überspringen',
-        'intro.skipKey': 'Klicken oder <kbd>Leertaste</kbd> zum Überspringen',
         'map.unavailable': 'Karte nicht verfügbar.',
 
         // Quiz allgemein
@@ -246,6 +249,10 @@ const UI_STRINGS = {
         'legend.title': 'Buildings',
         'legend.searchPlaceholder': 'Building, service or number',
         'legend.searchLabel': 'Search the campus',
+        'legend.searchButtonTitle': 'Search the campus (Space)',
+        'legend.searchKey': 'Space',
+        'legend.shortcutTip': 'Tip:',
+        'legend.shortcutText': 'opens the search window',
         'legend.searchResults': 'Search results',
         'legend.clear': 'Clear search',
         'legend.facilities': 'Facilities',
@@ -297,7 +304,6 @@ const UI_STRINGS = {
         // Intro
         'intro.skipTap': 'Tap to skip',
         'intro.skipClick': 'Click to skip',
-        'intro.skipKey': 'Click or press <kbd>Space</kbd> to skip',
         'map.unavailable': 'Map not available.',
 
         // Quiz general

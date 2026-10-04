@@ -2567,6 +2567,34 @@ body.legend-open .offcanvas-backdrop.show {
     display: none;
 }
 
+/* Hinweis unter dem Suchfeld: Leertaste öffnet dieses Panel
+   (nur mit Maus/Tastatur – auf Touch-Geräten gibt es keine Leertaste) */
+.legend-shortcut-hint {
+    margin: 8px 0 0;
+    color: var(--color-gray-text);
+    font-size: 0.8rem;
+}
+
+.legend-shortcut-hint kbd {
+    display: inline-block;
+    padding: 1px 6px;
+    background: #f1f3f5;
+    border: 1px solid #d0d4da;
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    color: #495057;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 600;
+    box-shadow: none;
+}
+
+@media (hover: none), (pointer: coarse) {
+    .legend-shortcut-hint {
+        display: none;
+    }
+}
+
 .legend-search-clear:hover {
     color: #212529;
 }
