@@ -1566,6 +1566,11 @@ function renderBuildingOffcanvas(b) {
     } else if (b.images?.length > 1) {
         html += `
      <div id="carouselBuilding" class="carousel slide carousel-fade mb-3" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+          ${b.images.map((_, i) => `
+            <button type="button" data-bs-target="#carouselBuilding" data-bs-slide-to="${i}"${i === 0 ? ' class="active" aria-current="true"' : ''}
+                    aria-label="${t('carousel.goto', { i: i + 1, n: b.images.length })}"></button>`).join("")}
+        </div>
         <div class="carousel-inner">
           ${b.images.map((src, i) => `
             <div class="carousel-item${i === 0 ? ' active' : ''}">
@@ -2379,7 +2384,7 @@ async function initAnimations() {
 
     if (!cachedCampusMapSvg) {
         try {
-            const r = await fetch('assets/campus_map_v2.svg?v=20261004a');
+            const r = await fetch('assets/campus_map_v2.svg?v=20261004c');
             if (r.ok) cachedCampusMapSvg = await r.text();
         } catch (e) { }
     }

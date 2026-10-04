@@ -36,6 +36,11 @@ function detectLang() {
 const CURRENT_LANG = detectLang();
 document.documentElement.lang = CURRENT_LANG;
 
+// ?partner=kis: KIS zeigt die Karte auf einer eigenen Seite und setzt sein Logo vor den Titel.
+if (new URLSearchParams(window.location.search).get('partner') === 'kis') {
+    document.documentElement.classList.add('partner-kis');
+}
+
 // true, wenn diese Seite durch einen Sprachwechsel neu geladen wurde
 const CAME_FROM_LANG_SWITCH = (() => {
     try {
@@ -189,6 +194,7 @@ const UI_STRINGS = {
         'building.imageAlt': '{title} – Bild {i} von {n}',
         'carousel.prev': 'Vorheriges Bild',
         'carousel.next': 'Nächstes Bild',
+        'carousel.goto': 'Bild {i} von {n}',
         'carousel.pause': 'Bildwechsel anhalten',
         'carousel.play': 'Bildwechsel fortsetzen',
 
@@ -379,6 +385,7 @@ const UI_STRINGS = {
         'building.imageAlt': '{title} – image {i} of {n}',
         'carousel.prev': 'Previous image',
         'carousel.next': 'Next image',
+        'carousel.goto': 'Image {i} of {n}',
         'carousel.pause': 'Pause slideshow',
         'carousel.play': 'Resume slideshow',
 
@@ -479,6 +486,12 @@ function localizeMapTexts(root) {
     });
     root.querySelectorAll(`[${attr}-aria-label]`).forEach(el => {
         el.setAttribute('aria-label', el.getAttribute(`${attr}-aria-label`));
+    });
+    // Button-Titel sind im SVG als Pfade gezeichnet: Pfad-Gruppe aus-, Text einblenden
+    root.querySelectorAll(`[${attr}-hide]`).forEach(el => { el.style.display = 'none'; });
+    root.querySelectorAll(`[${attr}-show]`).forEach(el => { el.style.display = ''; });
+    root.querySelectorAll(`[${attr}-width]`).forEach(el => {
+        el.setAttribute('width', el.getAttribute(`${attr}-width`));
     });
 }
 

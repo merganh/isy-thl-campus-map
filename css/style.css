@@ -59,6 +59,16 @@
         margin: 0;
     }
 
+    .partner-logo {
+        display: none;
+        height: 2rem;
+        width: auto;
+    }
+
+    .partner-kis .partner-logo {
+        display: block;
+    }
+
     .title-sub {
         display: block;
         font-weight: 400;
@@ -2632,20 +2642,21 @@ body.legend-open .offcanvas-backdrop.show {
 .legend-quick {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 6px 5px;
 }
 
 .legend-quick-chip {
     display: inline-flex;
     align-items: center;
-    gap: 7px;
-    min-height: 36px;
-    padding: 0 12px;
+    gap: 6px;
+    min-height: 34px;
+    padding: 0 10px;
     border: 1px solid var(--color-gray);
     border-radius: var(--border-radius-pill);
     background: #fff;
     color: #212529;
-    font-size: var(--font-size-small);
+    font-size: 0.8125rem;
+    white-space: nowrap;
     cursor: pointer;
 }
 
@@ -3264,4 +3275,45 @@ body.map-pill-open .map-controls {
     .legend-codes {
         max-width: 45%;
     }
+}
+
+/* Schließen-X in Modals/Offcanvas mit gleichem Hover-Hintergrund wie die anderen Icon-Buttons */
+.btn-close {
+    box-sizing: border-box;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    background-size: 12px auto;
+    background-clip: border-box;
+    border-radius: 8px;
+}
+
+.btn-close:hover {
+    background-color: rgba(75, 84, 89, 0.1);
+}
+
+/* Punkte unten im Gebäude-Karussell: dezent, aktives Bild etwas kräftiger */
+#carouselBuilding .carousel-indicators {
+    margin-bottom: 6px;
+}
+
+#carouselBuilding .carousel-indicators [data-bs-target] {
+    width: 8px;
+    height: 8px;
+    margin: 0 4px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background-color: #fff;
+    opacity: .5;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.35);
+}
+
+#carouselBuilding .carousel-indicators .active {
+    opacity: .95;
+}
+
+#carouselBuilding .carousel-indicators [data-bs-target]:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
 }
