@@ -380,6 +380,10 @@
         margin-bottom: 10px;
     }
 
+    #toolbox.toolbox-container {
+        padding-top: 0;
+    }
+
     .toolbox-container {
         position: static;
         border-radius: 12px;
