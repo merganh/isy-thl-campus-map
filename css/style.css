@@ -951,6 +951,17 @@
         color: #212529;
     }
 
+    /* Download-Link in den Einstellungen (sieht aus wie eine Filter-Karte) */
+    .download-card {
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .download-card-icon {
+        color: var(--color-primary);
+        margin-right: 6px;
+    }
+
     /* Custom Toggle Switch */
     .filter-toggle {
         position: relative;
