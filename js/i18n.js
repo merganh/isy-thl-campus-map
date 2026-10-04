@@ -48,7 +48,6 @@ if (new URLSearchParams(window.location.search).get('partner') === 'kis') {
         else if (el) el.hidden = true;
     };
     document.addEventListener('DOMContentLoaded', () => {
-        setPartnerLink('partnerBack', 'back');
         setPartnerLink('partnerHome', 'home');
     });
 }
@@ -70,7 +69,6 @@ const UI_STRINGS = {
         'page.title': 'Campusplan – Technische Hochschule Lübeck',
         'skip.toMap': 'Direkt zur Karte',
         'header.title': 'Campusplan',
-        'partner.back': '← Zurück',
         'partner.home': 'KIS Startseite',
         'toolbox.settings': 'Einstellungen',
         'toolbox.badges': 'Badges',
@@ -263,7 +261,6 @@ const UI_STRINGS = {
         'page.title': 'Campus Map – Technische Hochschule Lübeck',
         'skip.toMap': 'Skip to map',
         'header.title': 'Campus Map',
-        'partner.back': '← Back',
         'partner.home': 'KIS home page',
         'toolbox.settings': 'Settings',
         'toolbox.badges': 'Badges',
