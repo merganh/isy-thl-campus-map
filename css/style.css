@@ -53,6 +53,8 @@
     }
 
     .title-heading {
+        /* Der Header hat keinen Hintergrund mehr, der helle Schein haelt den Titel auf der Karte lesbar. */
+        text-shadow: 0 0 6px #fff, 0 0 12px #fff;
         font-weight: 700;
         color: #343a40;
         font-size: 1.9rem;
@@ -524,7 +526,7 @@
     }
 
     #allcontent-title {
-        background: linear-gradient(rgba(255, 255, 255, .95) 75%, transparent);
+        background: transparent;
         position: fixed;
         z-index: 100;
     }
@@ -568,7 +570,7 @@
         }
 
         #allcontent-title {
-            background: linear-gradient(rgba(255, 255, 255, .95) 80%, transparent);
+            background: transparent;
             position: fixed;
             z-index: 100;
         }
@@ -724,7 +726,7 @@
         }
 
         #allcontent-title {
-            background: linear-gradient(rgba(255, 255, 255, .95) 70%, transparent);
+            background: transparent;
         }
 
         #allcontent-title .py-2 {
