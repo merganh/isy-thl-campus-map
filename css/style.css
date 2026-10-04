@@ -67,10 +67,10 @@
         display: flex;
     }
 
-    /* Der Titel sitzt ohne Abstand nach oben, die Bootstrap-Klassen brauchen !important. */
+    /* Abstand nach oben wie Bootstrap pt-1 statt pt-2, die Bootstrap-Klassen brauchen !important. */
     #allcontent-title,
     #allcontent-title > div:first-child {
-        padding-top: 0 !important;
+        padding-top: 0.25rem !important;
     }
 
     .partner-home {
