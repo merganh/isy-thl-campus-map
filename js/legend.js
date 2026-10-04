@@ -860,8 +860,6 @@ const campusLegend = (() => {
             };
             bootstrap.Offcanvas.getOrCreateInstance(panel).hide();
         } else {
-            showPill({ title: contentOf(id)?.title || '', action: t('legend.pillInfo'), color: colorFor(id),
-                open: () => openBuildingInfo(id, { fromLegend: true }) });
             flyTo(id);
         }
     }
@@ -880,7 +878,6 @@ const campusLegend = (() => {
             };
             bootstrap.Offcanvas.getOrCreateInstance(panel).hide();
         } else {
-            showPill({ title, action: t('legend.pillMarked', { n: ids.length }), color: colorFor(ids[0]), open: openLegend });
             spotlight(ids, 'pulse');
         }
     }
