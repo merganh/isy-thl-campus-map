@@ -73,10 +73,6 @@
         padding-top: 0.25rem !important;
     }
 
-    /* Der Nebel sitzt nur hinter Titel und Untertitel, damit die Buttons rechts auf der Karte liegen. */
-    #allcontent-title > div:first-child {
-        background: linear-gradient(rgba(255, 255, 255, .95) 75%, transparent);
-    }
 
     .partner-home {
         display: block;
@@ -529,7 +525,7 @@
     }
 
     #allcontent-title {
-        background: transparent;
+        background: linear-gradient(rgba(255, 255, 255, .95) 75%, transparent);
         position: fixed;
         z-index: 100;
     }
@@ -573,13 +569,9 @@
         }
 
         #allcontent-title {
-            background: transparent;
+            background: linear-gradient(rgba(255, 255, 255, .95) 80%, transparent);
             position: fixed;
             z-index: 100;
-        }
-
-        #allcontent-title > div:first-child {
-            background: linear-gradient(rgba(255, 255, 255, .95) 80%, transparent);
         }
 
         #lottieMap {
@@ -733,10 +725,6 @@
         }
 
         #allcontent-title {
-            background: transparent;
-        }
-
-        #allcontent-title > div:first-child {
             background: linear-gradient(rgba(255, 255, 255, .95) 70%, transparent);
         }
 
