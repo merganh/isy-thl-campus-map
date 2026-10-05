@@ -2348,7 +2348,21 @@ function insertCampusSVG() {
         })
     ].join(',\n');
     const hoverStyle = document.createElement('style');
-    hoverStyle.textContent = `${hoverSelectors} { filter: brightness(0.9); }`;
+    // Safari wendet CSS-Funktionsfilter (brightness()) nicht auf innere SVG-Elemente an,
+    // url(#…)-SVG-Filter dagegen schon.
+    const dimFilter = document.createElementNS(svg.namespaceURI, 'filter');
+    dimFilter.setAttribute('id', 'thl-hover-dim');
+    dimFilter.setAttribute('color-interpolation-filters', 'sRGB');
+    const transfer = document.createElementNS(svg.namespaceURI, 'feComponentTransfer');
+    ['R', 'G', 'B'].forEach(kanal => {
+        const fn = document.createElementNS(svg.namespaceURI, `feFunc${kanal}`);
+        fn.setAttribute('type', 'linear');
+        fn.setAttribute('slope', '0.9');
+        transfer.appendChild(fn);
+    });
+    dimFilter.appendChild(transfer);
+    svg.insertBefore(dimFilter, svg.firstChild);
+    hoverStyle.textContent = `${hoverSelectors} { filter: url(#thl-hover-dim); }`;
     document.head.appendChild(hoverStyle);
 
     // Logo vollständig klickbar machen (auch die Lücken zwischen den Buchstaben)
