@@ -39,17 +39,16 @@ document.documentElement.lang = CURRENT_LANG;
 // ?partner=kis: KIS zeigt die Karte auf einer eigenen Seite und setzt sein Logo vor den Titel.
 if (new URLSearchParams(window.location.search).get('partner') === 'kis') {
     document.documentElement.classList.add('partner-kis');
-    // The logo links to this address by default; the "home" parameter is only an optional override.
-    const PARTNER_HOME_DEFAULT = 'https://kis-thl.de/services';
+    // KIS passes its own addresses; only web links are accepted.
     const params = new URLSearchParams(window.location.search);
-    const setPartnerLink = (id, name, fallback) => {
+    const setPartnerLink = (id, name) => {
         const el = document.getElementById(id);
         const value = params.get(name) || '';
-        // Only web links are accepted as override.
-        if (el) el.href = /^https?:\/\//i.test(value) ? value : fallback;
+        if (el && /^https?:\/\//i.test(value)) el.href = value;
+        else if (el) el.hidden = true;
     };
     document.addEventListener('DOMContentLoaded', () => {
-        setPartnerLink('partnerHome', 'home', PARTNER_HOME_DEFAULT);
+        setPartnerLink('partnerHome', 'home');
     });
 }
 
