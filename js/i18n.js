@@ -72,6 +72,7 @@ const UI_STRINGS = {
         'partner.home': 'KIS Startseite',
         'toolbox.settings': 'Einstellungen',
         'toolbox.badges': 'Badges',
+        'toolbox.menu': 'Menü',
         'lang.label': 'Sprache',
         'common.close': 'Schließen',
 
@@ -264,6 +265,7 @@ const UI_STRINGS = {
         'partner.home': 'KIS home page',
         'toolbox.settings': 'Settings',
         'toolbox.badges': 'Badges',
+        'toolbox.menu': 'Menu',
         'lang.label': 'Language',
         'common.close': 'Close',
 

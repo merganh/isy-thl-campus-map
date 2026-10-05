@@ -806,6 +806,17 @@ document.addEventListener('hidden.bs.offcanvas', e => {
         if (btn) btn.focus();
     }
 });
+
+// Auf dem Smartphone liegen Badges und Einstellungen im zugeklappten Menü.
+// Ihr Button ist dann unsichtbar und kann den Fokus nicht nehmen, also
+// bekommt ihn der Menü-Button.
+document.addEventListener('hidden.bs.offcanvas', e => {
+    if (e.target.id !== 'badgesOffcanvas' && e.target.id !== 'filterOffcanvas') return;
+    const a = document.activeElement;
+    if (a && a !== document.body && !e.target.contains(a)) return;
+    const menuBtn = document.getElementById('toolboxMenuBtn');
+    if (menuBtn && menuBtn.offsetParent) menuBtn.focus();
+});
 document.addEventListener('hidden.bs.modal', fokusZurueckGeben);
 
 // ============================================================

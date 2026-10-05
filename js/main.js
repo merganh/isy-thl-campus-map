@@ -2703,6 +2703,30 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Menue-Button (nur Smartphone): klappt Sprache, Badges und Einstellungen auf
+    const menu = document.getElementById('toolboxMenu');
+    const menuBtn = document.getElementById('toolboxMenuBtn');
+    if (menu && menuBtn) {
+        const setMenuOpen = open => {
+            menu.classList.toggle('open', open);
+            menuBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        };
+        menuBtn.addEventListener('click', () => setMenuOpen(!menu.classList.contains('open')));
+        // Nach der Auswahl eines Eintrags schliessen
+        document.getElementById('toolbox').addEventListener('click', e => {
+            if (e.target.closest('button')) setMenuOpen(false);
+        });
+        document.addEventListener('click', e => {
+            if (!menu.contains(e.target)) setMenuOpen(false);
+        });
+        menu.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && menu.classList.contains('open')) {
+                setMenuOpen(false);
+                menuBtn.focus();
+            }
+        });
+    }
+
     // Kein blur() nach dem Schließen der Panels: Tastaturnutzer verlören sonst
     // ihre Position (Fokus auf <body>). Den Fokusrahmen nach Mausklicks
     // unterdrückt bereits :focus-visible im CSS. Den Fokus auf den

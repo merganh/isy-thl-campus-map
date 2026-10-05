@@ -15,7 +15,7 @@
     <script src="vendor/wordfind/wordfind.js"></script>
     <script src="vendor/crossword/layout_generator.js"></script>
     <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css">
-    <link rel="stylesheet" href="css/style.css?v=20261004p">
+    <link rel="stylesheet" href="css/style.css?v=20261005a">
 </head>
 
 <body>
@@ -32,7 +32,11 @@
             <!-- Nur sichtbar, wenn KIS die Karte mit ?partner=kis einbettet -->
             <div class="partner-brand">
                 <a class="partner-home" id="partnerHome" href="#" target="_top" data-i18n-aria-label="partner.home" aria-label="KIS Startseite">
-                    <img class="partner-logo" src="assets/kis-logo.svg" alt="" width="228" height="78">
+                    <!-- Auf dem Smartphone nur der Vogel, das ganze Logo waere zu breit -->
+                    <picture>
+                        <source media="(max-width: 575px)" srcset="assets/kis-vogel.svg" width="154" height="78">
+                        <img class="partner-logo" src="assets/kis-logo.svg" alt="" width="228" height="78">
+                    </picture>
                 </a>
             </div>
             <h1 class="title-heading mb-0">
@@ -41,24 +45,33 @@
             </h1>
         </div>
 
-        <div id="toolbox" class="toolbox-container">
-            <div class="lang-switch" role="group" aria-label="Sprache / Language">
-                <button type="button" class="lang-switch-btn" data-lang-option="de" lang="de" title="Deutsch">
-                    DE<span class="visually-hidden"> – Deutsch</span>
+        <div class="toolbox-menu" id="toolboxMenu">
+            <!-- Nur auf dem Smartphone sichtbar, klappt die Buttons als Menue auf -->
+            <button class="toolbox-btn toolbox-menu-btn" type="button" id="toolboxMenuBtn" aria-expanded="false"
+                aria-controls="toolbox" aria-label="Menü" data-i18n-aria-label="toolbox.menu" title="Menü" data-i18n-title="toolbox.menu">
+                <i class="fas fa-bars" aria-hidden="true"></i>
+            </button>
+            <div id="toolbox" class="toolbox-container">
+                <div class="lang-switch" role="group" aria-label="Sprache / Language">
+                    <button type="button" class="lang-switch-btn" data-lang-option="de" lang="de" title="Deutsch">
+                        DE<span class="visually-hidden"> – Deutsch</span>
+                    </button>
+                    <button type="button" class="lang-switch-btn" data-lang-option="en" lang="en" title="English">
+                        EN<span class="visually-hidden"> – English</span>
+                    </button>
+                </div>
+                <button class="toolbox-btn" type="button" id="toolboxBadgesBtn" title="Badges" data-i18n-title="toolbox.badges">
+                    <i class="fas fa-medal" aria-hidden="true"></i>
+                    <span class="visually-hidden" data-i18n="toolbox.badges">Badges</span>
+                    <span class="toolbox-label" aria-hidden="true" data-i18n="toolbox.badges">Badges</span>
                 </button>
-                <button type="button" class="lang-switch-btn" data-lang-option="en" lang="en" title="English">
-                    EN<span class="visually-hidden"> – English</span>
+                <button class="toolbox-btn" type="button" title="Einstellungen" data-i18n-title="toolbox.settings"
+                    data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas">
+                    <i class="fas fa-cog" aria-hidden="true"></i>
+                    <span class="visually-hidden" data-i18n="toolbox.settings">Einstellungen</span>
+                    <span class="toolbox-label" aria-hidden="true" data-i18n="toolbox.settings">Einstellungen</span>
                 </button>
             </div>
-            <button class="toolbox-btn" type="button" id="toolboxBadgesBtn" title="Badges" data-i18n-title="toolbox.badges">
-                <i class="fas fa-medal" aria-hidden="true"></i>
-                <span class="visually-hidden" data-i18n="toolbox.badges">Badges</span>
-            </button>
-            <button class="toolbox-btn" type="button" title="Einstellungen" data-i18n-title="toolbox.settings"
-                data-bs-toggle="offcanvas" data-bs-target="#filterOffcanvas">
-                <i class="fas fa-cog" aria-hidden="true"></i>
-                <span class="visually-hidden" data-i18n="toolbox.settings">Einstellungen</span>
-            </button>
         </div>
     </header>
 
@@ -222,12 +235,12 @@
         <div id="skipIntroHint" class="skip-intro-hint" aria-hidden="true"></div>
     </main>
 
-    <script src="js/i18n.js?v=20261004k"></script>
+    <script src="js/i18n.js?v=20261005a"></script>
     <script src="js/config_v2.js?v=20261004b"></script>
     <script src="js/content_en.js?v=20261002e"></script>
-    <script src="js/main.js?v=20261004c"></script>
+    <script src="js/main.js?v=20261005a"></script>
     <script src="js/legend.js?v=20261004d"></script>
-    <script src="js/a11y.js?v=20261004a"></script>
+    <script src="js/a11y.js?v=20261005a"></script>
 
 </body>
 

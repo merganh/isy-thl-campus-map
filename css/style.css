@@ -502,6 +502,78 @@
         outline-offset: 2px;
     }
 
+    /* Menue-Button und Beschriftungen gibt es nur auf dem Smartphone. */
+    #toolboxMenuBtn,
+    .toolbox-label {
+        display: none;
+    }
+
+    /* Smartphone: Sprache, Badges und Einstellungen liegen in einem aufklappbaren Menue. */
+    @media (max-width: 575px) {
+        .toolbox-menu {
+            position: relative;
+        }
+
+        #toolboxMenuBtn {
+            display: flex;
+            width: 36px;
+            height: 36px;
+            font-size: 1rem;
+        }
+
+        #toolbox.toolbox-container {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 6px;
+            min-width: 190px;
+            padding: 8px;
+            background: #fff;
+            border: 1px solid var(--color-border-strong);
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .toolbox-menu.open #toolbox.toolbox-container {
+            display: flex;
+        }
+
+        #toolbox .lang-switch {
+            height: 36px;
+            margin-right: 0;
+            opacity: 1;
+            box-shadow: none;
+        }
+
+        #toolbox .lang-switch-btn {
+            flex: 1;
+        }
+
+        #toolbox .toolbox-btn {
+            width: auto;
+            height: 40px;
+            padding: 0 12px;
+            gap: 10px;
+            justify-content: flex-start;
+            font-size: var(--font-size-small);
+            opacity: 1;
+            box-shadow: none;
+        }
+
+        #toolbox .toolbox-btn[hidden] {
+            display: none;
+        }
+
+        #toolbox .toolbox-label {
+            display: inline;
+            color: var(--color-primary);
+            font-weight: 600;
+        }
+    }
+
     .btn-outline-secondary.btn-sm {
         border-radius: var(--border-radius-pill);
         padding: 4px 12px;
