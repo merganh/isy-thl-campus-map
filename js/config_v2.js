@@ -1157,7 +1157,7 @@ const filters = [
     { label: 'Info & Sammelplatz', icon: 'assets/info_icon_einstellungen_an.svg', id: ['Infopunkte'], defaultVisible: true },
     { label: 'WC', icon: 'assets/wc_icon_einstellungen_an.svg', id: ['WC'], defaultVisible: true },
     { label: 'Barrierefreiheit', icon: 'assets/barrierefreiheit_icon_einstellungen_an.svg', id: ['Barrierefreiheit', 'Aufzuege'], defaultVisible: false },
-    { label: 'Schranken & Zufahrt', icon: 'assets/schranke_icon_einstellungen_an.svg', id: ['Zufahrt'], defaultVisible: true },
+    { label: 'Schranken & Zufahrt', icon: 'assets/schranke_icon_einstellungen_an.svg', id: ['Zufahrt'], defaultVisible: false },
 ];
 
 const CLICKABLE_Geb_CONFIG = {
